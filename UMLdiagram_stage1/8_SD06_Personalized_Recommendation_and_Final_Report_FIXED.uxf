@@ -1,0 +1,815 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>25</x>
+      <y>10</y>
+      <w>2600</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>SD06 — Personalized Recommendation and Final Evaluation Report</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>30</x>
+      <y>58</y>
+      <w>90</w>
+      <h>82</h>
+    </coordinates>
+    <panel_attributes>User</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>188</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>UsedCarGUI</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>393</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>UsedCarApplicationFacade</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>598</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>EvaluationSession</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>803</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>UsedCarAgent</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1213</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>EvaluationStrategyFactory</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1418</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>EvaluationStrategy</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1623</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>PromptBuilder</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1828</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>llmClient : GeminiAdapter
+&lt;&lt;implements LLMClient&gt;&gt;</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2033</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;external&gt;&gt;
+Gemini API</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2443</x>
+      <y>70</y>
+      <w>184</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>ResponseParser</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>65</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>270</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>475</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>680</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>885</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1295</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1500</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1705</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1910</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2115</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2525</x>
+      <y>122</y>
+      <w>20</w>
+      <h>2808</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;0;10;2798</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>75</x>
+      <y>168</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+click Generate Recommendation / Report</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>273</x>
+      <y>180</y>
+      <w>14</w>
+      <h>1610</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>238</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+generateReport(vehicle : Vehicle) : EvaluationReport</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>478</x>
+      <y>250</y>
+      <w>14</w>
+      <h>1540</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>308</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+getPreference() : UserPreference</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>683</x>
+      <y>320</y>
+      <w>14</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>515</x>
+      <y>370</y>
+      <w>230</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>currentVehicle and clarification context
+read as session state (no getter call)</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>408</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+preference : UserPreference</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>478</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+generateRecommendation(vehicle : Vehicle, preference : UserPreference) : EvaluationReport</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>888</x>
+      <y>490</y>
+      <w>14</w>
+      <h>1260</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>770</x>
+      <y>550</y>
+      <w>400</w>
+      <h>78</h>
+    </coordinates>
+    <panel_attributes>Prior structured evidence available to agent:
+RiskAssessment, CostEstimate, ConstraintViolation list,
+VehicleKnowledge, MissingInformationResult</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>885</x>
+      <y>605</y>
+      <w>150</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;10;150;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>668</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+createStrategy(preference : UserPreference) : EvaluationStrategy</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1298</x>
+      <y>680</y>
+      <w>14</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>738</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+strategy : EvaluationStrategy</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>808</y>
+      <w>615</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+buildPriorityGuidance(preference : UserPreference) : String</panel_attributes>
+    <additional_attributes>0;12;615;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1503</x>
+      <y>820</y>
+      <w>14</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>878</y>
+      <w>615</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+priorityGuidance : String</panel_attributes>
+    <additional_attributes>0;12;615;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>948</y>
+      <w>820</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+buildRecommendationPrompt(vehicle : Vehicle, risk : RiskAssessment, cost : CostEstimate, violations : List&lt;ConstraintViolation&gt;) : String</panel_attributes>
+    <additional_attributes>0;12;820;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1708</x>
+      <y>960</y>
+      <w>14</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>1018</y>
+      <w>820</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+prompt : String</panel_attributes>
+    <additional_attributes>0;12;820;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>1088</y>
+      <w>1025</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+generate(prompt : String) : String
+[includes priorityGuidance + available structured evidence]</panel_attributes>
+    <additional_attributes>0;12;1025;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1913</x>
+      <y>1100</y>
+      <w>14</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1920</x>
+      <y>1158</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+request</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2118</x>
+      <y>1170</y>
+      <w>14</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1920</x>
+      <y>1298</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+raw response</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>1378</y>
+      <w>1025</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+response : String</panel_attributes>
+    <additional_attributes>0;12;1025;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>1428</y>
+      <w>1640</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+parseReport(response : String) : EvaluationReport</panel_attributes>
+    <additional_attributes>0;12;1640;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2528</x>
+      <y>1440</y>
+      <w>14</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes />
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>1498</y>
+      <w>1640</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+report : EvaluationReport</panel_attributes>
+    <additional_attributes>0;12;1640;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>1568</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+report</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>1608</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+report</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>75</x>
+      <y>1648</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-
+display category, strengths, risks, missing information, cost summary, inspection priorities, next steps, explanation</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>40</x>
+      <y>1710</y>
+      <w>440</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>Advisory category only:
+Strong Candidate | Consider with Caution | High Risk | Insufficient Information
+No purchase outcome is guaranteed.</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>30</x>
+      <y>1820</y>
+      <w>2560</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>alt
+[insufficient evidence]</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>1878</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+EvaluationReport category: Insufficient Information; missing/uncertain information</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>1933</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+display insufficient information</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>30</x>
+      <y>2010</y>
+      <w>2560</w>
+      <h>155</h>
+    </coordinates>
+    <panel_attributes>alt
+[one tool result unavailable]</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>2068</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+generate from available evidence; mark missing evidence explicitly</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>2123</y>
+      <w>205</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+report available evidence only</panel_attributes>
+    <additional_attributes>0;12;205;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>30</x>
+      <y>2195</y>
+      <w>2560</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>alt
+[LLM service unavailable]</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>2253</y>
+      <w>1230</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+failure; do not fabricate narrative recommendation</panel_attributes>
+    <additional_attributes>0;12;1230;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>2313</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+deterministic evidence remains available; AI recommendation unavailable</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>30</x>
+      <y>2395</y>
+      <w>2560</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>alt
+[malformed AI response]</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>2453</y>
+      <w>1640</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+invalid structure</panel_attributes>
+    <additional_attributes>0;12;1640;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>895</x>
+      <y>2513</y>
+      <w>1025</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;
+optional retry once with stricter formatting instruction</panel_attributes>
+    <additional_attributes>0;12;1025;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>2568</y>
+      <w>410</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+if still invalid: controlled failure / AI report unavailable</panel_attributes>
+    <additional_attributes>0;12;410;12</additional_attributes>
+  </element>
+</diagram>

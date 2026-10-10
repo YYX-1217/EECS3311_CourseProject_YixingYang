@@ -1,0 +1,1181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>640</x>
+      <y>20</y>
+      <w>400</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>UsedCarGUI
+--
+- facade : UsedCarApplicationFacade
+--
++ submit(command : Command) : Object
++ displayResult(result : Object) : void
++ displayError(message : String) : void</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1120</x>
+      <y>20</y>
+      <w>400</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>UsedCarCLI
+--
+- facade : UsedCarApplicationFacade
+--
++ readCommand() : String
++ submit(command : Command) : Object
++ displayResult(result : Object) : void</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1050</x>
+      <y>210</y>
+      <w>300</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Command
+--
+--
++ execute() : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>400</y>
+      <w>430</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>AnalyzeListingCommand
+--
+- facade : UsedCarApplicationFacade
+- listingText : String
+--
++ execute() : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>500</x>
+      <y>400</y>
+      <w>430</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>EvaluateVehicleCommand
+--
+- facade : UsedCarApplicationFacade
+- vehicle : Vehicle
+--
++ execute() : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>980</x>
+      <y>400</y>
+      <w>450</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>CompareVehiclesCommand
+--
+- facade : UsedCarApplicationFacade
+- first : Vehicle
+- second : Vehicle
+--
++ execute() : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1480</x>
+      <y>400</y>
+      <w>460</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>GenerateChecklistCommand
+--
+- facade : UsedCarApplicationFacade
+- vehicle : Vehicle
+--
++ execute() : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>700</x>
+      <y>690</y>
+      <w>900</w>
+      <h>350</h>
+    </coordinates>
+    <panel_attributes>UsedCarApplicationFacade
+--
+- agent : UsedCarAgent
+- session : EvaluationSession
+--
++ saveVehicle(vehicle : Vehicle) : Vehicle
++ savePreferences(preference : UserPreference) : void
++ analyzeListing(text : String) : Vehicle
++ checkMissingInformation(vehicle : Vehicle) : MissingInformationResult
++ retrieveKnowledge(vehicle : Vehicle) : VehicleKnowledge
++ estimateCost(vehicle : Vehicle, annualKm : double, fuelPrice : double) : CostEstimate
++ checkConstraints(vehicle : Vehicle) : List&lt;ConstraintViolation&gt;
++ evaluateVehicle(vehicle : Vehicle) : RiskAssessment
++ compareVehicles(first : Vehicle, second : Vehicle) : VehicleComparison
++ generateChecklist(vehicle : Vehicle) : InspectionChecklist
++ submitClarification(field : String, value : String) : void
++ generateReport(vehicle : Vehicle) : EvaluationReport</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1680</x>
+      <y>700</y>
+      <w>540</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>EvaluationSession
+--
+- currentVehicle : Vehicle
+- comparisonVehicle : Vehicle
+- preference : UserPreference
+- clarificationHistory : List&lt;String&gt;
+--
++ setCurrentVehicle(vehicle : Vehicle) : void
++ setComparisonVehicle(vehicle : Vehicle) : void
++ setPreference(preference : UserPreference) : void
++ recordClarification(text : String) : void
++ getPreference() : UserPreference</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>750</x>
+      <y>1150</y>
+      <w>920</w>
+      <h>330</h>
+    </coordinates>
+    <panel_attributes>UsedCarAgent
+--
+- toolManager : ToolManager
+- llmClient : LLMClient
+- promptBuilder : PromptBuilder
+- responseParser : ResponseParser
+- dataQualityChecker : DataQualityChecker
+- strategy : EvaluationStrategy
+--
++ analyzeListing(text : String) : Vehicle
++ assessRisk(vehicle : Vehicle, preference : UserPreference) : RiskAssessment
++ compare(first : Vehicle, second : Vehicle, preference : UserPreference) : VehicleComparison
++ generateChecklist(vehicle : Vehicle) : InspectionChecklist
++ generateClarificationQuestions(result : MissingInformationResult) : List&lt;String&gt;
++ generateRecommendation(vehicle : Vehicle, preference : UserPreference) : EvaluationReport
++ setStrategy(strategy : EvaluationStrategy) : void</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>1050</y>
+      <w>580</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>ToolManager
+--
+- tools : Map&lt;String, Tool&gt;
+--
++ registerTool(name : String, tool : Tool) : void
++ execute(name : String, input : Object) : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>1270</y>
+      <w>370</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Tool
+--
+--
++ execute(input : Object) : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>1480</y>
+      <w>600</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>VehicleKnowledgeTool
+--
+- repository : VehicleKnowledgeRepository
+--
++ execute(input : Object) : Object</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>1700</y>
+      <w>620</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>CostCalculatorTool
+--
+--
++ execute(input : Object) : Object
++ calculateAnnualFuelCost(annualKm : double, fuelConsumption : double,
+    fuelPrice : double) : double</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>1940</y>
+      <w>620</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>ConstraintCheckerTool
+--
+--
++ execute(input : Object) : Object
++ check(vehicle : Vehicle, preference : UserPreference) : List&lt;ConstraintViolation&gt;</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>2170</y>
+      <w>620</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>VehicleKnowledgeRepository
+--
+- dataFilePath : String
+--
++ load() : void
++ findByVehicle(make : String, model : String, year : int) : VehicleKnowledge</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>740</x>
+      <y>1780</y>
+      <w>880</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>DataQualityChecker
+--
+--
++ check(vehicle : Vehicle) : MissingInformationResult
++ checkConflict(manualVehicle : Vehicle, extractedVehicle : Vehicle) : MissingInformationResult</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1810</x>
+      <y>1100</y>
+      <w>420</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+LLMClient
+--
+--
++ generate(prompt : String) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1810</x>
+      <y>1310</y>
+      <w>420</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>DeepSeekAdapter
+--
+- apiKey : String
+- endpoint : String
+--
++ generate(prompt : String) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1690</x>
+      <y>1530</y>
+      <w>740</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>PromptBuilder
+--
+--
++ buildListingExtractionPrompt(text : String) : String
++ buildRiskPrompt(vehicle : Vehicle, knowledge : VehicleKnowledge, missing : MissingInformationResult,
+    violations : List&lt;ConstraintViolation&gt;) : String
++ buildComparisonPrompt(first : Vehicle, second : Vehicle) : String
++ buildChecklistPrompt(vehicle : Vehicle, knowledge : VehicleKnowledge,
+    missing : MissingInformationResult) : String
++ buildClarificationPrompt(missing : MissingInformationResult) : String
++ buildRecommendationPrompt(vehicle : Vehicle, risk : RiskAssessment, cost : CostEstimate,
+    violations : List&lt;ConstraintViolation&gt;) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1690</x>
+      <y>1900</y>
+      <w>690</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>ResponseParser
+--
+--
++ parseVehicle(response : String) : Vehicle
++ parseRiskAssessment(response : String) : RiskAssessment
++ parseComparison(response : String) : VehicleComparison
++ parseChecklist(response : String) : InspectionChecklist
++ parseClarificationQuestions(response : String) : List&lt;String&gt;
++ parseReport(response : String) : EvaluationReport</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2600</x>
+      <y>1110</y>
+      <w>620</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+EvaluationStrategy
+--
+--
++ buildPriorityGuidance(preference : UserPreference) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2600</x>
+      <y>1350</y>
+      <w>620</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>BalancedStrategy
+--
+--
++ buildPriorityGuidance(preference : UserPreference) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2600</x>
+      <y>1530</y>
+      <w>620</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>BudgetFocusedStrategy
+--
+--
++ buildPriorityGuidance(preference : UserPreference) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2600</x>
+      <y>1710</y>
+      <w>620</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>ReliabilityFocusedStrategy
+--
+--
++ buildPriorityGuidance(preference : UserPreference) : String</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2600</x>
+      <y>1910</y>
+      <w>650</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>EvaluationStrategyFactory
+--
+--
++ createStrategy(preference : UserPreference) : EvaluationStrategy</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>2580</y>
+      <w>400</w>
+      <h>350</h>
+    </coordinates>
+    <panel_attributes>Vehicle
+--
+- id : String
+- year : int
+- make : String
+- model : String
+- trim : String
+- mileage : int
+- askingPrice : double
+- transmission : String
+- fuelType : String
+- accidentHistory : String
+- maintenanceHistory : String
+- fuelConsumption : Double
+- notes : String
+--
++ updateField(name : String, value : Object) : void</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>500</x>
+      <y>2580</y>
+      <w>430</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>UserPreference
+--
+- maxBudget : double
+- maxMileage : Integer
+- acceptedTransmissions : Set&lt;String&gt;
+- preferredBodyType : String
+- reliabilityPriority : int
+- fuelEconomyPriority : int
+- accidentTolerance : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1010</x>
+      <y>2580</y>
+      <w>420</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>VehicleKnowledge
+--
+- summary : String
+- commonIssues : List&lt;String&gt;
+- inspectionNotes : List&lt;String&gt;
+- sourceLabel : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1510</x>
+      <y>2580</y>
+      <w>400</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>CostEstimate
+--
+- annualFuelUse : double
+- annualFuelCost : double
+- purchaseTax : Double
+- firstYearEstimate : Double
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1990</x>
+      <y>2580</y>
+      <w>420</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>MissingInformationResult
+--
+- missingFields : List&lt;String&gt;
+- uncertainFields : List&lt;String&gt;
+- conflicts : List&lt;String&gt;
+- sufficient : boolean
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2490</x>
+      <y>2580</y>
+      <w>400</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>ConstraintViolation
+--
+- constraint : String
+- expected : String
+- actual : String
+- severity : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>2970</x>
+      <y>2580</y>
+      <w>400</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>RiskAssessment
+--
+- riskLevel : String
+- strengths : List&lt;String&gt;
+- risks : List&lt;String&gt;
+- uncertainties : List&lt;String&gt;
+- explanation : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>3020</y>
+      <w>470</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>VehicleComparison
+--
+- firstVehicleId : String
+- secondVehicleId : String
+- metricSummary : Map&lt;String, String&gt;
+- preferredVehicleId : String
+- explanation : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>570</x>
+      <y>3020</y>
+      <w>450</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>InspectionChecklist
+--
+- sections : Map&lt;String, List&lt;String&gt;&gt;
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1100</x>
+      <y>3020</y>
+      <w>500</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>EvaluationReport
+--
+- category : String
+- strengths : List&lt;String&gt;
+- risks : List&lt;String&gt;
+- missingInformation : List&lt;String&gt;
+- costSummary : String
+- inspectionPriorities : List&lt;String&gt;
+- nextSteps : List&lt;String&gt;
+- explanation : String
+--</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>440</x>
+      <y>300</y>
+      <w>640</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>610;10;40;10;40;130;10;130</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>920</x>
+      <y>320</y>
+      <w>220</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>190;10;190;40;40;40;40;110;10;110</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1190</x>
+      <y>320</y>
+      <w>40</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;10;80</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1340</x>
+      <y>300</y>
+      <w>170</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;110;10;110;130;140;130</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>1380</y>
+      <w>40</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1880</x>
+      <y>1210</y>
+      <w>40</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2710</x>
+      <y>1220</y>
+      <w>40</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;10;130</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2560</x>
+      <y>1200</y>
+      <w>70</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>40;10;10;10;10;350;40;350</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>-10</x>
+      <y>1380</y>
+      <w>130</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>100;10;100;40;10;40;10;350;30;350</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3210</x>
+      <y>1200</y>
+      <w>70</w>
+      <h>560</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;40;10;40;530;10;530</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>1360</y>
+      <w>320</w>
+      <h>630</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10;10;290;10;290;600;260;600</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1590</x>
+      <y>740</y>
+      <w>120</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=1
+m2=1</panel_attributes>
+    <additional_attributes>10;20;60;20;60;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1660</x>
+      <y>1180</y>
+      <w>970</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;40;40;40;40;60;900;60;900;10;940;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1660</x>
+      <y>1190</y>
+      <w>180</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;80;30;80;30;10;150;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1150</y>
+      <w>190</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>160;70;40;70;40;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>950</x>
+      <y>170</y>
+      <w>130</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;40;70;40;70;60;100;60</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1340</x>
+      <y>170</y>
+      <w>70</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>40;10;40;60;10;60</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2710</x>
+      <y>1800</y>
+      <w>50</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>20;110;20;40;10;40;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>130</x>
+      <y>1180</y>
+      <w>50</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+m1=1
+m2=0..*</panel_attributes>
+    <additional_attributes>10;10;10;60;20;60;20;90</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>440</x>
+      <y>500</y>
+      <w>290</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;40;10;40;260;260;260</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>830</x>
+      <y>530</y>
+      <w>80</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;130;50;130;50;160</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1130</x>
+      <y>550</y>
+      <w>50</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;110;20;110;20;140</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1410</x>
+      <y>500</y>
+      <w>100</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>70;10;40;10;40;160;10;160;10;190</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1660</x>
+      <y>1400</y>
+      <w>210</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;40;10;40;100;180;100;180;130</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2560</x>
+      <y>1600</y>
+      <w>70</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>40;330;10;330;10;10;40;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>2270</y>
+      <w>410</w>
+      <h>370</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;350;10;350;340;380;340</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>870</x>
+      <y>1030</y>
+      <w>90</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=1
+m2=1</panel_attributes>
+    <additional_attributes>10;10;10;40;60;40;60;120</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>3210</x>
+      <y>1420</y>
+      <w>100</w>
+      <h>540</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>40;510;70;510;70;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>1470</y>
+      <w>50</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>20;10;20;280;10;280;10;310</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>-10</x>
+      <y>2030</y>
+      <w>140</w>
+      <h>580</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>30;10;10;10;10;520;110;520;110;550</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>2030</y>
+      <w>60</w>
+      <h>580</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;30;10;30;520;20;520;20;550</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>2010</y>
+      <w>1890</w>
+      <h>630</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;1040;10;1040;550;1830;550;1830;600;1860;600</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>890</x>
+      <y>170</y>
+      <w>150</w>
+      <h>550</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;40;60;40;60;490;120;490;120;520</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1270</x>
+      <y>170</y>
+      <w>220</w>
+      <h>550</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>170;10;170;40;190;40;190;500;10;500;10;520</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>1570</y>
+      <w>100</w>
+      <h>660</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=0..*
+m2=1</panel_attributes>
+    <additional_attributes>10;10;50;10;50;460;70;460;70;630;30;630</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1480</x>
+      <y>1470</y>
+      <w>240</w>
+      <h>500</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;40;180;40;180;470;210;470</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1660</x>
+      <y>1350</y>
+      <w>970</w>
+      <h>630</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;130;10;130;140;900;140;900;600;940;600</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2570</x>
+      <y>1160</y>
+      <w>60</w>
+      <h>830</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>30;800;10;800;10;10;30;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>1870</y>
+      <w>360</w>
+      <h>810</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>330;10;300;10;300;690;40;690;40;780;10;780</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1610</x>
+      <y>1870</y>
+      <w>490</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;40;10;40;680;460;680;460;710</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>630</x>
+      <y>1800</y>
+      <w>910</w>
+      <h>840</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;90;10;90;470;850;470;850;810;880;810</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>330</x>
+      <y>1400</y>
+      <w>450</w>
+      <h>1210</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>420;10;360;10;360;1140;10;1140;10;1180</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>690</x>
+      <y>1350</y>
+      <w>90</w>
+      <h>1260</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>60;10;10;10;10;1200;30;1200;30;1230</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1660</x>
+      <y>1300</y>
+      <w>1340</w>
+      <h>1350</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;30;10;30;210;890;210;890;1260;1280;1260;1280;1320;1310;1320</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>390</x>
+      <y>1300</y>
+      <w>390</w>
+      <h>1750</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>360;10;290;10;290;710;280;710;280;1230;50;1230;50;1690;10;1690;10;1720</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1010</x>
+      <y>1470</y>
+      <w>660</w>
+      <h>1600</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>340;10;340;290;630;290;630;1090;480;1090;480;1530;40;1530;40;1570;10;1570</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>1470</y>
+      <w>500</w>
+      <h>1580</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;</panel_attributes>
+    <additional_attributes>10;10;10;30;470;30;470;540;250;540;250;1520;220;1520;220;1550</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>890</y>
+      <w>2090</w>
+      <h>1950</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=1
+m2=0..2</panel_attributes>
+    <additional_attributes>1810;10;2060;10;2060;1920;10;1920</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>700</x>
+      <y>890</y>
+      <w>1010</w>
+      <h>1720</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+m1=1
+m2=1</panel_attributes>
+    <additional_attributes>980;10;950;10;950;240;30;240;30;870;10;870;10;1030;80;1030;80;1690</additional_attributes>
+  </element>
+</diagram>
