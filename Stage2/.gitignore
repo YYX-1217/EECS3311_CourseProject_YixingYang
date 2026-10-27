@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+config.local.json
+target/
+out/
+build/
+*.class
