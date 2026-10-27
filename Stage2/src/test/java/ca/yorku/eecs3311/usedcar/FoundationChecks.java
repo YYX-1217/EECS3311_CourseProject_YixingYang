@@ -391,6 +391,123 @@ public final class FoundationChecks {
                 && output.contains("Sample concern: uneven tire wear") && output.contains("Instructional sample only"), "CLI knowledge must retrieve and display labeled CSV content.");
     }
 
+    private static Map<String, String> completeProfile() {
+        var values = new java.util.LinkedHashMap<String, String>();
+        values.put("budget", "25000.50"); values.put("maxMileage", "100000");
+        values.put("acceptedTransmissions", " at, CVT,auto "); values.put("accidentTolerance", " no_accidents ");
+        values.put("preferredBodyType", " SUV "); values.put("reliabilityPriority", "5"); values.put("fuelEconomyPriority", "3");
+        return values;
+    }
+
+    public static void f03CompleteProfile() {
+        var facade = ApplicationFactory.create(); facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        var profile = facade.preferences();
+        equal(profile.maxBudget(), "25000.50");
+        check(profile.maxMileage() == 100000 && profile.acceptedTransmissions().equals(java.util.Set.of("AUTOMATIC", "CVT"))
+                && profile.preferredBodyType().equals("SUV") && profile.reliabilityPriority() == 5
+                && profile.fuelEconomyPriority() == 3 && profile.accidentTolerance().equals("NO_ACCIDENTS"), "All seven fields must be normalized and saved.");
+        check(facade.currentVehicle().isEmpty(), "Independent profile save must not create a vehicle.");
+        var values = PreparationForm.example(); values.putAll(completeProfile());
+        check(PreparationForm.command(facade, values).execute().preference().equals(profile), "Combined preparation must preserve all seven submitted fields.");
+    }
+
+    public static void f03NeutralProfile() {
+        var profile = PreparationForm.preferences(Map.of());
+        check(profile.equals(UserPreference.limits(null, null)), "Omitted fields must stay neutral.");
+        var values = completeProfile(); values.replaceAll((key, value) -> " ");
+        check(PreparationForm.preferences(values).equals(profile), "Blank fields must clear to neutral.");
+        values.put("budget", "0"); values.put("maxMileage", "0"); values.put("accidentTolerance", "ANY");
+        var explicit = PreparationForm.preferences(values);
+        check(explicit.maxBudget().signum() == 0 && explicit.maxMileage() == 0 && explicit.accidentTolerance().equals("ANY"), "Explicit zero limits and ANY must remain distinct from missing values.");
+    }
+
+    private static void rejectsProfile(String field, String... invalid) {
+        for (String value : invalid) {
+            var values = completeProfile(); values.put(field, value);
+            rejects(() -> PreparationForm.preferences(values));
+        }
+    }
+    public static void f03BudgetValidation() { rejectsProfile("budget", "-1", "abc", "NaN", "1e9"); }
+    public static void f03MileageValidation() { rejectsProfile("maxMileage", "-1", "1.5", "oops", "999999999999"); }
+    public static void f03PriorityValidation() {
+        for (String field : new String[]{"reliabilityPriority", "fuelEconomyPriority"}) {
+            rejectsProfile(field, "-1", "6", "2.5", "high");
+            for (String value : new String[]{"0", "5"}) {
+                var values = completeProfile(); values.put(field, value); PreparationForm.preferences(values);
+            }
+        }
+    }
+    public static void f03TransmissionValidation() {
+        rejectsProfile("acceptedTransmissions", "automatic,spaceship", "autmatic");
+        rejectsProfile("accidentTolerance", "MAYBE", "YES");
+    }
+
+    public static void f03ValidUpdate() {
+        var facade = ApplicationFactory.create(); facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        var values = completeProfile(); values.put("budget", "20000"); values.put("preferredBodyType", "Hatchback");
+        facade.savePreferences(PreparationForm.preferences(values));
+        equal(facade.preferences().maxBudget(), "20000");
+        check(facade.preferences().preferredBodyType().equals("Hatchback"), "Valid updates must replace saved values.");
+    }
+
+    public static void f03RejectedUpdate() {
+        var facade = ApplicationFactory.create(); facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        var prior = facade.preferences();
+        for (String[] invalid : new String[][]{{"budget", "-1"}, {"maxMileage", "-1"}, {"acceptedTransmissions", "bad"},
+                {"reliabilityPriority", "6"}, {"fuelEconomyPriority", "bad"}, {"accidentTolerance", "bad"}}) {
+            var values = completeProfile(); values.put(invalid[0], invalid[1]);
+            rejects(() -> facade.savePreferences(PreparationForm.preferences(values)));
+            check(facade.preferences().equals(prior), "Rejected update corrupted the saved profile.");
+        }
+    }
+
+    public static void f03VehiclePreservation() {
+        var facade = ApplicationFactory.create();
+        var vehicle = PreparationForm.command(facade, PreparationForm.example()).execute().vehicle();
+        facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        check(facade.currentVehicle().orElseThrow().equals(vehicle), "Independent preference save must retain the exact current vehicle.");
+    }
+
+    public static void f03ProfileRetrieval() {
+        var facade = ApplicationFactory.create(); var profile = PreparationForm.preferences(completeProfile());
+        facade.savePreferences(profile);
+        check(PreparationForm.preferences(PreparationForm.preferenceValues(facade.preferences())).equals(profile), "Reloading saved fields must round-trip the profile.");
+        String text = ResultFormatter.format(facade.preferences());
+        check(text.contains("25000.50") && text.contains("100000") && text.contains("SUV")
+                && text.contains("Reliability priority: 5") && text.contains("Fuel economy priority: 3")
+                && text.contains("NO_ACCIDENTS") && text.contains("AUTOMATIC"), "Display must expose all saved preferences.");
+        try { facade.preferences().acceptedTransmissions().add("MANUAL"); throw new AssertionError("Profile collection must be immutable."); }
+        catch (UnsupportedOperationException expected) { /* Encapsulation protects session state. */ }
+    }
+
+    public static void f03CliProfile() {
+        var facade = ApplicationFactory.create(); var bytes = new ByteArrayOutputStream();
+        String valid = String.join("\n", completeProfile().values());
+        var invalid = completeProfile(); invalid.put("budget", "-1");
+        String script = "profile-set\n" + valid + "\nprofile-set\n" + String.join("\n", invalid.values())
+                + "\nprofile-show\nprofile-set\n20000\n:keep\n:keep\n:keep\n:keep\n:keep\n:keep\nprofile-show\nprofile-set\n:cancel\nquit\n";
+        new UsedCarCLI(facade, new Scanner(script), new PrintStream(bytes)).run();
+        String output = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+        check(output.contains("ERROR:") && output.contains("Maximum budget (CAD): 25000.50")
+                && output.contains("Maximum budget (CAD): 20000") && output.contains("Preferred body type: SUV"), "CLI must support saving, showing, rejection and correction.");
+        equal(facade.preferences().maxBudget(), "20000");
+        check(facade.preferences().reliabilityPriority() == 5 && facade.currentVehicle().isEmpty(), "Keep/cancel must preserve profile fields without a vehicle.");
+        new UsedCarCLI(facade, new Scanner("profile-set\n100\n"), new PrintStream(bytes)).run();
+        equal(facade.preferences().maxBudget(), "20000");
+    }
+
+    public static void f03F07Compatibility() {
+        var facade = ApplicationFactory.create(); var values = completeVehicle(); values.put("accident", "YES");
+        var vehicle = PreparationForm.command(facade, values).execute().vehicle();
+        facade.savePreferences(PreparationForm.preferences(Map.of()));
+        check(facade.checkConstraints(vehicle).isEmpty(), "Neutral updated preferences must skip checks.");
+        var profile = completeProfile(); profile.put("budget", "17000"); profile.put("maxMileage", "70000"); profile.put("acceptedTransmissions", "MANUAL");
+        facade.savePreferences(PreparationForm.preferences(profile));
+        var findings = facade.checkConstraints(vehicle);
+        check(findings.size() == 4 && findings.stream().allMatch(f -> f.severity().equals("CONFLICT")), "All four F07 checks must consume the newly saved profile.");
+        check(facade.currentVehicle().orElseThrow().equals(vehicle), "Constraint checking must retain vehicle data.");
+    }
+
     public static void main(String[] args) {
         numericValidation(); requiredFieldsAndYear(); exactCostCalculation(); omittedAssumptions(); unknownConsumption();
         constraintBoundaries(); zeroAndRounding(); sessionAndInvalidUpdate(); toolContractsAndLlmBoundary(); cliFlow();
@@ -400,6 +517,9 @@ public final class FoundationChecks {
         f04MatchingSources(); f04ConflictingSources(); f04UnknownSources(); f04CliConflictFlow(); f04ConflictWithoutSession();
         f05ExactMatch(); f05CaseMatch(); f05WhitespaceMatch(); f05YearBoundaries(); f05NoMatch();
         f05MissingFile(); f05MalformedCsv(); f05ToolDispatch(); f05FacadeIntegration(); f05CliKnowledge();
-        System.out.println("PASS: 40 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        f03CompleteProfile(); f03NeutralProfile(); f03BudgetValidation(); f03MileageValidation(); f03PriorityValidation();
+        f03TransmissionValidation(); f03ValidUpdate(); f03RejectedUpdate(); f03VehiclePreservation();
+        f03ProfileRetrieval(); f03CliProfile(); f03F07Compatibility();
+        System.out.println("PASS: 52 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

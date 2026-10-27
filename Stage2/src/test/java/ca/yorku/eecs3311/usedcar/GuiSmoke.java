@@ -27,6 +27,18 @@ public final class GuiSmoke {
             var facade = ApplicationFactory.create(); var gui = new UsedCarGUI(facade); JFrame window = gui.show();
             try {
                 FoundationChecks.check(window.isShowing(), "Swing window did not launch.");
+                ((JTextField) named(gui.panel(), "budget")).setText("25000");
+                ((JTextField) named(gui.panel(), "preferredBodyType")).setText("SUV");
+                ((JTextField) named(gui.panel(), "reliabilityPriority")).setText("5");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                FoundationChecks.check(facade.currentVehicle().isEmpty() && facade.preferences().reliabilityPriority() == 5
+                        && facade.preferences().preferredBodyType().equals("SUV"), "GUI must save preferences without vehicle entry.");
+                ((JTextField) named(gui.panel(), "reliabilityPriority")).setText("6");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                FoundationChecks.check(((JTextArea) named(gui.panel(), "results")).getText().startsWith("ERROR:")
+                        && facade.preferences().reliabilityPriority() == 5, "Rejected GUI profile edit must preserve prior values.");
+                ((JButton) named(gui.panel(), "profileLoad")).doClick();
+                FoundationChecks.check(((JTextField) named(gui.panel(), "reliabilityPriority")).getText().equals("5"), "GUI must reload saved preferences.");
                 ((JButton) named(gui.panel(), "example")).doClick();
                 ((JButton) named(gui.panel(), "calculate")).doClick();
                 var results = (JTextArea) named(gui.panel(), "results");
@@ -67,6 +79,12 @@ public final class GuiSmoke {
                 ((JButton) named(gui.panel(), "calculate")).doClick();
                 ((JButton) named(gui.panel(), "knowledge")).doClick();
                 FoundationChecks.check(results.getText().contains("No local vehicle knowledge available."), "GUI must show the no-data result.");
+                var savedVehicle = facade.currentVehicle().orElseThrow();
+                ((JTextField) named(gui.panel(), "budget")).setText("1");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                FoundationChecks.check(facade.currentVehicle().orElseThrow().equals(savedVehicle)
+                        && facade.checkConstraints(savedVehicle).stream().anyMatch(v -> v.constraint().equals("Maximum budget")), "GUI preference update must retain vehicle and affect subsequent constraints.");
+                System.out.println("PASS: F03 independent profile save, rejection, reload and F07 use.");
                 System.out.println("PASS: F05 GUI knowledge and no-data results.");
                 System.out.println("PASS: F07 GUI conflict and uncertainty checks.");
                 System.out.println("PASS: Swing window launch, example calculation, invalid input, session preservation and edited calculation.");

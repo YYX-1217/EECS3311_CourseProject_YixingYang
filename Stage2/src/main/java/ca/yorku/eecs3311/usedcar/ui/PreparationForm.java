@@ -22,6 +22,9 @@ public final class PreparationForm {
             new Field("maxMileage", "Maximum mileage (km; blank = neutral)", "Preferences"),
             new Field("acceptedTransmissions", "Accepted transmissions (comma-separated; blank = any)", "Preferences"),
             new Field("accidentTolerance", "Accident tolerance (NO_ACCIDENTS/ANY; blank = neutral)", "Preferences"),
+            new Field("preferredBodyType", "Preferred body type (optional text)", "Preferences"),
+            new Field("reliabilityPriority", "Reliability priority (0-5; blank = neutral)", "Preferences"),
+            new Field("fuelEconomyPriority", "Fuel economy priority (0-5; blank = neutral)", "Preferences"),
             new Field("annualKm", "Annual distance (km) *", "Cost assumptions"),
             new Field("fuelPrice", "Fuel price (CAD/L) *", "Cost assumptions"),
             new Field("taxRate", "Tax fraction (e.g. 0.13; optional)", "Cost assumptions"),
@@ -43,12 +46,32 @@ public final class PreparationForm {
 
     public static PrepareEvaluationCommand command(UsedCarApplicationFacade facade, Map<String, String> values) {
         Vehicle vehicle = vehicle(facade, values);
-        Set<String> transmissions = new HashSet<>(Arrays.asList(values.getOrDefault("acceptedTransmissions", "").split(",")));
-        UserPreference preference = new UserPreference(decimal(values, "budget", false), integer(values, "maxMileage", false),
-                transmissions, "", 0, 0, values.get("accidentTolerance"));
+        UserPreference preference = preferences(values);
         CostAssumptions assumptions = new CostAssumptions(decimal(values, "annualKm", true), decimal(values, "fuelPrice", true),
                 decimal(values, "taxRate", false), decimal(values, "maintenanceAllowance", false), decimal(values, "insuranceAllowance", false));
         return new PrepareEvaluationCommand(facade, vehicle, preference, assumptions);
+    }
+
+    /** Parses only preference fields; validation completes before the facade is asked to save. */
+    public static UserPreference preferences(Map<String, String> values) {
+        Set<String> transmissions = new HashSet<>(Arrays.asList(values.getOrDefault("acceptedTransmissions", "").split(",")));
+        Integer reliability = integer(values, "reliabilityPriority", false);
+        Integer economy = integer(values, "fuelEconomyPriority", false);
+        return new UserPreference(decimal(values, "budget", false), integer(values, "maxMileage", false),
+                transmissions, values.get("preferredBodyType"), reliability == null ? 0 : reliability,
+                economy == null ? 0 : economy, values.get("accidentTolerance"));
+    }
+
+    public static Map<String, String> preferenceValues(UserPreference preference) {
+        var values = new LinkedHashMap<String, String>();
+        values.put("budget", preference.maxBudget() == null ? "" : preference.maxBudget().toPlainString());
+        values.put("maxMileage", preference.maxMileage() == null ? "" : preference.maxMileage().toString());
+        values.put("acceptedTransmissions", String.join(",", new TreeSet<>(preference.acceptedTransmissions())));
+        values.put("accidentTolerance", preference.accidentTolerance().equals("UNKNOWN") ? "" : preference.accidentTolerance());
+        values.put("preferredBodyType", preference.preferredBodyType());
+        values.put("reliabilityPriority", Integer.toString(preference.reliabilityPriority()));
+        values.put("fuelEconomyPriority", Integer.toString(preference.fuelEconomyPriority()));
+        return values;
     }
 
     public static Vehicle vehicle(UsedCarApplicationFacade facade, Map<String, String> values) {

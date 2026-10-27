@@ -38,6 +38,8 @@ public final class UsedCarCLI {
                     case "demo" -> demo();
                     case "prepare" -> enterPreparation(false);
                     case "check-conflicts" -> enterPreparation(true);
+                    case "profile-set" -> enterPreferences();
+                    case "profile-show" -> output.println(ResultFormatter.format(facade.preferences()));
                     case "show" -> {
                         output.println(facade.currentVehicle().map(Object::toString).orElse("No vehicle saved yet."));
                         output.println(facade.preferences());
@@ -73,8 +75,24 @@ public final class UsedCarCLI {
         else displayResult(submit(PreparationForm.command(facade, values)));
     }
 
+    private void enterPreferences() {
+        output.println("Enter all seven preferences. Blank clears to neutral; :keep retains the saved value; :cancel aborts.");
+        var values = PreparationForm.preferenceValues(facade.preferences());
+        for (var field : PreparationForm.FIELDS) {
+            if (!field.section().equals("Preferences")) continue;
+            output.print(field.label() + " [saved=" + values.get(field.key()) + "]: "); output.flush();
+            if (!input.hasNextLine()) { output.println("Cancelled; previous profile preserved."); return; }
+            String value = input.nextLine();
+            if (value.equalsIgnoreCase(":cancel")) { output.println("Cancelled; previous profile preserved."); return; }
+            if (!value.equalsIgnoreCase(":keep")) values.put(field.key(), value);
+        }
+        // All parsing and domain validation happens before any session update.
+        facade.savePreferences(PreparationForm.preferences(values));
+        output.println(ResultFormatter.format(facade.preferences()));
+    }
+
     private void help() {
-        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), show, status, help, quit.");
+        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, help, quit.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }
 }

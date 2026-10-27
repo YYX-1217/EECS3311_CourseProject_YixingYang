@@ -26,6 +26,18 @@ public final class ResultFormatter {
                 + "Retrieved notes only; no AI risk assessment or purchase recommendation.\n";
     }
 
+    public static String format(ca.yorku.eecs3311.usedcar.domain.UserPreference preference) {
+        return "SAVED BUYER PREFERENCES\n"
+                + "Maximum budget (CAD): " + supplied(preference.maxBudget()) + "\n"
+                + "Maximum mileage (km): " + supplied(preference.maxMileage()) + "\n"
+                + "Accepted transmissions: " + new java.util.TreeSet<>(preference.acceptedTransmissions()) + " (empty = neutral)\n"
+                + "Preferred body type: " + (preference.preferredBodyType().isEmpty() ? "not supplied" : preference.preferredBodyType()) + "\n"
+                + "Reliability priority: " + preference.reliabilityPriority() + "\n"
+                + "Fuel economy priority: " + preference.fuelEconomyPriority() + " (priorities: 0 = neutral; 1-5 increasing importance)\n"
+                + "Accident tolerance: " + preference.accidentTolerance() + " (UNKNOWN = neutral)\n"
+                + "Body type and priorities are stored; scoring and recommendation use remains planned.\n";
+    }
+
     public static String format(PreparationResult result) {
         var v = result.vehicle(); var a = result.assumptions(); var c = result.cost();
         var text = new StringBuilder("DETERMINISTIC PREPARATION ONLY - no AI risk assessment or purchase recommendation\n");

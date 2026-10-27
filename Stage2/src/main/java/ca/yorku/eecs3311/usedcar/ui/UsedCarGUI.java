@@ -35,8 +35,31 @@ public final class UsedCarGUI {
             var holder = new JPanel(new BorderLayout());
             holder.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
             holder.add(form, BorderLayout.NORTH);
+            if (section.equals("Preferences")) {
+                var profileButtons = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                var save = new JButton("Save preferences"); save.setName("profileSave");
+                save.addActionListener(event -> {
+                    var values = new LinkedHashMap<String, String>();
+                    PreparationForm.FIELDS.stream().filter(f -> f.section().equals("Preferences"))
+                            .forEach(f -> values.put(f.key(), fields.get(f.key()).getText()));
+                    try {
+                        facade.savePreferences(PreparationForm.preferences(values));
+                        output.setText(ResultFormatter.format(facade.preferences())); output.setCaretPosition(0);
+                        message.setText("Preferences saved independently; current vehicle preserved.");
+                    } catch (IllegalArgumentException e) { displayError(e.getMessage()); }
+                });
+                var load = new JButton("Load saved preferences"); load.setName("profileLoad");
+                load.addActionListener(event -> {
+                    PreparationForm.preferenceValues(facade.preferences()).forEach((key, value) -> fields.get(key).setText(value));
+                    output.setText(ResultFormatter.format(facade.preferences())); output.setCaretPosition(0);
+                    message.setText("Saved preferences loaded; unsaved preference edits discarded.");
+                });
+                profileButtons.add(save); profileButtons.add(load);
+                holder.add(profileButtons, BorderLayout.SOUTH);
+            }
             tabs.addTab(section, new JScrollPane(holder));
         }
+        PreparationForm.preferenceValues(facade.preferences()).forEach((key, value) -> fields.get(key).setText(value));
         output.setName("results"); output.setEditable(false); output.setLineWrap(true); output.setWrapStyleWord(true);
         output.setText("Fill the Vehicle, Preferences and Cost assumptions tabs, then select Save and calculate.\n"
                 + "Optional values may remain blank. No AI risk assessment is generated.\n" + facade.llmStatus());

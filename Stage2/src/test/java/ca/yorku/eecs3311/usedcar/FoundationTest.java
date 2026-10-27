@@ -43,4 +43,16 @@ public final class FoundationTest {
     @Test public void f05ToolDispatch() { FoundationChecks.f05ToolDispatch(); }
     @Test public void f05FacadeIntegration() { FoundationChecks.f05FacadeIntegration(); }
     @Test public void f05CliKnowledge() { FoundationChecks.f05CliKnowledge(); }
+    @Test public void f03CompleteProfile() { FoundationChecks.f03CompleteProfile(); }
+    @Test public void f03NeutralProfile() { FoundationChecks.f03NeutralProfile(); }
+    @Test public void f03BudgetValidation() { FoundationChecks.f03BudgetValidation(); }
+    @Test public void f03MileageValidation() { FoundationChecks.f03MileageValidation(); }
+    @Test public void f03PriorityValidation() { FoundationChecks.f03PriorityValidation(); }
+    @Test public void f03TransmissionValidation() { FoundationChecks.f03TransmissionValidation(); }
+    @Test public void f03ValidUpdate() { FoundationChecks.f03ValidUpdate(); }
+    @Test public void f03RejectedUpdate() { FoundationChecks.f03RejectedUpdate(); }
+    @Test public void f03VehiclePreservation() { FoundationChecks.f03VehiclePreservation(); }
+    @Test public void f03ProfileRetrieval() { FoundationChecks.f03ProfileRetrieval(); }
+    @Test public void f03CliProfile() { FoundationChecks.f03CliProfile(); }
+    @Test public void f03F07Compatibility() { FoundationChecks.f03F07Compatibility(); }
 }
