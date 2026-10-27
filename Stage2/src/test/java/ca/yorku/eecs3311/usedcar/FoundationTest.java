@@ -13,4 +13,14 @@ public final class FoundationTest {
     @Test public void preservesSessionOnRejectedEdit() { FoundationChecks.sessionAndInvalidUpdate(); }
     @Test public void checksToolsAndUnavailableLlm() { FoundationChecks.toolContractsAndLlmBoundary(); }
     @Test public void runsInteractiveCliWorkflow() { FoundationChecks.cliFlow(); }
+    @Test public void transmissionConflict() { FoundationChecks.transmissionConflict(); }
+    @Test public void transmissionMatch() { FoundationChecks.transmissionMatch(); }
+    @Test public void multipleTransmissions() { FoundationChecks.multipleTransmissions(); }
+    @Test public void neutralTransmission() { FoundationChecks.neutralTransmission(); }
+    @Test public void unknownTransmission() { FoundationChecks.unknownTransmission(); }
+    @Test public void accidentConflict() { FoundationChecks.accidentConflict(); }
+    @Test public void acceptableHistory() { FoundationChecks.acceptableHistory(); }
+    @Test public void neutralAccidentTolerance() { FoundationChecks.neutralAccidentTolerance(); }
+    @Test public void unknownAccidentHistory() { FoundationChecks.unknownAccidentHistory(); }
+    @Test public void invalidConstraintPreferences() { FoundationChecks.invalidConstraintPreferences(); }
 }

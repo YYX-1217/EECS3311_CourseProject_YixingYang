@@ -15,11 +15,13 @@ public final class PreparationForm {
             new Field("model", "Model *", "Vehicle"), new Field("trim", "Trim", "Vehicle"),
             new Field("mileage", "Mileage (km) *", "Vehicle"), new Field("price", "Asking price (CAD) *", "Vehicle"),
             new Field("transmission", "Transmission (blank = unknown)", "Vehicle"),
-            new Field("fuelType", "Fuel type", "Vehicle"), new Field("accident", "Accident history", "Vehicle"),
+            new Field("fuelType", "Fuel type", "Vehicle"), new Field("accident", "Accident history (YES/NO/UNKNOWN)", "Vehicle"),
             new Field("maintenance", "Maintenance history", "Vehicle"),
             new Field("consumption", "Fuel consumption (L/100 km)", "Vehicle"), new Field("notes", "Notes", "Vehicle"),
             new Field("budget", "Maximum budget (CAD; blank = neutral)", "Preferences"),
             new Field("maxMileage", "Maximum mileage (km; blank = neutral)", "Preferences"),
+            new Field("acceptedTransmissions", "Accepted transmissions (comma-separated; blank = any)", "Preferences"),
+            new Field("accidentTolerance", "Accident tolerance (NO_ACCIDENTS/ANY; blank = neutral)", "Preferences"),
             new Field("annualKm", "Annual distance (km) *", "Cost assumptions"),
             new Field("fuelPrice", "Fuel price (CAD/L) *", "Cost assumptions"),
             new Field("taxRate", "Tax fraction (e.g. 0.13; optional)", "Cost assumptions"),
@@ -45,7 +47,9 @@ public final class PreparationForm {
                 values.get("trim"), integer(values, "mileage", true), decimal(values, "price", true),
                 values.get("transmission"), values.get("fuelType"), values.get("accident"), values.get("maintenance"),
                 decimal(values, "consumption", false), values.get("notes"));
-        UserPreference preference = UserPreference.limits(decimal(values, "budget", false), integer(values, "maxMileage", false));
+        Set<String> transmissions = new HashSet<>(Arrays.asList(values.getOrDefault("acceptedTransmissions", "").split(",")));
+        UserPreference preference = new UserPreference(decimal(values, "budget", false), integer(values, "maxMileage", false),
+                transmissions, "", 0, 0, values.get("accidentTolerance"));
         CostAssumptions assumptions = new CostAssumptions(decimal(values, "annualKm", true), decimal(values, "fuelPrice", true),
                 decimal(values, "taxRate", false), decimal(values, "maintenanceAllowance", false), decimal(values, "insuranceAllowance", false));
         return new PrepareEvaluationCommand(facade, vehicle, preference, assumptions);

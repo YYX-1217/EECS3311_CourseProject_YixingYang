@@ -18,7 +18,9 @@ public final class ResultFormatter {
                 .append("Accident history: ").append(v.accidentHistory()).append(" | Maintenance history: ").append(v.maintenanceHistory()).append('\n')
                 .append("Notes: ").append(v.notes()).append('\n')
                 .append("Saved buyer limits: budget=").append(supplied(result.preference().maxBudget()))
-                .append(" CAD; mileage=").append(supplied(result.preference().maxMileage())).append(" km\n\n")
+                .append(" CAD; mileage=").append(supplied(result.preference().maxMileage())).append(" km\n")
+                .append("Accepted transmissions: ").append(result.preference().acceptedTransmissions())
+                .append(" (empty = neutral); accident tolerance: ").append(result.preference().accidentTolerance()).append("\n\n")
                 .append("Explicit assumptions: ").append(a.annualKm()).append(" km/year; ").append(supplied(v.fuelConsumption()))
                 .append(" L/100 km; CAD ").append(a.fuelPrice()).append("/L\n")
                 .append("Tax fraction: ").append(supplied(a.taxRate())).append("; maintenance CAD ").append(supplied(a.annualMaintenance()))
@@ -29,10 +31,10 @@ public final class ResultFormatter {
                 .append("First-year estimate (CAD): ").append(amount(c.firstYearEstimate())).append('\n')
                 .append("Formula: price + tax + annual fuel + maintenance + insurance. Excludes financing, depreciation, registration and other unlisted costs.\n");
         c.unavailable().forEach(item -> text.append("UNAVAILABLE: ").append(item).append('\n'));
-        text.append("\nChecks currently cover budget and mileage only; other buyer constraints are PLANNED.\n");
-        if (result.violations().isEmpty()) text.append("No conflicts among the supplied budget/mileage limits; unspecified limits are skipped.\n");
+        text.append("\nChecks cover budget, mileage, accepted transmissions and accident tolerance. UNKNOWN means not evaluable, not a confirmed conflict or pass.\n");
+        if (result.violations().isEmpty()) text.append("No conflicts or unresolved checks among the supplied constraints; unspecified preferences are skipped.\n");
         result.violations().forEach(item -> text.append(item.severity()).append(": ").append(item.constraint())
-                .append(" | limit=").append(item.expected()).append(" | actual=").append(item.actual()).append('\n'));
+                .append(" | expected=").append(item.expected()).append(" | actual=").append(item.actual()).append('\n'));
         text.append("Unknown fields: ").append(result.missing().missingFields()).append('\n')
                 .append("Data readiness is a basic field check, not a reliability judgment.\n")
                 .append(result.llmStatus()).append('\n').append("Session is in memory only; closing the application discards it.\n");

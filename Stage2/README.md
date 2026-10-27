@@ -133,7 +133,7 @@ In a terminal that permits script execution, the available verification modes ar
 & .\scripts\verify.ps1 -Gui             # Also open a real GUI, test its buttons, and close it
 ```
 
-The ten tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing.
+The twenty tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
 
 The GUI smoke check verifies window launch, calculation, error display, and recalculation. It saves an image of the application's panel to `build/verification/gui.png`. These checks do not constitute complete Stage 3 testing, and KUMA validation has not been performed.
 
@@ -170,6 +170,6 @@ The Stage2 ignore rules cover `.env`, `.env.*`, and `config.local.json`, while r
 | **Architectural foundation only** | Adapter has an interface and unavailable provider implementation, without actual provider-protocol adaptation. |
 | **Planned design patterns** | Strategy and Factory remain planned. |
 
-The application does not currently provide reliability ratings, purchase recommendations, knowledge-base retrieval, disk persistence, or complete evaluation reports. Buyer constraint checks currently cover budget and mileage, and session data remains in memory. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
+The application does not currently provide reliability ratings, purchase recommendations, knowledge-base retrieval, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; dedicated constraint commands and future AI evaluation/comparison integration remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
 
 For further detail, see [Implementation Status](docs/IMPLEMENTATION_STATUS.md), [Stage 1 Traceability](docs/STAGE1_TRACEABILITY.md), [Design Decisions](docs/DESIGN_DECISIONS.md), [Development and Verification Log](docs/DEVELOPMENT_LOG.md), and [Next Steps](docs/NEXT_STEPS.md).

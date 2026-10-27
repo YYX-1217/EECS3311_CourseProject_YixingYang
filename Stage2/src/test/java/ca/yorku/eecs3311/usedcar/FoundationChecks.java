@@ -112,13 +112,60 @@ public final class FoundationChecks {
         throw new AssertionError("Unimplemented adapter must never fake a successful response.");
     }
 
+    private static void constraintFinding(String transmission, String accepted, String history, String tolerance,
+                                          String constraint, String severity) {
+        var values = PreparationForm.example();
+        values.put("budget", ""); values.put("maxMileage", "");
+        values.put("transmission", transmission); values.put("acceptedTransmissions", accepted);
+        values.put("accident", history); values.put("accidentTolerance", tolerance);
+        var facade = ApplicationFactory.create();
+        var result = PreparationForm.command(facade, values).execute();
+        var findings = result.violations();
+        check(findings.equals(facade.checkConstraints(facade.currentVehicle().orElseThrow())), "Saved preferences must drive the same checks.");
+        if (severity == null) check(findings.isEmpty(), "Unexpected constraint finding: " + findings);
+        else {
+            check(findings.size() == 1 && findings.getFirst().constraint().equals(constraint)
+                    && findings.getFirst().severity().equals(severity), "Unexpected findings: " + findings);
+            check(ResultFormatter.format(result).contains(severity + ": " + constraint), "Finding must be visible in output.");
+        }
+    }
+
+    public static void transmissionConflict() { constraintFinding("manual", "auto", "", "", "Transmission", "CONFLICT"); }
+    public static void transmissionMatch() { constraintFinding(" AT ", " automatic ", "", "", "Transmission", null); }
+    public static void multipleTransmissions() { constraintFinding("mt", "auto, MANUAL,auto", "", "", "Transmission", null); }
+    public static void neutralTransmission() { constraintFinding("manual", "", "", "", "Transmission", null); }
+    public static void unknownTransmission() {
+        for (String unknown : new String[]{"", "UNKNOWN", "uncertain", "unlisted gearbox"})
+            constraintFinding(unknown, "auto", "", "", "Transmission", "UNKNOWN");
+    }
+    public static void accidentConflict() { constraintFinding("auto", "", " yes ", " no_accidents ", "Accident history", "CONFLICT"); }
+    public static void acceptableHistory() {
+        constraintFinding("auto", "", "NO", "NO_ACCIDENTS", "Accident history", null);
+        constraintFinding("auto", "", "YES", "ANY", "Accident history", null);
+    }
+    public static void neutralAccidentTolerance() { constraintFinding("auto", "", "YES", "", "Accident history", null); }
+    public static void unknownAccidentHistory() {
+        for (String tolerance : new String[]{"NO_ACCIDENTS", "ANY"})
+            for (String history : new String[]{"", "UNKNOWN", "seller says probably fine"})
+                constraintFinding("auto", "", history, tolerance, "Accident history", "UNKNOWN");
+    }
+    public static void invalidConstraintPreferences() {
+        var values = PreparationForm.example(); values.put("acceptedTransmissions", "autmatic");
+        rejects(() -> PreparationForm.command(ApplicationFactory.create(), values));
+        values.put("acceptedTransmissions", "auto"); values.put("accidentTolerance", "maybe");
+        rejects(() -> PreparationForm.command(ApplicationFactory.create(), values));
+    }
+
     public static void cliFlow() {
         var bytes = new ByteArrayOutputStream();
         var facade = ApplicationFactory.create();
-        String script = "prepare\n" + String.join("\n", PreparationForm.example().values()) + "\nshow\nevaluate\nquit\n";
+        var values = PreparationForm.example();
+        values.put("acceptedTransmissions", "manual"); values.put("accidentTolerance", "NO_ACCIDENTS"); values.put("accident", "YES");
+        String script = "prepare\n" + String.join("\n", values.values()) + "\nshow\nevaluate\nquit\n";
         new UsedCarCLI(facade, new Scanner(script), new PrintStream(bytes)).run();
         String output = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
         check(output.contains("24922.00") && output.contains("CONFLICT: Maximum budget"), "Interactive CLI must calculate entered input.");
+        check(output.contains("CONFLICT: Transmission") && output.contains("CONFLICT: Accident history"), "CLI must invoke the new checks.");
         check(output.contains("PLANNED"), "AI status must be explicit.");
         check(facade.currentVehicle().isPresent(), "CLI must save the vehicle through the shared facade.");
     }
@@ -126,6 +173,8 @@ public final class FoundationChecks {
     public static void main(String[] args) {
         numericValidation(); requiredFieldsAndYear(); exactCostCalculation(); omittedAssumptions(); unknownConsumption();
         constraintBoundaries(); zeroAndRounding(); sessionAndInvalidUpdate(); toolContractsAndLlmBoundary(); cliFlow();
-        System.out.println("PASS: 10 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        transmissionConflict(); transmissionMatch(); multipleTransmissions(); neutralTransmission(); unknownTransmission();
+        accidentConflict(); acceptableHistory(); neutralAccidentTolerance(); unknownAccidentHistory(); invalidConstraintPreferences();
+        System.out.println("PASS: 20 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

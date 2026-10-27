@@ -42,6 +42,18 @@ public final class GuiSmoke {
                 ((JTextField) named(gui.panel(), "price")).setText("16000");
                 ((JButton) named(gui.panel(), "calculate")).doClick();
                 FoundationChecks.check(results.getText().contains("22662.00"), "Edited input must change real computed total.");
+                ((JTextField) named(gui.panel(), "acceptedTransmissions")).setText("manual");
+                ((JTextField) named(gui.panel(), "accidentTolerance")).setText("NO_ACCIDENTS");
+                ((JTextField) named(gui.panel(), "accident")).setText("YES");
+                ((JButton) named(gui.panel(), "calculate")).doClick();
+                FoundationChecks.check(results.getText().contains("CONFLICT: Transmission")
+                        && results.getText().contains("CONFLICT: Accident history"), "GUI must invoke both new checks.");
+                ((JTextField) named(gui.panel(), "transmission")).setText("");
+                ((JTextField) named(gui.panel(), "accident")).setText("");
+                ((JButton) named(gui.panel(), "calculate")).doClick();
+                FoundationChecks.check(results.getText().contains("UNKNOWN: Transmission")
+                        && results.getText().contains("UNKNOWN: Accident history"), "GUI must distinguish unknown data from conflicts.");
+                System.out.println("PASS: F07 GUI conflict and uncertainty checks.");
                 System.out.println("PASS: Swing window launch, example calculation, invalid input, session preservation and edited calculation.");
             } catch (Exception e) { throw new RuntimeException(e); }
             finally { window.dispose(); }

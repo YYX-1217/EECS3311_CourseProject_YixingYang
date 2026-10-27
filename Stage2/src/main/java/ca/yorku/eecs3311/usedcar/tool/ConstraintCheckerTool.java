@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/** F07 initial slice: budget and mileage only. Transmission/history rules remain planned. */
+/** F07 deterministic checks. UNKNOWN findings are not confirmed violations or passes. */
 public final class ConstraintCheckerTool implements Tool {
     public record Input(Vehicle vehicle, UserPreference preference) {
         public Input { Objects.requireNonNull(vehicle); Objects.requireNonNull(preference); }
@@ -25,6 +25,28 @@ public final class ConstraintCheckerTool implements Tool {
         if (preference.maxMileage() != null && vehicle.mileage() > preference.maxMileage())
             results.add(new ConstraintViolation("Maximum mileage", preference.maxMileage().toString(),
                     Integer.toString(vehicle.mileage()), "CONFLICT"));
+        if (!preference.acceptedTransmissions().isEmpty()) {
+            String actual = vehicle.transmission();
+            String expected = String.join(", ", new java.util.TreeSet<>(preference.acceptedTransmissions()));
+            if (!UserPreference.SUPPORTED_TRANSMISSIONS.contains(actual))
+                results.add(new ConstraintViolation("Transmission", expected, actual, "UNKNOWN"));
+            else if (!preference.acceptedTransmissions().contains(actual))
+                results.add(new ConstraintViolation("Transmission", expected, actual, "CONFLICT"));
+        }
+        if (!preference.accidentTolerance().equals("UNKNOWN")) {
+            // Only explicit structured statements are classified; free text is not inferred.
+            String history = switch (vehicle.accidentHistory()) {
+                case "YES", "ACCIDENT_REPORTED", "HAS_ACCIDENTS" -> "YES";
+                case "NO", "NONE", "NO_ACCIDENTS", "ACCIDENT_FREE" -> "NO";
+                default -> "UNKNOWN";
+            };
+            if (history.equals("UNKNOWN"))
+                results.add(new ConstraintViolation("Accident history", preference.accidentTolerance(),
+                        vehicle.accidentHistory(), "UNKNOWN"));
+            else if (history.equals("YES") && preference.accidentTolerance().equals("NO_ACCIDENTS"))
+                results.add(new ConstraintViolation("Accident history", "NO_ACCIDENTS",
+                        vehicle.accidentHistory(), "CONFLICT"));
+        }
         return List.copyOf(results);
     }
 }
