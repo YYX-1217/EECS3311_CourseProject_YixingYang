@@ -84,6 +84,22 @@ public final class GuiSmoke {
                 ((JButton) named(gui.panel(), "profileSave")).doClick();
                 FoundationChecks.check(facade.currentVehicle().orElseThrow().equals(savedVehicle)
                         && facade.checkConstraints(savedVehicle).stream().anyMatch(v -> v.constraint().equals("Maximum budget")), "GUI preference update must retain vehicle and affect subsequent constraints.");
+                var selectedMode = (JComboBox<?>) named(gui.panel(), "strategyMode");
+                selectedMode.setSelectedItem("budget");
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Budget Focused") && results.getText().contains("CAD 1"), "GUI preview must use selected strategy and saved preferences.");
+                ((JTextField) named(gui.panel(), "budget")).setText("2");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("CAD 2"), "GUI guidance must refresh after a preference update.");
+                selectedMode.setSelectedItem("reliability");
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Reliability Focused") && results.getText().contains("inspection concerns")
+                        && facade.currentVehicle().orElseThrow().equals(savedVehicle), "GUI strategy switch must update guidance and preserve vehicle.");
+                selectedMode.setSelectedItem("balanced");
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Balanced"), "GUI must expose all three modes.");
+                System.out.println("PASS: Strategy GUI selection, fresh preferences and vehicle preservation.");
                 System.out.println("PASS: F03 independent profile save, rejection, reload and F07 use.");
                 System.out.println("PASS: F05 GUI knowledge and no-data results.");
                 System.out.println("PASS: F07 GUI conflict and uncertainty checks.");

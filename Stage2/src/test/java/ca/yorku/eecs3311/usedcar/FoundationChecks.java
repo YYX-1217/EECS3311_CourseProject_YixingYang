@@ -5,6 +5,7 @@ import ca.yorku.eecs3311.usedcar.domain.*;
 import ca.yorku.eecs3311.usedcar.tool.*;
 import ca.yorku.eecs3311.usedcar.llm.GeminiAdapter;
 import ca.yorku.eecs3311.usedcar.ui.*;
+import ca.yorku.eecs3311.usedcar.strategy.*;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Scanner;
@@ -508,6 +509,103 @@ public final class FoundationChecks {
         check(facade.currentVehicle().orElseThrow().equals(vehicle), "Constraint checking must retain vehicle data.");
     }
 
+    public static void strategyBalanced() {
+        var p = PreparationForm.preferences(completeProfile());
+        String text = new BalancedStrategy().buildPriorityGuidance(p);
+        check(text.contains("Balance budget, reliability, mileage, vehicle risk and ownership costs")
+                && text.contains("reliability more emphasis than fuel economy") && text.contains("CAD 25000.50"), "Balanced guidance must combine dimensions and explicit relative priorities.");
+        var values = completeProfile(); values.put("fuelEconomyPriority", "5"); values.put("reliabilityPriority", "1");
+        check(new BalancedStrategy().buildPriorityGuidance(PreparationForm.preferences(values)).contains("fuel economy more emphasis than reliability"), "Balanced policy must respond to changed priorities.");
+    }
+    public static void strategyBudget() {
+        var policy = new BudgetFocusedStrategy();
+        String text = policy.buildPriorityGuidance(PreparationForm.preferences(completeProfile()));
+        check(text.contains("purchase price and ownership costs first") && text.contains("CAD 25000.50")
+                && text.contains("purchase-budget excess") && text.contains("cannot be treated as zero"), "Budget strategy must apply the real budget and missing-cost rules.");
+        check(policy.buildPriorityGuidance(UserPreference.limits(null, null)).contains("Request a budget before judging affordability"), "Budget focus must not invent an absent limit.");
+    }
+    public static void strategyReliability() {
+        String text = new ReliabilityFocusedStrategy().buildPriorityGuidance(PreparationForm.preferences(completeProfile()));
+        check(text.contains("maintenance uncertainty, inspection concerns and vehicle risks before cost advantages")
+                && text.contains("reliability importance 5/5") && text.contains("not a mechanical-condition score"), "Reliability mode must prioritize evidence, not invent a score.");
+    }
+    public static void strategyDistinctPolicies() {
+        var p = PreparationForm.preferences(completeProfile());
+        var texts = java.util.List.of(new BalancedStrategy().buildPriorityGuidance(p),
+                new BudgetFocusedStrategy().buildPriorityGuidance(p), new ReliabilityFocusedStrategy().buildPriorityGuidance(p));
+        // Discard mode headings so differing labels alone cannot satisfy this assertion.
+        var bodies = texts.stream().map(t -> t.substring(t.indexOf('\n') + 1)).collect(java.util.stream.Collectors.toSet());
+        check(bodies.size() == 3, "Policy bodies must differ beyond their labels.");
+    }
+    public static void strategyNeutralPreferences() {
+        var neutral = UserPreference.limits(null, null);
+        for (EvaluationStrategy policy : java.util.List.of(new BalancedStrategy(), new BudgetFocusedStrategy(), new ReliabilityFocusedStrategy())) {
+            String text = policy.buildPriorityGuidance(neutral);
+            check(text.contains("Budget is unspecified") && text.contains("Mileage preference is unspecified")
+                    && text.contains("Reliability importance is unspecified") && text.contains("Fuel-economy importance is unspecified")
+                    && text.contains("Transmission preference is unspecified") && text.contains("Body-type preference is unspecified")
+                    && text.contains("Accident tolerance is unspecified") && !text.contains("CAD "), "All unspecified preferences must remain neutral.");
+        }
+        var values = completeProfile(); values.put("reliabilityPriority", "");
+        check(new BalancedStrategy().buildPriorityGuidance(PreparationForm.preferences(values)).contains("Do not infer a relative preference"), "Unspecified importance must not be treated as an explicit low ranking.");
+    }
+    public static void strategySafetyAndConstraints() {
+        var values = completeProfile(); values.put("accidentTolerance", "ANY");
+        String text = new BudgetFocusedStrategy().buildPriorityGuidance(PreparationForm.preferences(values));
+        check(text.contains("retain safety and reliability warnings") && text.contains("does not establish safety")
+                && text.contains("do not invent vehicle history") && text.contains("100000 km")
+                && text.contains("AUTOMATIC") && text.contains("SUV"), "Cost focus must preserve warnings and the full preference context.");
+        values.put("accidentTolerance", "NO_ACCIDENTS"); values.put("budget", "0");
+        text = new BudgetFocusedStrategy().buildPriorityGuidance(PreparationForm.preferences(values));
+        check(text.contains("CAD 0") && text.contains("unknown accident history is not a pass"), "Explicit zero and strict accident tolerance must not disappear.");
+    }
+    public static void strategyAgentPolymorphism() {
+        var agent = new ca.yorku.eecs3311.usedcar.agent.UsedCarAgent(new ToolManager(), new GeminiAdapter(), new DataQualityChecker());
+        var supplied = PreparationForm.preferences(completeProfile());
+        var seen = new java.util.concurrent.atomic.AtomicReference<UserPreference>();
+        agent.setStrategy(p -> { seen.set(p); return "Custom policy " + p.maxBudget(); });
+        check(agent.buildPriorityGuidance(supplied).equals("Custom policy 25000.50") && seen.get() == supplied,
+                "Agent must invoke an injected strategy through the interface with current preferences.");
+        agent.setStrategy(new ReliabilityFocusedStrategy());
+        check(agent.buildPriorityGuidance(supplied).contains("Reliability Focused"), "Runtime replacement must change subsequent guidance.");
+    }
+    public static void strategyFacadeState() {
+        var facade = ApplicationFactory.create();
+        try { facade.previewPriorityGuidance(); throw new AssertionError("Mode must be explicitly selected."); }
+        catch (IllegalStateException expected) { check(expected.getMessage().contains("Select a strategy"), "Missing mode needs an actionable error."); }
+        var saved = PreparationForm.command(facade, PreparationForm.example()).execute().vehicle();
+        facade.selectStrategy(" BUDGET ");
+        String first = facade.previewPriorityGuidance();
+        facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        String updated = facade.previewPriorityGuidance();
+        check(first.contains("CAD 17000") && updated.contains("CAD 25000.50") && updated.contains("Budget Focused"), "Retained strategy must use fresh saved preferences.");
+        rejects(() -> facade.selectStrategy("cheap"));
+        check(facade.previewPriorityGuidance().equals(updated), "Rejected selection must preserve the prior mode.");
+        facade.selectStrategy("reliability");
+        check(facade.previewPriorityGuidance().contains("Reliability Focused") && facade.currentVehicle().orElseThrow().equals(saved), "Mode switch must preserve vehicle and profile.");
+        equal(facade.preferences().maxBudget(), "25000.50");
+    }
+    public static void strategyDoesNotChangeF07() {
+        var facade = ApplicationFactory.create(); var values = completeVehicle(); values.put("accident", "YES");
+        var vehicle = PreparationForm.command(facade, values).execute().vehicle();
+        facade.savePreferences(PreparationForm.preferences(completeProfile()));
+        var constraints = facade.checkConstraints(vehicle);
+        for (String mode : facade.evaluationModes()) {
+            facade.selectStrategy(mode); facade.previewPriorityGuidance();
+            check(facade.checkConstraints(vehicle).equals(constraints), "Guidance selection must not weaken or change F07 findings.");
+        }
+    }
+    public static void strategyCliFlow() {
+        var facade = ApplicationFactory.create(); var bytes = new ByteArrayOutputStream();
+        String script = "strategy\nprofile-set\n" + String.join("\n", completeProfile().values())
+                + "\nstrategy budget\nstrategy reliability\nstrategy balanced\nstrategy invalid\nstrategy\nquit\n";
+        new UsedCarCLI(facade, new Scanner(script), new PrintStream(bytes)).run();
+        String text = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+        check(text.contains("Select a strategy first") && text.contains("Budget Focused") && text.contains("Reliability Focused")
+                && text.contains("Balanced") && text.contains("CAD 25000.50") && text.contains("not an AI risk assessment"), "CLI must invoke actual preference-dependent strategies.");
+        check(facade.previewPriorityGuidance().contains("Balanced") && facade.currentVehicle().isEmpty(), "CLI mode persists after invalid selection and requires no vehicle.");
+    }
+
     public static void main(String[] args) {
         numericValidation(); requiredFieldsAndYear(); exactCostCalculation(); omittedAssumptions(); unknownConsumption();
         constraintBoundaries(); zeroAndRounding(); sessionAndInvalidUpdate(); toolContractsAndLlmBoundary(); cliFlow();
@@ -520,6 +618,8 @@ public final class FoundationChecks {
         f03CompleteProfile(); f03NeutralProfile(); f03BudgetValidation(); f03MileageValidation(); f03PriorityValidation();
         f03TransmissionValidation(); f03ValidUpdate(); f03RejectedUpdate(); f03VehiclePreservation();
         f03ProfileRetrieval(); f03CliProfile(); f03F07Compatibility();
-        System.out.println("PASS: 52 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        strategyBalanced(); strategyBudget(); strategyReliability(); strategyDistinctPolicies(); strategyNeutralPreferences();
+        strategySafetyAndConstraints(); strategyAgentPolymorphism(); strategyFacadeState(); strategyDoesNotChangeF07(); strategyCliFlow();
+        System.out.println("PASS: 62 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

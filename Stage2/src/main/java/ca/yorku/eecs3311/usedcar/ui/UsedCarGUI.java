@@ -55,7 +55,20 @@ public final class UsedCarGUI {
                     message.setText("Saved preferences loaded; unsaved preference edits discarded.");
                 });
                 profileButtons.add(save); profileButtons.add(load);
-                holder.add(profileButtons, BorderLayout.SOUTH);
+                var mode = new JComboBox<String>(); mode.setName("strategyMode");
+                mode.addItem("Select a mode"); facade.evaluationModes().forEach(mode::addItem);
+                var preview = new JButton("Preview priority guidance"); preview.setName("strategyPreview");
+                preview.addActionListener(event -> {
+                    try {
+                        facade.selectStrategy((String) mode.getSelectedItem());
+                        output.setText(facade.previewPriorityGuidance()); output.setCaretPosition(0);
+                        message.setText("Guidance uses saved preferences. Save preference edits before previewing. No AI assessment generated.");
+                    } catch (IllegalArgumentException | IllegalStateException e) { displayError(e.getMessage()); }
+                });
+                var strategyControls = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                strategyControls.add(new JLabel("Evaluation priority:")); strategyControls.add(mode); strategyControls.add(preview);
+                var actions = new JPanel(new GridLayout(0, 1)); actions.add(profileButtons); actions.add(strategyControls);
+                holder.add(actions, BorderLayout.SOUTH);
             }
             tabs.addTab(section, new JScrollPane(holder));
         }

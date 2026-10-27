@@ -45,10 +45,16 @@ public final class UsedCarCLI {
                         output.println(facade.preferences());
                     }
                     case "knowledge" -> output.println(ResultFormatter.format(facade.retrieveKnowledge()));
+                    case "strategy" -> output.println(facade.previewPriorityGuidance());
                     case "status" -> output.println(facade.llmStatus());
                     case "evaluate", "analyze-listing", "compare", "checklist", "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
-                    default -> output.println("Unknown command. Type help.");
+                    default -> {
+                        if (command.startsWith("strategy ")) {
+                            facade.selectStrategy(command.substring("strategy ".length()));
+                            output.println(facade.previewPriorityGuidance());
+                        } else output.println("Unknown command. Type help.");
+                    }
                 }
             } catch (IllegalArgumentException | IllegalStateException e) {
                 output.println("ERROR: " + e.getMessage());
@@ -93,6 +99,7 @@ public final class UsedCarCLI {
 
     private void help() {
         output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, help, quit.");
+        output.println("strategy balanced|budget|reliability selects and previews priority guidance; strategy previews the retained mode using saved preferences.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }
 }

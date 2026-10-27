@@ -55,4 +55,14 @@ public final class FoundationTest {
     @Test public void f03ProfileRetrieval() { FoundationChecks.f03ProfileRetrieval(); }
     @Test public void f03CliProfile() { FoundationChecks.f03CliProfile(); }
     @Test public void f03F07Compatibility() { FoundationChecks.f03F07Compatibility(); }
+    @Test public void strategyBalanced() { FoundationChecks.strategyBalanced(); }
+    @Test public void strategyBudget() { FoundationChecks.strategyBudget(); }
+    @Test public void strategyReliability() { FoundationChecks.strategyReliability(); }
+    @Test public void strategyDistinctPolicies() { FoundationChecks.strategyDistinctPolicies(); }
+    @Test public void strategyNeutralPreferences() { FoundationChecks.strategyNeutralPreferences(); }
+    @Test public void strategySafetyAndConstraints() { FoundationChecks.strategySafetyAndConstraints(); }
+    @Test public void strategyAgentPolymorphism() { FoundationChecks.strategyAgentPolymorphism(); }
+    @Test public void strategyFacadeState() { FoundationChecks.strategyFacadeState(); }
+    @Test public void strategyDoesNotChangeF07() { FoundationChecks.strategyDoesNotChangeF07(); }
+    @Test public void strategyCliFlow() { FoundationChecks.strategyCliFlow(); }
 }
