@@ -36,7 +36,8 @@ public final class UsedCarCLI {
                     case "quit", "exit" -> { return; }
                     case "help", "" -> help();
                     case "demo" -> demo();
-                    case "prepare" -> enterPreparation();
+                    case "prepare" -> enterPreparation(false);
+                    case "check-conflicts" -> enterPreparation(true);
                     case "show" -> {
                         output.println(facade.currentVehicle().map(Object::toString).orElse("No vehicle saved yet."));
                         output.println(facade.preferences());
@@ -52,22 +53,27 @@ public final class UsedCarCLI {
         }
     }
 
-    private void enterPreparation() {
-        output.println("Enter a vehicle, buyer limits and cost assumptions. Blank optional fields stay unknown/neutral.");
-        output.println("This replaces the current in-memory vehicle after successful calculation. Type :cancel to cancel.");
+    private void enterPreparation(boolean conflictCheck) {
+        if (conflictCheck && facade.currentVehicle().isEmpty()) throw new IllegalStateException("Save a manual vehicle first.");
+        output.println(conflictCheck
+                ? "Enter a second structured record for the saved vehicle (no AI extraction). Saved data will be preserved."
+                : "Enter a vehicle, buyer limits and cost assumptions. Successful preparation replaces the saved vehicle.");
+        output.println("Blank vehicle fields are missing; UNKNOWN is explicitly uncertain. Type :cancel to cancel.");
         var values = new LinkedHashMap<String, String>();
         for (var field : PreparationForm.FIELDS) {
+            if (conflictCheck && !field.section().equals("Vehicle")) continue;
             output.print(field.label() + ": "); output.flush();
             if (!input.hasNextLine()) { output.println("Cancelled at end of input; previous session preserved."); return; }
             String value = input.nextLine();
             if (value.equalsIgnoreCase(":cancel")) { output.println("Cancelled; previous session preserved."); return; }
             values.put(field.key(), value);
         }
-        displayResult(submit(PreparationForm.command(facade, values)));
+        if (conflictCheck) output.println(ResultFormatter.format(facade.checkConflict(PreparationForm.vehicle(facade, values))));
+        else displayResult(submit(PreparationForm.command(facade, values)));
     }
 
     private void help() {
-        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), show, status, help, quit.");
+        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), show, status, help, quit.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. AI, knowledge retrieval and comparison are PLANNED.");
     }
 }

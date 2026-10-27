@@ -24,6 +24,10 @@ public final class UsedCarApplicationFacade {
     public UserPreference preferences() { return session.getPreference(); }
     public String llmStatus() { return agent.llmStatus(); }
     public MissingInformationResult checkMissingInformation(Vehicle vehicle) { return agent.checkMissingInformation(vehicle); }
+    public MissingInformationResult checkConflict(Vehicle extractedVehicle) {
+        Vehicle manualVehicle = currentVehicle().orElseThrow(() -> new IllegalStateException("Save a manual vehicle first."));
+        return agent.checkConflict(manualVehicle, extractedVehicle);
+    }
     public List<ConstraintViolation> checkConstraints(Vehicle vehicle) { return agent.checkConstraints(vehicle, preferences()); }
     public CostEstimate estimateCost(Vehicle vehicle, double annualKm, double fuelPrice) {
         if (!Double.isFinite(annualKm) || !Double.isFinite(fuelPrice))

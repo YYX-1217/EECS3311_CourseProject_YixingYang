@@ -17,10 +17,10 @@ public record Vehicle(String id, int year, String make, String model, String tri
         trim = Values.optionalText(trim);
         if (mileage < 0) throw new IllegalArgumentException("Mileage must not be negative.");
         askingPrice = Values.nonNegative(askingPrice, "Asking price");
-        transmission = Values.transmission(transmission);
-        fuelType = Values.label(fuelType);
-        accidentHistory = Values.label(accidentHistory);
-        maintenanceHistory = Values.label(maintenanceHistory);
+        transmission = Values.optionalText(transmission).isEmpty() ? "" : Values.transmission(transmission);
+        fuelType = Values.optionalText(fuelType).isEmpty() ? "" : Values.label(fuelType);
+        accidentHistory = Values.optionalText(accidentHistory).isEmpty() ? "" : Values.label(accidentHistory);
+        maintenanceHistory = Values.optionalText(maintenanceHistory).isEmpty() ? "" : Values.label(maintenanceHistory);
         fuelConsumption = Values.optionalNonNegative(fuelConsumption, "Fuel consumption");
         notes = Values.optionalText(notes);
     }

@@ -51,7 +51,18 @@ public final class UsedCarGUI {
         });
         var calculate = new JButton("Save and calculate"); calculate.setName("calculate");
         calculate.addActionListener(event -> calculate());
-        buttons.add(example); buttons.add(calculate);
+        var conflicts = new JButton("Check against saved vehicle"); conflicts.setName("conflicts");
+        conflicts.setToolTipText("Use the Vehicle tab as a second structured record; does not save or extract listing text.");
+        conflicts.addActionListener(event -> {
+            var values = new LinkedHashMap<String, String>();
+            fields.forEach((key, field) -> values.put(key, field.getText()));
+            try {
+                output.setText(ResultFormatter.format(facade.checkConflict(PreparationForm.vehicle(facade, values))));
+                output.setCaretPosition(0);
+                message.setText("Compared saved manual record with Vehicle tab values. Neither source was changed.");
+            } catch (IllegalArgumentException | IllegalStateException e) { displayError(e.getMessage()); }
+        });
+        buttons.add(example); buttons.add(calculate); buttons.add(conflicts);
         var bottom = new JPanel(new BorderLayout()); bottom.add(buttons, BorderLayout.NORTH); bottom.add(message, BorderLayout.SOUTH);
         panel.add(bottom, BorderLayout.SOUTH);
     }

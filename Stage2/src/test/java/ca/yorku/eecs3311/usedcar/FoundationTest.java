@@ -23,4 +23,14 @@ public final class FoundationTest {
     @Test public void neutralAccidentTolerance() { FoundationChecks.neutralAccidentTolerance(); }
     @Test public void unknownAccidentHistory() { FoundationChecks.unknownAccidentHistory(); }
     @Test public void invalidConstraintPreferences() { FoundationChecks.invalidConstraintPreferences(); }
+    @Test public void f04UnknownAccident() { FoundationChecks.f04UnknownAccident(); }
+    @Test public void f04UnknownMaintenance() { FoundationChecks.f04UnknownMaintenance(); }
+    @Test public void f04CompleteData() { FoundationChecks.f04CompleteData(); }
+    @Test public void f04MissingHistory() { FoundationChecks.f04MissingHistory(); }
+    @Test public void f04OptionalData() { FoundationChecks.f04OptionalData(); }
+    @Test public void f04MatchingSources() { FoundationChecks.f04MatchingSources(); }
+    @Test public void f04ConflictingSources() { FoundationChecks.f04ConflictingSources(); }
+    @Test public void f04UnknownSources() { FoundationChecks.f04UnknownSources(); }
+    @Test public void f04CliConflictFlow() { FoundationChecks.f04CliConflictFlow(); }
+    @Test public void f04ConflictWithoutSession() { FoundationChecks.f04ConflictWithoutSession(); }
 }

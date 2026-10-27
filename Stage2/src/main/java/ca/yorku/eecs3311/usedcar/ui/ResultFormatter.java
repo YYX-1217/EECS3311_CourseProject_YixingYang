@@ -1,6 +1,7 @@
 package ca.yorku.eecs3311.usedcar.ui;
 
 import ca.yorku.eecs3311.usedcar.result.PreparationResult;
+import ca.yorku.eecs3311.usedcar.result.MissingInformationResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -8,6 +9,14 @@ public final class ResultFormatter {
     private ResultFormatter() { }
     private static String amount(BigDecimal value) { return value == null ? "unavailable" : value.setScale(2, RoundingMode.HALF_UP).toPlainString(); }
     private static String supplied(Object value) { return value == null ? "not supplied" : value.toString(); }
+
+    public static String format(MissingInformationResult result) {
+        return "Missing fields: " + result.missingFields() + "\n"
+                + "Uncertain fields: " + result.uncertainFields() + "\n"
+                + "Source conflicts: " + result.conflicts() + "\n"
+                + "Sufficient essential data: " + result.sufficient() + "\n"
+                + "Data sufficiency is not a safety or reliability judgment. No source values are merged.\n";
+    }
 
     public static String format(PreparationResult result) {
         var v = result.vehicle(); var a = result.assumptions(); var c = result.cost();
@@ -35,8 +44,7 @@ public final class ResultFormatter {
         if (result.violations().isEmpty()) text.append("No conflicts or unresolved checks among the supplied constraints; unspecified preferences are skipped.\n");
         result.violations().forEach(item -> text.append(item.severity()).append(": ").append(item.constraint())
                 .append(" | expected=").append(item.expected()).append(" | actual=").append(item.actual()).append('\n'));
-        text.append("Unknown fields: ").append(result.missing().missingFields()).append('\n')
-                .append("Data readiness is a basic field check, not a reliability judgment.\n")
+        text.append(format(result.missing()))
                 .append(result.llmStatus()).append('\n').append("Session is in memory only; closing the application discards it.\n");
         return text.toString();
     }

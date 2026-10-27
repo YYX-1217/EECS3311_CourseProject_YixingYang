@@ -31,6 +31,13 @@ public final class GuiSmoke {
                 ((JButton) named(gui.panel(), "calculate")).doClick();
                 var results = (JTextArea) named(gui.panel(), "results");
                 FoundationChecks.check(results.getText().contains("24922.00"), "GUI calculation mismatch.");
+                ((JTextField) named(gui.panel(), "price")).setText("19000");
+                ((JButton) named(gui.panel(), "conflicts")).doClick();
+                FoundationChecks.check(results.getText().contains("Asking price | manual=18000 | extracted=19000")
+                        && results.getText().contains("Missing fields:") && results.getText().contains("Uncertain fields:")
+                        && results.getText().contains("Sufficient essential data: false"), "GUI must display source conflicts and data quality.");
+                FoundationChecks.check(facade.currentVehicle().orElseThrow().askingPrice().intValueExact() == 18000, "GUI comparison must preserve the saved record.");
+                System.out.println("PASS: F04 GUI source comparison and session preservation.");
                 var image = new BufferedImage(gui.panel().getWidth(), gui.panel().getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D graphics = image.createGraphics();
                 try { gui.panel().printAll(graphics); } finally { graphics.dispose(); }

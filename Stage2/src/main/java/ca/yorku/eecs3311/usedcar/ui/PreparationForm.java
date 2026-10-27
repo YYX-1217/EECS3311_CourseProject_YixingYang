@@ -14,9 +14,9 @@ public final class PreparationForm {
             new Field("year", "Year *", "Vehicle"), new Field("make", "Make *", "Vehicle"),
             new Field("model", "Model *", "Vehicle"), new Field("trim", "Trim", "Vehicle"),
             new Field("mileage", "Mileage (km) *", "Vehicle"), new Field("price", "Asking price (CAD) *", "Vehicle"),
-            new Field("transmission", "Transmission (blank = unknown)", "Vehicle"),
+            new Field("transmission", "Transmission (blank = missing)", "Vehicle"),
             new Field("fuelType", "Fuel type", "Vehicle"), new Field("accident", "Accident history (YES/NO/UNKNOWN)", "Vehicle"),
-            new Field("maintenance", "Maintenance history", "Vehicle"),
+            new Field("maintenance", "Maintenance (DOCUMENTED/PARTIAL/NONE/UNKNOWN)", "Vehicle"),
             new Field("consumption", "Fuel consumption (L/100 km)", "Vehicle"), new Field("notes", "Notes", "Vehicle"),
             new Field("budget", "Maximum budget (CAD; blank = neutral)", "Preferences"),
             new Field("maxMileage", "Maximum mileage (km; blank = neutral)", "Preferences"),
@@ -42,17 +42,22 @@ public final class PreparationForm {
     }
 
     public static PrepareEvaluationCommand command(UsedCarApplicationFacade facade, Map<String, String> values) {
-        String id = facade.currentVehicle().map(Vehicle::id).orElseGet(() -> UUID.randomUUID().toString());
-        Vehicle vehicle = new Vehicle(id, integer(values, "year", true), values.get("make"), values.get("model"),
-                values.get("trim"), integer(values, "mileage", true), decimal(values, "price", true),
-                values.get("transmission"), values.get("fuelType"), values.get("accident"), values.get("maintenance"),
-                decimal(values, "consumption", false), values.get("notes"));
+        Vehicle vehicle = vehicle(facade, values);
         Set<String> transmissions = new HashSet<>(Arrays.asList(values.getOrDefault("acceptedTransmissions", "").split(",")));
         UserPreference preference = new UserPreference(decimal(values, "budget", false), integer(values, "maxMileage", false),
                 transmissions, "", 0, 0, values.get("accidentTolerance"));
         CostAssumptions assumptions = new CostAssumptions(decimal(values, "annualKm", true), decimal(values, "fuelPrice", true),
                 decimal(values, "taxRate", false), decimal(values, "maintenanceAllowance", false), decimal(values, "insuranceAllowance", false));
         return new PrepareEvaluationCommand(facade, vehicle, preference, assumptions);
+    }
+
+    public static Vehicle vehicle(UsedCarApplicationFacade facade, Map<String, String> values) {
+        String id = facade.currentVehicle().map(Vehicle::id).orElseGet(() -> UUID.randomUUID().toString());
+        Vehicle vehicle = new Vehicle(id, integer(values, "year", true), values.get("make"), values.get("model"),
+                values.get("trim"), integer(values, "mileage", true), decimal(values, "price", true),
+                values.get("transmission"), values.get("fuelType"), values.get("accident"), values.get("maintenance"),
+                decimal(values, "consumption", false), values.get("notes"));
+        return vehicle;
     }
 
     private static BigDecimal decimal(Map<String, String> values, String key, boolean required) {
