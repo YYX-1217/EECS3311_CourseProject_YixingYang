@@ -1,0 +1,4 @@
+make,model,yearFrom,yearTo,summary,commonIssues,inspectionNotes,sourceLabel
+Example Motors,Sample Sedan,2018,2022,Fictional sedan scenario for retrieval practice,Sample concern: uneven tire wear|Sample concern: incomplete service log,Review the supplied service log|Inspect tires in this fictional scenario,Instructional sample only - fictional vehicles and concerns
+Example Motors,Sample Sedan,2023,2025,Fictional later sedan scenario for year-range practice,Sample concern: missing spare key,Verify the included keys in this fictional scenario,Instructional sample only - fictional vehicles and concerns
+Demo Works,Practice Hatch,2019,2024,Fictional hatchback scenario for retrieval practice,Sample concern: cosmetic seat wear,Inspect seat condition in this fictional scenario,Instructional sample only - fictional vehicles and concerns

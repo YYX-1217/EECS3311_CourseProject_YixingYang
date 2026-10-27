@@ -33,4 +33,14 @@ public final class FoundationTest {
     @Test public void f04UnknownSources() { FoundationChecks.f04UnknownSources(); }
     @Test public void f04CliConflictFlow() { FoundationChecks.f04CliConflictFlow(); }
     @Test public void f04ConflictWithoutSession() { FoundationChecks.f04ConflictWithoutSession(); }
+    @Test public void f05ExactMatch() { FoundationChecks.f05ExactMatch(); }
+    @Test public void f05CaseMatch() { FoundationChecks.f05CaseMatch(); }
+    @Test public void f05WhitespaceMatch() { FoundationChecks.f05WhitespaceMatch(); }
+    @Test public void f05YearBoundaries() { FoundationChecks.f05YearBoundaries(); }
+    @Test public void f05NoMatch() { FoundationChecks.f05NoMatch(); }
+    @Test public void f05MissingFile() { FoundationChecks.f05MissingFile(); }
+    @Test public void f05MalformedCsv() { FoundationChecks.f05MalformedCsv(); }
+    @Test public void f05ToolDispatch() { FoundationChecks.f05ToolDispatch(); }
+    @Test public void f05FacadeIntegration() { FoundationChecks.f05FacadeIntegration(); }
+    @Test public void f05CliKnowledge() { FoundationChecks.f05CliKnowledge(); }
 }

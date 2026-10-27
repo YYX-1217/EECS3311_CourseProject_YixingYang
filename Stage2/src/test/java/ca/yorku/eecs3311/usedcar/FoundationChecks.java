@@ -289,6 +289,108 @@ public final class FoundationChecks {
         throw new AssertionError("Comparison requires a saved manual record.");
     }
 
+    public static void f05ExactMatch() {
+        var result = new VehicleKnowledgeRepository().findByVehicle("Example Motors", "Sample Sedan", 2020);
+        check(result.summary().equals("Fictional sedan scenario for retrieval practice"), "Exact lookup must retrieve the CSV record.");
+        check(result.commonIssues().size() == 2 && result.inspectionNotes().size() == 2
+                && result.commonIssues().getFirst().equals("Sample concern: uneven tire wear")
+                && result.sourceLabel().contains("Instructional sample only"), "CSV lists and source metadata must be preserved.");
+    }
+
+    public static void f05CaseMatch() {
+        var repository = new VehicleKnowledgeRepository();
+        check(repository.findByVehicle("EXAMPLE MOTORS", "sample sedan", 2020)
+                .equals(repository.findByVehicle("Example Motors", "Sample Sedan", 2020)), "Matching must ignore case.");
+    }
+
+    public static void f05WhitespaceMatch() {
+        var repository = new VehicleKnowledgeRepository();
+        check(repository.findByVehicle("  Example Motors ", " Sample Sedan  ", 2020)
+                .equals(repository.findByVehicle("Example Motors", "Sample Sedan", 2020)), "Matching must ignore surrounding whitespace.");
+    }
+
+    public static void f05YearBoundaries() {
+        var repository = new VehicleKnowledgeRepository();
+        for (int year : new int[]{2018, 2022})
+            check(repository.findByVehicle("Example Motors", "Sample Sedan", year).summary().equals("Fictional sedan scenario for retrieval practice"), "Inclusive range boundary failed.");
+        check(repository.findByVehicle("Example Motors", "Sample Sedan", 2023).summary().contains("later sedan"), "Adjacent range must select the appropriate record.");
+        for (int year : new int[]{2017, 2026})
+            check(repository.findByVehicle("Example Motors", "Sample Sedan", year).equals(ca.yorku.eecs3311.usedcar.result.VehicleKnowledge.noData()), "Outside range must not select a nearby record.");
+    }
+
+    public static void f05NoMatch() {
+        var repository = new VehicleKnowledgeRepository();
+        for (String[] identity : new String[][]{{"Unknown maker", "Sample Sedan"}, {"Example Motors", "Unknown model"}}) {
+            var result = repository.findByVehicle(identity[0], identity[1], 2020);
+            check(result.equals(ca.yorku.eecs3311.usedcar.result.VehicleKnowledge.noData())
+                    && result.commonIssues().isEmpty() && result.inspectionNotes().isEmpty(), "No match must have explicit status and no invented notes.");
+            check(ResultFormatter.format(result).contains("No local vehicle knowledge available."), "No-data status must be visible.");
+        }
+    }
+
+    public static void f05MissingFile() {
+        var path = java.nio.file.Path.of("build", "missing-knowledge-" + java.util.UUID.randomUUID() + ".csv");
+        try { new VehicleKnowledgeRepository(path).load(); }
+        catch (IllegalStateException expected) {
+            check(expected.getMessage().contains("Cannot load local vehicle knowledge") && expected.getMessage().contains(path.toString()), "Missing-file error must identify the source."); return;
+        }
+        throw new AssertionError("Missing file must not appear as an empty successful repository.");
+    }
+
+    public static void f05MalformedCsv() {
+        String header = "make,model,yearFrom,yearTo,summary,commonIssues,inspectionNotes,sourceLabel\n";
+        String valid = " Fixture Maker , Fixture Model ,2000,2005,Fixture summary,Concern one|Concern two,Inspect sample,Test fixture\n";
+        try {
+            java.nio.file.Files.createDirectories(java.nio.file.Path.of("build", "verification"));
+            var file = java.nio.file.Files.createTempFile(java.nio.file.Path.of("build", "verification"), "knowledge-", ".csv");
+            try {
+                java.nio.file.Files.writeString(file, header + valid);
+                var repository = new VehicleKnowledgeRepository(file); repository.load();
+                check(repository.findByVehicle("fixture maker", "fixture model", 2000).commonIssues().size() == 2, "Filesystem CSV and stored-name normalization must work.");
+                for (String bad : new String[]{"wrong header\n", header + "too,few,columns\n",
+                        header + valid.replace("2000", "oops"), header + valid.replace("2005", "1999"),
+                        header + valid.replace("Fixture summary", ""), header + valid.replace("Concern one|Concern two", "One||Two"),
+                        header + valid.replace("Fixture summary", "\"quoted, summary\""), header + valid + valid}) {
+                    java.nio.file.Files.writeString(file, bad);
+                    try { repository.load(); throw new AssertionError("Malformed CSV was accepted: " + bad); }
+                    catch (IllegalStateException expected) {
+                        check(expected.getMessage().contains("Malformed CSV at line"), "Malformed-file error must identify the line.");
+                    }
+                    try { repository.findByVehicle("fixture maker", "fixture model", 2000); throw new AssertionError("Failed reload served stale data."); }
+                    catch (IllegalStateException expected) { /* Explicit failure is required. */ }
+                }
+            } finally { java.nio.file.Files.deleteIfExists(file); }
+        } catch (java.io.IOException e) { throw new AssertionError(e); }
+    }
+
+    public static void f05ToolDispatch() {
+        var manager = new ToolManager();
+        manager.registerTool("vehicleKnowledge", new VehicleKnowledgeTool(new VehicleKnowledgeRepository()));
+        var vehicle = PreparationForm.vehicle(ApplicationFactory.create(), PreparationForm.example());
+        check(manager.execute("vehicleKnowledge", vehicle).equals(new VehicleKnowledgeRepository()
+                .findByVehicle(vehicle.make(), vehicle.model(), vehicle.year())), "ToolManager must dispatch the real knowledge lookup.");
+        rejects(() -> manager.execute("vehicleKnowledge", "not a vehicle"));
+    }
+
+    public static void f05FacadeIntegration() {
+        var facade = ApplicationFactory.create();
+        try { facade.retrieveKnowledge(); throw new AssertionError("Lookup without a saved vehicle must fail."); }
+        catch (IllegalStateException expected) { check(expected.getMessage().contains("Save a vehicle"), "Missing session should be explained."); }
+        var saved = PreparationForm.command(facade, PreparationForm.example()).execute().vehicle();
+        check(facade.retrieveKnowledge().equals(facade.retrieveKnowledge(saved))
+                && facade.retrieveKnowledge().summary().contains("Fictional sedan"), "Facade must reach the repository through the agent and tool.");
+        check(facade.currentVehicle().orElseThrow().equals(saved), "Knowledge retrieval must preserve the vehicle.");
+    }
+
+    public static void f05CliKnowledge() {
+        var bytes = new ByteArrayOutputStream();
+        var facade = ApplicationFactory.create();
+        new UsedCarCLI(facade, new Scanner("knowledge\ndemo\nknowledge\nquit\n"), new PrintStream(bytes)).run();
+        String output = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
+        check(output.contains("ERROR: Save a vehicle first.") && output.contains("Fictional sedan scenario")
+                && output.contains("Sample concern: uneven tire wear") && output.contains("Instructional sample only"), "CLI knowledge must retrieve and display labeled CSV content.");
+    }
+
     public static void main(String[] args) {
         numericValidation(); requiredFieldsAndYear(); exactCostCalculation(); omittedAssumptions(); unknownConsumption();
         constraintBoundaries(); zeroAndRounding(); sessionAndInvalidUpdate(); toolContractsAndLlmBoundary(); cliFlow();
@@ -296,6 +398,8 @@ public final class FoundationChecks {
         accidentConflict(); acceptableHistory(); neutralAccidentTolerance(); unknownAccidentHistory(); invalidConstraintPreferences();
         f04UnknownAccident(); f04UnknownMaintenance(); f04CompleteData(); f04MissingHistory(); f04OptionalData();
         f04MatchingSources(); f04ConflictingSources(); f04UnknownSources(); f04CliConflictFlow(); f04ConflictWithoutSession();
-        System.out.println("PASS: 30 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        f05ExactMatch(); f05CaseMatch(); f05WhitespaceMatch(); f05YearBoundaries(); f05NoMatch();
+        f05MissingFile(); f05MalformedCsv(); f05ToolDispatch(); f05FacadeIntegration(); f05CliKnowledge();
+        System.out.println("PASS: 40 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

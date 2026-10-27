@@ -38,6 +38,9 @@ public final class GuiSmoke {
                         && results.getText().contains("Sufficient essential data: false"), "GUI must display source conflicts and data quality.");
                 FoundationChecks.check(facade.currentVehicle().orElseThrow().askingPrice().intValueExact() == 18000, "GUI comparison must preserve the saved record.");
                 System.out.println("PASS: F04 GUI source comparison and session preservation.");
+                ((JButton) named(gui.panel(), "knowledge")).doClick();
+                FoundationChecks.check(results.getText().contains("Fictional sedan scenario")
+                        && results.getText().contains("Instructional sample only"), "GUI must display knowledge for the saved vehicle.");
                 var image = new BufferedImage(gui.panel().getWidth(), gui.panel().getHeight(), BufferedImage.TYPE_INT_RGB);
                 Graphics2D graphics = image.createGraphics();
                 try { gui.panel().printAll(graphics); } finally { graphics.dispose(); }
@@ -60,6 +63,11 @@ public final class GuiSmoke {
                 ((JButton) named(gui.panel(), "calculate")).doClick();
                 FoundationChecks.check(results.getText().contains("UNKNOWN: Transmission")
                         && results.getText().contains("UNKNOWN: Accident history"), "GUI must distinguish unknown data from conflicts.");
+                ((JTextField) named(gui.panel(), "model")).setText("Unlisted model");
+                ((JButton) named(gui.panel(), "calculate")).doClick();
+                ((JButton) named(gui.panel(), "knowledge")).doClick();
+                FoundationChecks.check(results.getText().contains("No local vehicle knowledge available."), "GUI must show the no-data result.");
+                System.out.println("PASS: F05 GUI knowledge and no-data results.");
                 System.out.println("PASS: F07 GUI conflict and uncertainty checks.");
                 System.out.println("PASS: Swing window launch, example calculation, invalid input, session preservation and edited calculation.");
             } catch (Exception e) { throw new RuntimeException(e); }

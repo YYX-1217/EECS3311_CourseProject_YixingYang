@@ -33,6 +33,9 @@ public final class UsedCarAgent {
     public MissingInformationResult checkConflict(Vehicle manualVehicle, Vehicle extractedVehicle) {
         return dataQualityChecker.checkConflict(manualVehicle, extractedVehicle);
     }
+    public VehicleKnowledge retrieveKnowledge(Vehicle vehicle) {
+        return (VehicleKnowledge) toolManager.execute("vehicleKnowledge", vehicle);
+    }
     public String llmStatus() { return llmClient.status(); }
 
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {

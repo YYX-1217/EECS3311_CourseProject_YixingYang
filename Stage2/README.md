@@ -80,6 +80,7 @@ Within the interactive CLI, use the following commands:
 | `:cancel` | Cancel data entry at a `prepare` or `check-conflicts` field prompt. |
 | `demo` | Execute the deterministic workflow with fictional example input. |
 | `show` | Display the saved current vehicle and buyer preferences. |
+| `knowledge` | Retrieve local CSV knowledge for the currently saved vehicle; report explicitly when no matching record exists. |
 | `status` | Display the current LLM integration status. |
 | `help` | List available commands. |
 | `quit` | Exit the application. |
@@ -103,6 +104,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode gui
 Select **Load fictional example**, review the **Vehicle**, **Preferences**, and **Cost assumptions** tabs, and then select **Save and calculate**. Alternatively, enter your own data. The results area supports scrolling and displays validation errors. After changing input, select **Save and calculate** again to obtain updated results.
 
 To check source differences, first save the manual vehicle with **Save and calculate**. Enter the second structured record in the **Vehicle** tab, then select **Check against saved vehicle**. This action uses only the Vehicle tab and leaves the saved record unchanged. Do not select Save and calculate before comparing, because that replaces the baseline. Review both reported values and explicitly edit/save your chosen record; automatic resolution is not implemented.
+
+Select **View local knowledge** to retrieve notes for the saved vehicle in the existing results area. Unsaved form edits are not used; save the vehicle first. Both matching results and the explicit no-data result are displayed.
 
 The GUI and CLI use the same underlying application workflow. Neither interface currently provides all planned Stage 2 features.
 
@@ -136,7 +139,7 @@ In a terminal that permits script execution, the available verification modes ar
 & .\scripts\verify.ps1 -Gui             # Also open a real GUI, test its buttons, and close it
 ```
 
-The thirty tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
+The forty tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
 
 Ten F04 tests additionally cover missing versus unknown histories, complete and insufficient essential data, optional omissions, matching and conflicting sources, unknown values without false conflicts, session preservation, and the interactive conflict-check command.
 
@@ -166,6 +169,20 @@ An initial Maven build may download the declared plugins and test dependencies. 
 
 This is a deterministic F04 increment, not complete F04 implementation. The second record is entered manually to represent structured extraction output. LLM listing extraction, ambiguity interpretation, automated clarification, and a dedicated conflict-resolution workflow remain planned. A source comparison concerns two descriptions of the same vehicle; it does not implement F09 comparison of competing vehicles. No risk rating or purchase recommendation is generated.
 
+## F05 local vehicle knowledge retrieval
+
+`knowledge` in the CLI and **View local knowledge** in the GUI follow the Stage 1 UC05/SD03 call chain: facade → agent → existing ToolManager (`vehicleKnowledge`) → VehicleKnowledgeTool → VehicleKnowledgeRepository. The result retains the Stage 1 `summary`, `commonIssues`, `inspectionNotes`, and `sourceLabel` fields. Retrieval does not modify the saved vehicle.
+
+The UTF-8 dataset `src/main/resources/vehicle-knowledge.csv` contains three explicitly fictional instructional records: two non-overlapping year ranges for Example Motors / Sample Sedan and one for Demo Works / Practice Hatch. The existing fictional 2020 demo matches the first record. These notes are sample inputs for demonstrating retrieval, not claims about real vehicle reliability. The build packages the CSV in the JAR, so lookup does not depend on the working directory. Rebuild after editing the bundled data.
+
+The restricted CSV schema is `make,model,yearFrom,yearTo,summary,commonIssues,inspectionNotes,sourceLabel`. The header is exact. Each nonblank record occupies one line with eight comma-separated columns; quoting, embedded commas, multiline fields, and comments are unsupported and rejected. The two list columns use `|` separators and may be empty; empty items within a nonempty list are rejected. Other columns are required. Years are inclusive integers from 1886 through 9999 with start ≤ end. Matching ignores case and surrounding whitespace. Overlapping ranges for the same normalized make/model are rejected rather than selected arbitrarily.
+
+The repository loads lazily on first lookup, caches validated records, and exposes `load()` for explicit reloads. It also accepts a local `Path` for tests or programmatic use. Missing/unreadable files and malformed records produce explicit retrieval errors; malformed-record errors include a line number. A failed reload cannot silently serve old records. No matching make/model/year returns **No local vehicle knowledge available.** with empty issue and inspection lists. Other deterministic operations remain available if knowledge retrieval fails.
+
+Ten F05 tests cover exact matching, case and whitespace normalization, inclusive year boundaries, no-data results, missing files, malformed CSV, tool dispatch, facade integration, and the CLI command. GUI smoke verification exercises both a matching record and no-data output.
+
+This increment provides local deterministic retrieval only. There is no live database, fuzzy matching, dataset editor, or external API call. Automatic use of knowledge in future AI assessment, comparison, checklists, and recommendations remains planned.
+
 ## Gemini API integration status
 
 `LLMClient` currently defines the provider-independent boundary. `GeminiAdapter` is an explicitly unavailable architectural foundation: its `generate()` method throws an exception with a `PLANNED` message. There is no HTTP implementation, no API-key access, no `.env` loading, and no simulated AI response. Providing an API key **does not enable AI functionality in this version**.
@@ -182,12 +199,12 @@ The Stage2 ignore rules cover `.env`, `.env.*`, and `config.local.json`, while r
 
 | Status | Features or components |
 |---|---|
-| **Implemented initial subsets** | F01 vehicle information entry and management; F03 buyer preference profile; F04 missing-information detection; F06 ownership-cost estimation; F07 buyer constraint checking. These subsets operate through the shared preparation workflow and do not complete the full original feature specifications. |
-| **Planned features** | F02 listing-text analysis; F05 local vehicle knowledge retrieval; F08 AI-assisted risk assessment; F09 two-vehicle comparison; F10 inspection checklist generation; F11 clarification and follow-up management; F12 personalized recommendation and evaluation report. |
+| **Implemented initial subsets** | F01 vehicle information entry and management; F03 buyer preference profile; F04 missing-information detection; F05 local CSV knowledge retrieval; F06 ownership-cost estimation; F07 buyer constraint checking. These subsets operate through the shared preparation workflow and do not complete the full original feature specifications. |
+| **Planned features** | F02 listing-text analysis; F08 AI-assisted risk assessment; F09 two-vehicle comparison; F10 inspection checklist generation; F11 clarification and follow-up management; F12 personalized recommendation and evaluation report. |
 | **Operational pattern relationships** | Facade and Command have working workflow implementations. |
 | **Architectural foundation only** | Adapter has an interface and unavailable provider implementation, without actual provider-protocol adaptation. |
 | **Planned design patterns** | Strategy and Factory remain planned. |
 
-The application does not currently provide reliability ratings, purchase recommendations, knowledge-base retrieval, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; dedicated constraint commands and future AI evaluation/comparison integration remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
+The application does not currently provide reliability ratings, purchase recommendations, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; dedicated constraint commands and future AI evaluation/comparison integration remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
 
 For further detail, see [Implementation Status](docs/IMPLEMENTATION_STATUS.md), [Stage 1 Traceability](docs/STAGE1_TRACEABILITY.md), [Design Decisions](docs/DESIGN_DECISIONS.md), [Development and Verification Log](docs/DEVELOPMENT_LOG.md), and [Next Steps](docs/NEXT_STEPS.md).

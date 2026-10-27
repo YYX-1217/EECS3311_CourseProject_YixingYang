@@ -62,7 +62,17 @@ public final class UsedCarGUI {
                 message.setText("Compared saved manual record with Vehicle tab values. Neither source was changed.");
             } catch (IllegalArgumentException | IllegalStateException e) { displayError(e.getMessage()); }
         });
-        buttons.add(example); buttons.add(calculate); buttons.add(conflicts);
+        var knowledge = new JButton("View local knowledge"); knowledge.setName("knowledge");
+        knowledge.addActionListener(event -> {
+            try {
+                output.setText(ResultFormatter.format(facade.retrieveKnowledge())); output.setCaretPosition(0);
+                message.setText("Local knowledge for the saved vehicle; unsaved form edits are not used.");
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                output.setText("ERROR: " + e.getMessage());
+                message.setText("Knowledge retrieval failed; saved session preserved.");
+            }
+        });
+        buttons.add(example); buttons.add(calculate); buttons.add(conflicts); buttons.add(knowledge);
         var bottom = new JPanel(new BorderLayout()); bottom.add(buttons, BorderLayout.NORTH); bottom.add(message, BorderLayout.SOUTH);
         panel.add(bottom, BorderLayout.SOUTH);
     }

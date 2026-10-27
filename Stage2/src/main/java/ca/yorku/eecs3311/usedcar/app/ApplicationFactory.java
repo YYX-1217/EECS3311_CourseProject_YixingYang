@@ -11,6 +11,7 @@ public final class ApplicationFactory {
         var tools = new ToolManager();
         tools.registerTool("cost", new CostCalculatorTool());
         tools.registerTool("constraints", new ConstraintCheckerTool());
+        tools.registerTool("vehicleKnowledge", new VehicleKnowledgeTool(new VehicleKnowledgeRepository()));
         return new UsedCarApplicationFacade(new UsedCarAgent(tools, new GeminiAdapter(), new DataQualityChecker()), new EvaluationSession());
     }
 }

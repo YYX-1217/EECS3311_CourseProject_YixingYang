@@ -42,8 +42,9 @@ public final class UsedCarCLI {
                         output.println(facade.currentVehicle().map(Object::toString).orElse("No vehicle saved yet."));
                         output.println(facade.preferences());
                     }
+                    case "knowledge" -> output.println(ResultFormatter.format(facade.retrieveKnowledge()));
                     case "status" -> output.println(facade.llmStatus());
-                    case "evaluate", "analyze-listing", "compare", "checklist", "report", "knowledge", "clarify" ->
+                    case "evaluate", "analyze-listing", "compare", "checklist", "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
                     default -> output.println("Unknown command. Type help.");
                 }
@@ -73,7 +74,7 @@ public final class UsedCarCLI {
     }
 
     private void help() {
-        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), show, status, help, quit.");
-        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. AI, knowledge retrieval and comparison are PLANNED.");
+        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), show, status, help, quit.");
+        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }
 }

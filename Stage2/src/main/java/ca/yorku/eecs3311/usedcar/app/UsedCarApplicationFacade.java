@@ -22,6 +22,10 @@ public final class UsedCarApplicationFacade {
     public void savePreferences(UserPreference preference) { session.setPreference(preference); }
     public Optional<Vehicle> currentVehicle() { return session.getCurrentVehicle(); }
     public UserPreference preferences() { return session.getPreference(); }
+    public VehicleKnowledge retrieveKnowledge(Vehicle vehicle) { return agent.retrieveKnowledge(vehicle); }
+    public VehicleKnowledge retrieveKnowledge() {
+        return retrieveKnowledge(currentVehicle().orElseThrow(() -> new IllegalStateException("Save a vehicle first.")));
+    }
     public String llmStatus() { return agent.llmStatus(); }
     public MissingInformationResult checkMissingInformation(Vehicle vehicle) { return agent.checkMissingInformation(vehicle); }
     public MissingInformationResult checkConflict(Vehicle extractedVehicle) {

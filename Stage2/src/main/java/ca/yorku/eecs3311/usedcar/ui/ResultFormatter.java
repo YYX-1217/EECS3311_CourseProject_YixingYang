@@ -18,6 +18,14 @@ public final class ResultFormatter {
                 + "Data sufficiency is not a safety or reliability judgment. No source values are merged.\n";
     }
 
+    public static String format(ca.yorku.eecs3311.usedcar.result.VehicleKnowledge result) {
+        return "LOCAL VEHICLE KNOWLEDGE\n" + result.summary() + "\n"
+                + "Common issues: " + result.commonIssues() + "\n"
+                + "Inspection notes: " + result.inspectionNotes() + "\n"
+                + "Source: " + result.sourceLabel() + "\n"
+                + "Retrieved notes only; no AI risk assessment or purchase recommendation.\n";
+    }
+
     public static String format(PreparationResult result) {
         var v = result.vehicle(); var a = result.assumptions(); var c = result.cost();
         var text = new StringBuilder("DETERMINISTIC PREPARATION ONLY - no AI risk assessment or purchase recommendation\n");
