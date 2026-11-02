@@ -99,6 +99,26 @@ public final class GuiSmoke {
                 selectedMode.setSelectedItem("balanced");
                 ((JButton) named(gui.panel(), "strategyPreview")).doClick();
                 FoundationChecks.check(results.getText().contains("Balanced"), "GUI must expose all three modes.");
+                selectedMode.setSelectedItem("auto");
+                ((JTextField) named(gui.panel(), "reliabilityPriority")).setText("5");
+                ((JTextField) named(gui.panel(), "fuelEconomyPriority")).setText("1");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().equals(facade.previewPriorityGuidance())
+                        && results.getText().contains("Reliability Focused") && results.getText().contains("reliability=5/5, fuel economy=1/5"),
+                        "GUI auto must use shared facade output and display the selection basis.");
+                ((JTextField) named(gui.panel(), "reliabilityPriority")).setText("1");
+                ((JTextField) named(gui.panel(), "fuelEconomyPriority")).setText("5");
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Reliability Focused"), "Unsaved edits must not change auto selection.");
+                ((JButton) named(gui.panel(), "profileSave")).doClick();
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Balanced"), "GUI auto must reselect after saving a profile.");
+                selectedMode.setSelectedItem("budget");
+                ((JButton) named(gui.panel(), "strategyPreview")).doClick();
+                FoundationChecks.check(results.getText().contains("Budget Focused") && facade.currentVehicle().orElseThrow().equals(savedVehicle),
+                        "GUI manual override must remain available and preserve the vehicle.");
+                System.out.println("PASS: Factory GUI auto selection, saved/unsaved preferences, shared output and manual override.");
                 System.out.println("PASS: Strategy GUI selection, fresh preferences and vehicle preservation.");
                 System.out.println("PASS: F03 independent profile save, rejection, reload and F07 use.");
                 System.out.println("PASS: F05 GUI knowledge and no-data results.");

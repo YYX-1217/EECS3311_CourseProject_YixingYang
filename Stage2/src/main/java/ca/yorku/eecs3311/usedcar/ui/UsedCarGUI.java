@@ -57,6 +57,7 @@ public final class UsedCarGUI {
                 profileButtons.add(save); profileButtons.add(load);
                 var mode = new JComboBox<String>(); mode.setName("strategyMode");
                 mode.addItem("Select a mode"); facade.evaluationModes().forEach(mode::addItem);
+                mode.setToolTipText("auto selects from saved preferences; other modes explicitly override automatic selection.");
                 var preview = new JButton("Preview priority guidance"); preview.setName("strategyPreview");
                 preview.addActionListener(event -> {
                     try {

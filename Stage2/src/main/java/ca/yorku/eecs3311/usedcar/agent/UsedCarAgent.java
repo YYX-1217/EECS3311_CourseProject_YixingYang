@@ -4,12 +4,15 @@ import ca.yorku.eecs3311.usedcar.domain.*;
 import ca.yorku.eecs3311.usedcar.llm.LLMClient;
 import ca.yorku.eecs3311.usedcar.result.*;
 import ca.yorku.eecs3311.usedcar.tool.*;
+import ca.yorku.eecs3311.usedcar.strategy.*;
 import java.util.List;
 import java.util.Objects;
 
 /** Initial deterministic coordination only; not yet the Stage 2 reasoning agent. */
 public final class UsedCarAgent {
-    private ca.yorku.eecs3311.usedcar.strategy.EvaluationStrategy strategy;
+    private EvaluationStrategy strategy;
+    private final EvaluationStrategyFactory strategyFactory = new EvaluationStrategyFactory();
+    private boolean automaticStrategy;
     private final ToolManager toolManager;
     private final LLMClient llmClient;
     private final DataQualityChecker dataQualityChecker;
@@ -37,11 +40,19 @@ public final class UsedCarAgent {
     public VehicleKnowledge retrieveKnowledge(Vehicle vehicle) {
         return (VehicleKnowledge) toolManager.execute("vehicleKnowledge", vehicle);
     }
-    public void setStrategy(ca.yorku.eecs3311.usedcar.strategy.EvaluationStrategy strategy) {
+    public void setStrategy(EvaluationStrategy strategy) {
         this.strategy = Objects.requireNonNull(strategy, "Evaluation strategy is required");
+        automaticStrategy = false;
     }
+    public void useAutomaticStrategy() { automaticStrategy = true; }
+    public void selectManualStrategy(String mode) { setStrategy(strategyFactory.createManualStrategy(mode)); }
     public String buildPriorityGuidance(UserPreference preference) {
-        if (strategy == null) throw new IllegalStateException("Select a strategy first: balanced, budget or reliability.");
+        if (automaticStrategy) {
+            UserPreference current = preference == null ? UserPreference.limits(null, null) : preference;
+            strategy = strategyFactory.createStrategy(current);
+            return strategyFactory.selectionBasis(current) + strategy.buildPriorityGuidance(current);
+        }
+        if (strategy == null) throw new IllegalStateException("Select a strategy first: auto, balanced, budget or reliability.");
         return strategy.buildPriorityGuidance(Objects.requireNonNull(preference));
     }
     public String llmStatus() { return llmClient.status(); }

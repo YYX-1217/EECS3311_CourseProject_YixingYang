@@ -1,6 +1,6 @@
 # Implementation status
 
-Baseline date: 2026-10-26 (America/New_York; same local date as Toronto). This is initial scaffolding, not a final Stage 2 submission.
+Updated: 2026-11-02 (America/New_York; same local date as Toronto). This remains a partial implementation, not a final Stage 2 submission.
 
 **WORKING SUBSET** means the described operation runs end to end; it does not mark the entire original feature complete. **FOUNDATION ONLY** means a boundary exists without the final behavior. **PLANNED** means no implementation claim.
 
@@ -8,18 +8,18 @@ Baseline date: 2026-10-26 (America/New_York; same local date as Toronto). This i
 |---|---|---|---|
 | F01 | WORKING SUBSET | Manual fields, validation/normalization, create/replace current vehicle through GUI/CLI, identity retained for edit | Independent vehicle-add/edit/save controls; explicit provenance; multi-vehicle storage |
 | F02 | PLANNED | None | Listing extraction, schema validation, uncertainty and confirmation before save |
-| F03 | WORKING SUBSET | Validated budget/mileage limits, neutral unspecified limits, session storage and CLI show | Full preference UI, priority/tolerance semantics, local persistence |
-| F04 | WORKING SUBSET | Known unknown history/transmission/fuel fields listed; basic conservative sufficient flag | Incomplete drafts, prioritized gaps, uncertain source text, checkConflict and source resolution |
-| F05 | PLANNED | None | Local repository, source metadata, normalized lookup, no-match and I/O failure cases |
+| F03 | WORKING SUBSET | All seven validated preferences, independent CLI/GUI save/load, neutral values and in-memory storage | Local persistence and full downstream AI use |
+| F04 | WORKING SUBSET | Missing/uncertain fields, conservative sufficiency and structured source conflicts through CLI/GUI | Incomplete drafts, prioritized gaps, uncertain source text and dedicated source resolution |
+| F05 | WORKING SUBSET | Local CSV repository, source labels, normalized lookup, no-match and malformed/I/O handling | Real curated data and downstream AI integration |
 | F06 | WORKING SUBSET | Fuel, optional tax and complete-input first-year estimate; exact decimal arithmetic; unknown components preserved | Independent estimate-cost command/panel; reusable stored assumptions/results; wider formats/units |
-| F07 | WORKING SUBSET | Explicit budget/mileage rules and boundary behavior | Transmission and accident rules; unknown/not-evaluable constraint status |
-| F08 | PLANNED | Supporting deterministic preparation only | Real grounded risk synthesis, evidence validation, structured RiskAssessment |
+| F07 | WORKING SUBSET | Budget, mileage, transmission and accident rules; distinct UNKNOWN and CONFLICT findings | Dedicated controls and downstream AI integration |
+| F08 | PLANNED | Deterministic preparation and automatic/manual priority guidance only | Real grounded risk synthesis, evidence validation, structured RiskAssessment |
 | F09 | PLANNED | None | Two candidates, symmetric evidence, deterministic comparison and AI trade-offs |
 | F10 | PLANNED | None | Grounded grouped checklist, completion state, honest generic fallback |
 | F11 | PLANNED | None | One-to-three questions, saved history, skip/conflict handling, resumed workflow |
-| F12 | PLANNED | None | Fresh evidence aggregation, advisory report, unavailable-evidence labeling and local save |
+| F12 | PLANNED | Supporting priority guidance only; no recommendation/report | Fresh evidence aggregation, advisory report, unavailable-evidence labeling and local save |
 
-`PreparationResult` is not an `EvaluationReport` or `RiskAssessment`. GUI/CLI have one useful preparation workflow, not access to all final major features. Unknown transmission/history rules are not falsely reported as passing: output explicitly limits current checks to budget and mileage.
+`PreparationResult` is not an `EvaluationReport` or `RiskAssessment`. GUI/CLI have one useful preparation workflow, not access to all final major features. Unknown transmission/history values remain explicitly UNKNOWN when the corresponding preference is set; strategy selection does not change F07 findings.
 
 ## Pattern status
 
@@ -28,14 +28,16 @@ Baseline date: 2026-10-26 (America/New_York; same local date as Toronto). This i
 | Facade | WORKING | UsedCarApplicationFacade hides tools/session and serves both boundaries |
 | Command | WORKING SUBSET | PrepareEvaluationCommand is invoked by both GUI and CLI |
 | Adapter | FOUNDATION ONLY | LLMClient and GeminiAdapter exist; generate throws an honest unavailable error |
-| Strategy | PLANNED | All original strategy roles/methods documented in traceability |
-| Factory Method / Factory | PLANNED | Distinction and proposed correction documented; no count claimed |
+| Strategy | WORKING SUBSET | Three real priority-guidance policies invoked through EvaluationStrategy by the agent |
+| Simple Factory | WORKING SUBSET | EvaluationStrategyFactory creates automatic/manual policies used by CLI and GUI; not formal GoF Factory Method |
 
-Only two useful pattern relationships are currently operational. Five completed patterns, a real LLM, meaningful AI agent behavior and all twelve features remain final-development targets.
+Facade, Command, Strategy and a Simple Factory now have working relationships. Formal GoF Factory Method is not implemented or claimed; the course minimum of five completed patterns has not been established. A real LLM, meaningful AI agent behavior and completion of the proposed features remain development targets.
+
+Automatic mode chooses Reliability Focused only for two specified priorities with reliability strictly higher; otherwise it chooses Balanced. Missing/zero priorities are neutral. Budget Focused remains an explicit manual choice because the profile has no budget-priority field. Each automatic preview reselects from the latest saved preferences; manual choices persist until explicitly changed. D02 in DESIGN_DECISIONS.md records the Stage 1 clarification and pattern classification.
 
 ## Verification boundary
 
-Java 21 compilation, executable JAR/demo, 10 JUnit tests, interactive CLI processing and Swing smoke operations were run. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
+Java 21 compilation, executable JAR/demo, 72 JUnit tests (62 existing plus 10 factory tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
 
 Maven CLI was unavailable, so Maven compilation/test execution is unverified. The dependency-free runner is for environments without JUnit and is not a substitute for Stage 3 JUnit coverage, KUMA agent validation or failure analysis.
 

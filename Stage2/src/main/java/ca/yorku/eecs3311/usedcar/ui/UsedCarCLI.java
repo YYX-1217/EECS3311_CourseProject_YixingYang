@@ -99,7 +99,7 @@ public final class UsedCarCLI {
 
     private void help() {
         output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, help, quit.");
-        output.println("strategy balanced|budget|reliability selects and previews priority guidance; strategy previews the retained mode using saved preferences.");
+        output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }
 }

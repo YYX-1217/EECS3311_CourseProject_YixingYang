@@ -65,4 +65,14 @@ public final class FoundationTest {
     @Test public void strategyFacadeState() { FoundationChecks.strategyFacadeState(); }
     @Test public void strategyDoesNotChangeF07() { FoundationChecks.strategyDoesNotChangeF07(); }
     @Test public void strategyCliFlow() { FoundationChecks.strategyCliFlow(); }
+    @Test public void factoryNeutral() { FactoryChecks.neutral(); }
+    @Test public void factoryTies() { FactoryChecks.ties(); }
+    @Test public void factoryReliability() { FactoryChecks.reliability(); }
+    @Test public void factoryPriorityMatrix() { FactoryChecks.priorityMatrix(); }
+    @Test public void factoryBudgetNotInferred() { FactoryChecks.budgetNotInferred(); }
+    @Test public void factoryManualFactory() { FactoryChecks.manualFactory(); }
+    @Test public void factoryAgentDispatch() { FactoryChecks.agentDispatch(); }
+    @Test public void factoryAgentOverride() { FactoryChecks.agentOverride(); }
+    @Test public void factoryFacadeModes() { FactoryChecks.facadeModes(); }
+    @Test public void factoryCliAuto() { FactoryChecks.cliAuto(); }
 }

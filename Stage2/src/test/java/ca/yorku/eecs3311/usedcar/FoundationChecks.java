@@ -620,6 +620,7 @@ public final class FoundationChecks {
         f03ProfileRetrieval(); f03CliProfile(); f03F07Compatibility();
         strategyBalanced(); strategyBudget(); strategyReliability(); strategyDistinctPolicies(); strategyNeutralPreferences();
         strategySafetyAndConstraints(); strategyAgentPolymorphism(); strategyFacadeState(); strategyDoesNotChangeF07(); strategyCliFlow();
-        System.out.println("PASS: 62 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        FactoryChecks.runAll();
+        System.out.println("PASS: 72 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

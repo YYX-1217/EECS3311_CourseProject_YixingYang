@@ -22,7 +22,7 @@ Stage2/
   pom.xml, README.md, .gitignore, .env.example
   Project-Stage2-Instruction.pdf          Original course instruction file
   src/main/java/ca/yorku/eecs3311/usedcar/
-    app/ agent/ command/ domain/ llm/ result/ tool/ ui/
+    app/ agent/ command/ domain/ llm/ result/ strategy/ tool/ ui/
   src/main/resources/example.properties
   src/test/java/ca/yorku/eecs3311/usedcar/
   scripts/common.ps1, build.ps1, run.ps1, verify.ps1
@@ -83,8 +83,9 @@ Within the interactive CLI, use the following commands:
 | `profile-set` | Enter or update all seven buyer preferences independently of vehicle entry. Blank clears a field to neutral; `:keep` retains its saved value and `:cancel` cancels the update. |
 | `profile-show` | Display the saved buyer preference profile. |
 | `knowledge` | Retrieve local CSV knowledge for the currently saved vehicle; report explicitly when no matching record exists. |
+| `strategy auto` | Select automatically from saved buyer preferences and preview the selected policy and selection basis; subsequent previews reselect using current saved preferences. |
 | `strategy balanced`, `strategy budget`, `strategy reliability` | Select and preview an evaluation-priority policy using saved preferences. |
-| `strategy` | Preview the retained policy with the latest saved preferences; requires explicit selection first. |
+| `strategy` | Preview the active mode with the latest saved preferences; automatic mode reselects its policy. Requires explicit selection first. |
 | `status` | Display the current LLM integration status. |
 | `help` | List available commands. |
 | `quit` | Exit the application. |
@@ -143,7 +144,7 @@ In a terminal that permits script execution, the available verification modes ar
 & .\scripts\verify.ps1 -Gui             # Also open a real GUI, test its buttons, and close it
 ```
 
-The sixty-two tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
+The seventy-two tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
 
 Ten F04 tests additionally cover missing versus unknown histories, complete and insufficient essential data, optional omissions, matching and conflicting sources, unknown values without false conflicts, session preservation, and the interactive conflict-check command.
 
@@ -170,7 +171,7 @@ Blank budget/mileage limits remain unspecified; explicit zero is a real limit. N
 
 The combined `prepare` / **Save and calculate** workflow still explicitly submits and saves the preference fields together with vehicle and cost input; it now includes all seven fields. The fictional example loads sample preferences into the form, and executing `demo` saves those sample values. Use the independent profile operations when only preferences should change.
 
-Profiles remain in memory for the current session. Body type and priorities are stored and displayed for future evaluation workflows; they do not introduce new F07 rules, scoring, Strategy/Factory implementations, or AI recommendations. Twelve additional automated tests cover complete/neutral profiles, validation, updates, preservation, retrieval, CLI behavior, and F07 compatibility. GUI smoke verification also exercises independent save, rejection, reload, and vehicle preservation.
+Profiles remain in memory for the current session. Body type and priorities are stored and displayed; they do not introduce new F07 rules, scoring, or AI recommendations. The Strategy/Factory preview described below now also uses the saved profile. Twelve additional automated tests cover complete/neutral profiles, validation, updates, preservation, retrieval, CLI behavior, and F07 compatibility. GUI smoke verification also exercises independent save, rejection, reload, and vehicle preservation.
 
 ## F04 deterministic data-quality checks
 
@@ -201,7 +202,7 @@ This increment provides local deterministic retrieval only. There is no live dat
 
 ## Evaluation-priority Strategy preview
 
-The Preferences tab includes a mode selector (`balanced`, `budget`, `reliability`) and **Preview priority guidance**. Save preference edits first: previews use the session profile, not unsaved form fields. The CLI offers the equivalent `strategy <mode>` operation and `strategy` to repeat the preview. No vehicle is required. Selection persists in the current agent context until changed or the application closes; a new context has no implicit strategy. Invalid selection preserves the previous strategy.
+The Preferences tab includes a mode selector (`auto`, `balanced`, `budget`, `reliability`) and **Preview priority guidance**. Save preference edits first: previews use the session profile, not unsaved form fields. The CLI offers the equivalent `strategy <mode>` operation and `strategy` to repeat the preview. No vehicle is required. Selection persists in the current agent context until changed or the application closes; a new context has no implicit strategy. Invalid selection preserves the previous strategy.
 
 - **Balanced:** discusses budget, reliability, mileage, vehicle risk, and ownership-cost trade-offs. Relative reliability/fuel-economy emphasis follows their explicit nonzero priority values; an unspecified priority is not interpreted as a lower ranking.
 - **Budget Focused:** discusses purchase price, the supplied budget, and ownership costs first. An absent budget remains unspecified; missing cost assumptions are not zero. Low cost never overrides risk warnings or explicit constraints.
@@ -209,7 +210,30 @@ The Preferences tab includes a mode selector (`balanced`, `budget`, `reliability
 
 All modes retain explicit mileage, transmission, body-type and accident preferences, preserve neutral values, and prohibit invented history or risk ratings. Guidance is deterministic instruction text, not a completed AI assessment, inspection checklist, or purchase recommendation. F07 decisions are unchanged.
 
-The implementation preserves Stage 1 `EvaluationStrategy.buildPriorityGuidance(UserPreference): String`, the three named concrete strategies, and `UsedCarAgent.setStrategy(EvaluationStrategy)`. The agent holds the interface and dispatches polymorphically. A package-private `PriorityGuidance` helper shares preference rendering and safeguards. The facade selects from three preconstructed stateless policies for both interfaces; it does not infer the mode from budget or priorities. This explicit preview is an incremental adaptation of SD03/SD06 while F08/F12 remain planned. `EvaluationStrategyFactory` and automatic factory selection are deferred; no completed Factory pattern is claimed.
+The implementation preserves Stage 1 `EvaluationStrategy.buildPriorityGuidance(UserPreference): String`, the three named concrete strategies, and `UsedCarAgent.setStrategy(EvaluationStrategy)`. The agent holds the interface and dispatches polymorphically. A package-private `PriorityGuidance` helper shares preference rendering and safeguards. `EvaluationStrategyFactory.createStrategy(UserPreference)` now centralizes automatic construction. The agent obtains the product and invokes its guidance through `EvaluationStrategy`; CLI and GUI use the same facade. Manual construction also resides in the factory. This preview implements the strategy-selection portion of SD03/SD06; F08/F12 and their LLM workflows remain planned.
+
+### Automatic selection and manual override
+
+Run `strategy auto` in the interactive CLI, or choose `auto` in Preferences and select **Preview priority guidance**. Output identifies automatic mode, both priority values, the selection basis, the selected strategy, and its real guidance. Save preferences before previewing. `strategy` repeats the active mode. The factory is called again on every automatic preview, so saving a changed profile updates the next selection without changing the saved vehicle.
+
+| Saved preference basis | Automatic strategy |
+|---|---|
+| Both priorities are 1–5 and reliability is strictly greater than fuel economy | Reliability Focused |
+| Null profile, either priority is 0 (unspecified), equal priorities, or fuel economy is greater | Balanced |
+
+The factory treats a null profile as neutral for selection; the automatic agent path supplies a neutral profile to the existing non-null Strategy interface. Other optional profile fields retain their existing semantics. In particular, an absent budget is unspecified and a zero budget remains an explicit constraint.
+
+The profile has no budget-importance field. A maximum budget constrains affordability, and fuel economy can matter for reasons other than purchase price or total cost. Neither is sufficient to infer budget-first intent, even in combination. Consequently automatic mode does not select Budget Focused in this version. Use `strategy budget` (or GUI `budget`) to express that explicit choice; manual `balanced` and `reliability` also remain available. A manual choice persists across profile updates until another mode is explicitly selected. Selecting `auto` resumes inference. Invalid mode input leaves the active mode unchanged.
+
+This is a **Simple Factory**, consistent with the single factory class and argument-based selection in the Stage 1 UML and the creational lecture's argument-based example. It is not the formal GoF Factory Method, which delegates construction to creator subclasses. No artificial creator hierarchy or completed formal Factory Method is claimed. See D02 in [Design Decisions](docs/DESIGN_DECISIONS.md) for the source gap, conservative rule, and impact on future F08/F12 integration.
+
+Ten additional factory JUnit tests cover null/neutral/tied profiles, all 36 priority combinations, actual reliability guidance, unsupported budget inference, manual products, agent interface dispatch, override transitions, saved-profile updates, invalid selection preservation, and CLI integration. GUI smoke checks exercise automatic selection, unsaved versus saved edits, shared facade output, and manual override. Targeted checks can also be run after verification using the Java 21 executable (this command is a dependency-free targeted check, not a separate JUnit run):
+
+```powershell
+& .\scripts\verify.ps1 -Gui
+. .\scripts\common.ps1
+& (Join-Path (Find-Stage2Jdk) 'bin\java.exe') -cp 'build\classes;build\test-classes' ca.yorku.eecs3311.usedcar.FactoryChecks
+```
 
 Ten additional JUnit tests verify policy differences beyond labels, preference-sensitive behavior, neutrality, safety constraints, injected agent dispatch, runtime replacement, session preservation, F07 compatibility and CLI operation. Swing smoke verification covers all modes and fresh guidance after saving preferences.
 
@@ -231,9 +255,9 @@ The Stage2 ignore rules cover `.env`, `.env.*`, and `config.local.json`, while r
 |---|---|
 | **Implemented initial subsets** | F01 vehicle information entry and management; F03 buyer preference profile; F04 missing-information detection; F05 local CSV knowledge retrieval; F06 ownership-cost estimation; F07 buyer constraint checking. These subsets operate through the shared preparation workflow and do not complete the full original feature specifications. |
 | **Planned features** | F02 listing-text analysis; F08 AI-assisted risk assessment; F09 two-vehicle comparison; F10 inspection checklist generation; F11 clarification and follow-up management; F12 personalized recommendation and evaluation report. |
-| **Operational pattern relationships** | Facade and Command have working workflows; Strategy is operational for the deterministic priority-guidance preview. |
+| **Operational pattern relationships** | Facade and Command have working workflows; Strategy and a Simple Factory are operational for the deterministic priority-guidance preview. |
 | **Architectural foundation only** | Adapter has an interface and unavailable provider implementation, without actual provider-protocol adaptation. |
-| **Planned design patterns** | Factory remains planned. Strategy integration into future AI assessment/report generation is not yet implemented. |
+| **Planned design patterns** | Formal GoF Factory Method is not implemented or claimed. Strategy/Factory integration into future AI assessment/report generation is not yet implemented. |
 
 The application does not currently provide reliability ratings, purchase recommendations, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; dedicated constraint commands and future AI evaluation/comparison integration remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
 
