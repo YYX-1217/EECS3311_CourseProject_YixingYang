@@ -46,6 +46,7 @@ public final class UsedCarCLI {
                     }
                     case "knowledge" -> output.println(ResultFormatter.format(facade.retrieveKnowledge()));
                     case "strategy" -> output.println(facade.previewPriorityGuidance());
+                    case "llm-test" -> { output.println(facade.testLlmConnection()); output.println(facade.llmStatus()); }
                     case "status" -> output.println(facade.llmStatus());
                     case "evaluate", "analyze-listing", "compare", "checklist", "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
@@ -98,7 +99,7 @@ public final class UsedCarCLI {
     }
 
     private void help() {
-        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, help, quit.");
+        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }

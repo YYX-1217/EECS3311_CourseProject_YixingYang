@@ -33,6 +33,7 @@ public final class UsedCarApplicationFacade {
         else agent.selectManualStrategy(mode);
     }
     public String previewPriorityGuidance() { return agent.buildPriorityGuidance(preferences()); }
+    public String testLlmConnection() { return agent.testLlmConnection(); }
     public String llmStatus() { return agent.llmStatus(); }
     public MissingInformationResult checkMissingInformation(Vehicle vehicle) { return agent.checkMissingInformation(vehicle); }
     public MissingInformationResult checkConflict(Vehicle extractedVehicle) {

@@ -30,3 +30,16 @@ function Write-Stage2SourceList($Files, [string]$Path) {
 function Assert-Stage2Exit([string]$Action) {
     if ($LASTEXITCODE -ne 0) { throw "$Action failed (exit $LASTEXITCODE)." }
 }
+
+function Get-Stage2Gson {
+    $dependencyDir = Join-Path $Stage2Root 'build\dependencies'
+    New-Item -ItemType Directory -Force -Path $dependencyDir | Out-Null
+    $dependencyJar = Join-Path $dependencyDir 'gson-2.13.2.jar'
+    if (-not (Test-Path -LiteralPath $dependencyJar)) {
+        Invoke-WebRequest -UseBasicParsing 'https://repo.maven.apache.org/maven2/com/google/code/gson/gson/2.13.2/gson-2.13.2.jar' -OutFile $dependencyJar
+    }
+    if ((Get-FileHash -LiteralPath $dependencyJar -Algorithm SHA256).Hash -ne 'DD0CE1B55A3ED2080CB70F9C655850CDA86C206862310009DCB5E5C95265A5E0') {
+        throw 'Gson checksum mismatch. Remove only build/dependencies/gson-2.13.2.jar and rebuild.'
+    }
+    return $dependencyJar
+}

@@ -55,6 +55,7 @@ public final class UsedCarAgent {
         if (strategy == null) throw new IllegalStateException("Select a strategy first: auto, balanced, budget or reliability.");
         return strategy.buildPriorityGuidance(Objects.requireNonNull(preference));
     }
+    public String testLlmConnection() { return llmClient.generate("Reply with one short greeting sentence. This is a connection test."); }
     public String llmStatus() { return llmClient.status(); }
 
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {

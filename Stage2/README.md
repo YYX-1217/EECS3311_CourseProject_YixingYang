@@ -2,7 +2,7 @@
 
 ## Project overview
 
-This project is the **initial Stage 2 foundation** for the EECS3311 Fall 2026 course project. It supports a working deterministic workflow through a command-line interface (CLI) and a Swing graphical user interface (GUI): vehicle entry, session-based buyer preferences, ownership-cost estimation, data-quality checks, and buyer constraint checks. It is not a fully implemented Stage 2 application, and Gemini integration is not operational.
+This project is the **initial Stage 2 foundation** for the EECS3311 Fall 2026 course project. It supports a working deterministic workflow through a command-line interface (CLI) and a Swing graphical user interface (GUI): vehicle entry, session-based buyer preferences, ownership-cost estimation, data-quality checks, and buyer constraint checks. It is not a fully implemented Stage 2 application, and the Gemini HTTP adapter is implemented but live connectivity has not been verified.
 
 The `Stage2` directory is part of the existing course-project repository. The original `Project-Stage2-Instruction.pdf` is retained. The foundation was developed without modifying the Stage 1 materials, repository-root README, or Git configuration. No particular checkout location or personal Windows directory is required.
 
@@ -10,7 +10,7 @@ The `Stage2` directory is part of the existing course-project repository. The or
 
 - Windows PowerShell 5.1 or PowerShell 7 and a **Java 21 JDK**, rather than only a JRE.
 - A Windows desktop display for the GUI.
-- No Maven installation, network access, or API key is required for the standard script-based build or deterministic CLI/GUI workflow.
+- No Maven installation or API key is required for deterministic use. The first script build downloads Gson 2.13.2 from Maven Central; subsequent builds use its checksum-verified cache in build/dependencies. Runtime JSON classes are packaged in the executable JAR.
 - The verification script prefers JUnit 4.13.2 and Hamcrest from an existing VS Code Java extension installation. If those libraries are unavailable, it explicitly uses the dependency-free verification runner.
 
 The scripts check the current process's `STAGE2_JAVA_HOME`, then `JAVA_HOME`, `javac` on `PATH`, and common JDK installation directories to locate Java 21. They do not modify system-wide environment settings. During the initial scaffolding verification, the default `java` on `PATH` was Java 8; the scripts successfully located an installed Adoptium Java 21 JDK instead.
@@ -86,6 +86,7 @@ Within the interactive CLI, use the following commands:
 | `strategy auto` | Select automatically from saved buyer preferences and preview the selected policy and selection basis; subsequent previews reselect using current saved preferences. |
 | `strategy balanced`, `strategy budget`, `strategy reliability` | Select and preview an evaluation-priority policy using saved preferences. |
 | `strategy` | Preview the active mode with the latest saved preferences; automatic mode reselects its policy. Requires explicit selection first. |
+| `llm-test` | Explicitly send one harmless connection-test prompt; display genuine returned text and updated provider status. May consume API quota. |
 | `status` | Display the current LLM integration status. |
 | `help` | List available commands. |
 | `quit` | Exit the application. |
@@ -144,7 +145,7 @@ In a terminal that permits script execution, the available verification modes ar
 & .\scripts\verify.ps1 -Gui             # Also open a real GUI, test its buttons, and close it
 ```
 
-The seventy-two tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
+The eighty-six tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
 
 Ten F04 tests additionally cover missing versus unknown histories, complete and insufficient essential data, optional omissions, matching and conflicting sources, unknown values without false conflicts, session preservation, and the interactive conflict-check command.
 
@@ -239,15 +240,43 @@ Ten additional JUnit tests verify policy differences beyond labels, preference-s
 
 ## Gemini API integration status
 
-`LLMClient` currently defines the provider-independent boundary. `GeminiAdapter` is an explicitly unavailable architectural foundation: its `generate()` method throws an exception with a `PLANNED` message. There is no HTTP implementation, no API-key access, no `.env` loading, and no simulated AI response. Providing an API key **does not enable AI functionality in this version**.
+`GeminiAdapter implements LLMClient` now uses Java 21 `HttpClient` to POST to `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`. Gson 2.13.2 serializes `contents[].parts[].text` and strictly parses the response. Authentication uses the `x-goog-api-key` header, never a URL query parameter. The first candidate's completed text parts are joined; thought parts are excluded. Empty, malformed, blocked, missing-text and incomplete responses are rejected instead of presented as successful output.
 
-No API key is required to build or run the deterministic demonstration.
+The default is `gemini-3.1-flash-lite`, listed as stable and cost-efficient in the [official model catalog](https://ai.google.dev/gemini-api/docs/models) and [release notes](https://ai.google.dev/gemini-api/docs/changelog). Set `GEMINI_MODEL` to override it with an available Gemini model identifier. Account access, availability and quota must be verified locally. The implementation follows the [generateContent reference](https://ai.google.dev/api/generate-content) and [API-key documentation](https://ai.google.dev/gemini-api/docs/api-key). The documented generateContent endpoint is retained for this focused text adapter; no automatic model fallback or retry is performed.
 
-## API key security precautions
+Connection timeout is 10 seconds; request timeout is 30 seconds. HTTP errors distinguish authorization, quota/rate limits, unavailable models and server failures. Interrupts restore the thread interrupt flag. Diagnostics omit raw provider responses, exception causes and credentials. The exact configured key is also redacted if unexpectedly echoed in generated output. No network request occurs during startup, status queries or deterministic operations.
 
-After the provider adapter and configuration loader have been implemented, copy `.env.example` to `.env` within Stage2 and enter a key only in the local file. The current version does not read that file, so creating or supplying a real key is unnecessary at this stage.
+`status` distinguishes missing/invalid configuration, configured but not live-verified, last successful generation in this session, and last request failure. A configured key does not prove connectivity. **No real Gemini request was made during this increment; live connectivity remains unverified.** Offline fixtures are test data, not live evidence.
 
-The Stage2 ignore rules cover `.env`, `.env.*`, and `config.local.json`, while retaining the placeholder `.env.example`. Never include real keys in source code, screenshots, logs, reports, or version-controlled files. The example configuration contains placeholders only.
+The explicit CLI `llm-test` command follows facade -> agent -> LLMClient -> GeminiAdapter, sends a short greeting prompt and displays the actual returned response plus model/status. It does not send or change the saved vehicle or buyer preferences. The GUI still provides deterministic functionality; no blocking network button was added. This is provider integration only: F02, full AI-assisted F04, F08, F09, F10, F11 and F12 still require their domain prompts, parsers and workflows.
+
+## API key security and optional live test
+
+From the Stage2 directory, build first. Enter a key only into the local hidden PowerShell prompt, never into chat, code or a command-history literal:
+
+```powershell
+& .\scripts\build.ps1
+$geminiSecret = Read-Host 'Gemini API key (hidden)' -AsSecureString
+$geminiPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($geminiSecret)
+try {
+    $env:GEMINI_API_KEY = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($geminiPointer)
+} finally {
+    [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($geminiPointer)
+    $geminiSecret.Dispose()
+}
+$env:GEMINI_MODEL = 'gemini-3.1-flash-lite'
+try {
+    & .\scripts\run.ps1 -Mode cli
+} finally {
+    Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue
+}
+```
+
+In the CLI, enter `status`, then `llm-test` only when ready to authorize one real request, then `status` and `quit`. A successful test prints genuine generated text and the configured model. A failure prints a safe diagnostic; check account permissions, quota/billing or model access as appropriate before retrying manually. This operation can consume quota and incur provider charges. Without a key, the test explains missing configuration while other operations remain available.
+
+The application reads process environment variables only; `.env` is not loaded. `.env.example` contains placeholders and variable names, not working credentials. `.gitignore` continues to exclude `.env`, `.env.*` and `config.local.json`, while retaining `.env.example`. Never include keys in source, logs, screenshots, reports or Git. Do not enable HTTP header debugging with real keys. Environment variables exist in process memory; close the terminal after use if appropriate.
+
+Fourteen adapter test groups exercise loopback HTTP requests, JSON escaping, endpoint selection, actual parser behavior, configuration, HTTP failures, malformed/empty/blocked output, timeout/connection/interruption handling, secret redaction, state transitions and shared CLI integration. They require no real key and consume no Gemini quota. The existing verification command runs these alongside all prior regression tests.
 
 ## Implementation status and known limitations
 
@@ -256,7 +285,7 @@ The Stage2 ignore rules cover `.env`, `.env.*`, and `config.local.json`, while r
 | **Implemented initial subsets** | F01 vehicle information entry and management; F03 buyer preference profile; F04 missing-information detection; F05 local CSV knowledge retrieval; F06 ownership-cost estimation; F07 buyer constraint checking. These subsets operate through the shared preparation workflow and do not complete the full original feature specifications. |
 | **Planned features** | F02 listing-text analysis; F08 AI-assisted risk assessment; F09 two-vehicle comparison; F10 inspection checklist generation; F11 clarification and follow-up management; F12 personalized recommendation and evaluation report. |
 | **Operational pattern relationships** | Facade and Command have working workflows; Strategy and a Simple Factory are operational for the deterministic priority-guidance preview. |
-| **Architectural foundation only** | Adapter has an interface and unavailable provider implementation, without actual provider-protocol adaptation. |
+| **Implemented provider adapter; live unverified** | Adapter performs HTTP/JSON adaptation behind LLMClient; explicit CLI connection test is available. |
 | **Planned design patterns** | Formal GoF Factory Method is not implemented or claimed. Strategy/Factory integration into future AI assessment/report generation is not yet implemented. |
 
 The application does not currently provide reliability ratings, purchase recommendations, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; dedicated constraint commands and future AI evaluation/comparison integration remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.

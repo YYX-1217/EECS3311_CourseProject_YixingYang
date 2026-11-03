@@ -57,3 +57,9 @@ All newly authored project code/configuration/documentation and retained build/i
 No Git command was run. No repository/branch/commit was created. No add/commit/push/pull/fetch/reset, remote GitHub access, upload, synchronization, submission, deployment, LLM request or global software/environment change occurred. No real API credential was requested, read or printed; `.env.example` contains only a placeholder.
 
 Final integrity check: 154 protected pre-existing files checked; 0 changed, 0 missing, 0 newly added outside Stage2. `pom.xml` parsed successfully as XML.
+
+## 2026-11-02 — Real Gemini provider adapter
+
+Inspected Stage 1 PDF/DOCX, class/SD01/SD03/SD06 UMLet definitions and Stage 2 instructions. Implemented Java 21 HTTP POST adaptation, strict Gson JSON handling, environment-only credentials/model, safe error/status transitions and an explicit CLI connection test through existing facade/agent/LLMClient. Preserved Strategy/Factory and deterministic domain behavior. Added one pinned JSON runtime dependency and packaging support; no Maven requirement introduced.
+
+Verification: Java 21 script build, 86 JUnit tests (14 new adapter groups), loopback HTTP and injected failure checks, deterministic packaged CLI demo and Swing smoke. An accidental change to an existing immutability test's exception type was corrected before the final successful run. No real Gemini call was made; live connectivity, account permissions and billing remain unverified. No Git mutation, commit or push was performed. Domain AI features remain incomplete.

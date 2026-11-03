@@ -6,7 +6,7 @@ The Stage 1 sources were inspected before implementation. Changes below are expl
 
 **Original:** the actual class diagram XML and PNG name `DeepSeekAdapter`; the embedded class diagram on report p. 10 also shows that name. The report prose (pp. 3, 13, 16 and feature explanations), task DOCX documents and SD01/03/04/05/06 use `GeminiAdapter` and Gemini API.
 
-**Decision:** retain `GeminiAdapter implements LLMClient` in Stage2, as explicitly required by the user and consistently specified by the written report and sequence diagrams. This is an acknowledged internal contradiction in the local final report, not a silently resolved naming change. Do not create a second DeepSeek adapter. No provider implementation or network call is included. Update a future Stage2 UML copy; leave originals untouched.
+**Decision:** retain `GeminiAdapter implements LLMClient` in Stage2, as explicitly required by the user and consistently specified by the written report and sequence diagrams. This is an acknowledged internal contradiction in the local final report, not a silently resolved naming change. Do not create a second DeepSeek adapter. The original foundation had no transport; D10 records the implemented Gemini transport. Update a future Stage2 UML copy; leave originals untouched.
 
 ## D02 — Factory terminology and selection policy
 
@@ -62,10 +62,20 @@ SD05 XML includes a conflict-resolution message `submitClarification(resolvedVal
 
 Java 21, Maven conventions and Swing fit the single-user local design and avoid UI dependencies. Maven CLI is not installed/discoverable through PATH; offline PowerShell scripts compile/package with the existing JDK. JUnit 4.13.2 was already available in VS Code's Java extension and matches the lecture style; no libraries were downloaded. A dependency-free runner reuses the same checks when those optional jars are absent.
 
-Only essential operational classes were created. Repository, strategies, prompts/parsers, four AI commands and final result types are documented rather than filled with empty methods. GeminiAdapter is the one deliberately unavailable provider boundary: it throws a clear PLANNED exception, never returns a fake model answer, and reads no credentials.
+Only essential operational classes were created. Repository, strategies, prompts/parsers, four AI commands and final result types are documented rather than filled with empty methods. The initial unavailable Gemini boundary has been replaced by the real adapter described in D10.
 
 `.env.example` describes future configuration; the current application does not load it. `.gitignore` excludes local secrets and all build outputs. Scripts resolve their own Stage2 root and never run Git operations. The workspace project is not assumed to be the existing Documents-folder Git checkout; no repository was created or copied.
 
 ## D09 — Tool ownership notation
 
 The class diagram's ToolManager-to-Tool relation uses `lt=<<<-` (filled diamond) with 1 to 0..* multiplicity, while report p. 15 describes aggregation. The current registration API stores references to injected tools and does not enforce exclusive lifecycle ownership. Treat this implementation as a managed collection/association; clarify aggregation versus composition in the future Stage2 diagram instead of claiming that Java references alone enforce UML composition.
+
+## D10 — Real Gemini transport (2026-11-02)
+
+**Original:** Stage 1 Section 3.2 and Adapter Pattern define `LLMClient.generate(String): String`, `GeminiAdapter` as the provider adapter, and UsedCarAgent as the abstraction-dependent client. SD01/03/06 reserve domain prompt building and domain result parsing for PromptBuilder/ResponseParser. The class diagram's DeepSeek naming discrepancy remains documented in D01; the report and sequence diagrams use Gemini.
+
+**Implemented:** the existing composition root still injects GeminiAdapter into the existing agent. The adapter handles generateContent request serialization, header authentication, HTTP, provider-envelope parsing and safe failures. Gson 2.13.2 is the only new runtime library; the PowerShell build pins/verifies its SHA-256, caches it under ignored build storage and packages its runtime classes/license in the executable JAR. Maven declares the same dependency and shades the package; Maven execution remains unverified. First-build dependency download is a documented change from the dependency-free foundation.
+
+**Extension:** facade/agent `testLlmConnection()` and CLI `llm-test` explicitly invoke a harmless prompt, without vehicle/profile mutation. This diagnostic is not a completed Stage 1 domain feature or meaningful agent reasoning workflow. Status is session-local and distinguishes configuration, success and failure. Startup does not call Gemini. Environment-only configuration intentionally avoids adding a new local secret-file parser.
+
+**Limits:** one synchronous text request, 10-second connection/30-second request timeouts, no redirects, retries or paid-model fallback, 512 output tokens, first candidate only, STOP completion required, no partial/blocked output. API-specific JSON parsing is not the planned domain ResponseParser. Full F02/F04/F08–F12 prompts, structured validation and reasoning remain outstanding. A successful offline fixture is not live verification; no live request was authorized or executed here. README links the official API, authentication and model documentation and supplies safe manual verification instructions.

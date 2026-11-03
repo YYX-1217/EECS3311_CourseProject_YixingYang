@@ -27,17 +27,17 @@ Updated: 2026-11-02 (America/New_York; same local date as Toronto). This remains
 |---|---|---|
 | Facade | WORKING | UsedCarApplicationFacade hides tools/session and serves both boundaries |
 | Command | WORKING SUBSET | PrepareEvaluationCommand is invoked by both GUI and CLI |
-| Adapter | FOUNDATION ONLY | LLMClient and GeminiAdapter exist; generate throws an honest unavailable error |
+| Adapter | IMPLEMENTED; LIVE UNVERIFIED | GeminiAdapter performs real HTTP/JSON adaptation; explicit CLI connection test, safe status/errors and offline HTTP verification |
 | Strategy | WORKING SUBSET | Three real priority-guidance policies invoked through EvaluationStrategy by the agent |
 | Simple Factory | WORKING SUBSET | EvaluationStrategyFactory creates automatic/manual policies used by CLI and GUI; not formal GoF Factory Method |
 
-Facade, Command, Strategy and a Simple Factory now have working relationships. Formal GoF Factory Method is not implemented or claimed; the course minimum of five completed patterns has not been established. A real LLM, meaningful AI agent behavior and completion of the proposed features remain development targets.
+Facade, Command, Strategy and a Simple Factory now have working relationships. Formal GoF Factory Method is not implemented or claimed; the course minimum of five completed patterns has not been established. Live Gemini verification, meaningful AI agent behavior and completion of the proposed features remain development targets. The transport is implemented, but a connection test alone does not satisfy the agent-behavior requirement.
 
 Automatic mode chooses Reliability Focused only for two specified priorities with reliability strictly higher; otherwise it chooses Balanced. Missing/zero priorities are neutral. Budget Focused remains an explicit manual choice because the profile has no budget-priority field. Each automatic preview reselects from the latest saved preferences; manual choices persist until explicitly changed. D02 in DESIGN_DECISIONS.md records the Stage 1 clarification and pattern classification.
 
 ## Verification boundary
 
-Java 21 compilation, executable JAR/demo, 72 JUnit tests (62 existing plus 10 factory tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
+Java 21 compilation, executable JAR/demo, 86 JUnit tests (72 previous tests plus 14 adapter tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
 
 Maven CLI was unavailable, so Maven compilation/test execution is unverified. The dependency-free runner is for environments without JUnit and is not a substitute for Stage 3 JUnit coverage, KUMA agent validation or failure analysis.
 

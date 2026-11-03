@@ -75,4 +75,18 @@ public final class FoundationTest {
     @Test public void factoryAgentOverride() { FactoryChecks.agentOverride(); }
     @Test public void factoryFacadeModes() { FactoryChecks.facadeModes(); }
     @Test public void factoryCliAuto() { FactoryChecks.cliAuto(); }
+    @Test public void geminiHttpRequest() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.httpRequest(); }
+    @Test public void geminiMissingKey() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.missingKey(); }
+    @Test public void geminiAuthorization() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.authorization(); }
+    @Test public void geminiQuota() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.quota(); }
+    @Test public void geminiServerError() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.serverError(); }
+    @Test public void geminiEmpty() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.empty(); }
+    @Test public void geminiMalformed() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.malformed(); }
+    @Test public void geminiMissingText() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.missingText(); }
+    @Test public void geminiBlocked() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.blocked(); }
+    @Test public void geminiTransportErrors() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.transportErrors(); }
+    @Test public void geminiInterrupted() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.interrupted(); }
+    @Test public void geminiRedaction() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.redaction(); }
+    @Test public void geminiCliIntegration() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.cliIntegration(); }
+    @Test public void geminiFailureState() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.failureState(); }
 }

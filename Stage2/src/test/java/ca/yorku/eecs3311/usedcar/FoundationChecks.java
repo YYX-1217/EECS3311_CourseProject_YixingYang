@@ -106,11 +106,11 @@ public final class FoundationChecks {
         var manager = new ToolManager(); manager.registerTool("cost", new CostCalculatorTool());
         rejects(() -> manager.registerTool("cost", new CostCalculatorTool()));
         rejects(() -> manager.execute("missing", "input")); rejects(() -> manager.execute("cost", "bad input"));
-        try { new GeminiAdapter().generate("Do not send anywhere"); }
-        catch (UnsupportedOperationException expected) {
-            check(expected.getMessage().contains("PLANNED"), "Unavailable LLM must be explicit."); return;
+        try { new GeminiAdapter("", null).generate("Do not send anywhere"); }
+        catch (IllegalStateException expected) {
+            check(expected.getMessage().contains("NOT CONFIGURED"), "Unavailable LLM must be explicit."); return;
         }
-        throw new AssertionError("Unimplemented adapter must never fake a successful response.");
+        throw new AssertionError("Unconfigured adapter must never fake a successful response.");
     }
 
     private static void constraintFinding(String transmission, String accepted, String history, String tolerance,
@@ -621,6 +621,7 @@ public final class FoundationChecks {
         strategyBalanced(); strategyBudget(); strategyReliability(); strategyDistinctPolicies(); strategyNeutralPreferences();
         strategySafetyAndConstraints(); strategyAgentPolymorphism(); strategyFacadeState(); strategyDoesNotChangeF07(); strategyCliFlow();
         FactoryChecks.runAll();
-        System.out.println("PASS: 72 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        ca.yorku.eecs3311.usedcar.llm.GeminiChecks.runAll();
+        System.out.println("PASS: 86 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }
