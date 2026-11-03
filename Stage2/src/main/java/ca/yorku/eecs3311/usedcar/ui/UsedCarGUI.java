@@ -74,6 +74,7 @@ public final class UsedCarGUI {
             tabs.addTab(section, new JScrollPane(holder));
         }
         PreparationForm.preferenceValues(facade.preferences()).forEach((key, value) -> fields.get(key).setText(value));
+        tabs.addTab("Comparison", new ComparisonPanel(facade));
         tabs.addTab("Risk Assessment", new RiskEvaluationPanel(facade));
         tabs.addTab("Listing Analyzer", new JScrollPane(new ListingAnalyzerPanel(facade)));
         output.setName("results"); output.setEditable(false); output.setLineWrap(true); output.setWrapStyleWord(true);

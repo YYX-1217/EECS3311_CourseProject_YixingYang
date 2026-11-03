@@ -50,7 +50,14 @@ public final class UsedCarCLI {
                     case "evaluate" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.EvaluateVehicleCommand(facade))));
                     case "status" -> output.println(facade.llmStatus());
                     case "analyze-listing" -> analyzeListing();
-                    case "compare", "checklist", "report", "clarify" ->
+                    case "comparison-set" -> enterComparisonVehicle();
+                    case "comparison-show" -> {
+                        output.println("A: "+facade.currentVehicle().map(Object::toString).orElse("UNAVAILABLE"));
+                        output.println("B: "+facade.comparisonVehicle().map(Object::toString).orElse("UNAVAILABLE"));
+                        output.println("Common cost assumptions: "+facade.costAssumptions().map(Object::toString).orElse("UNAVAILABLE"));
+                    }
+                    case "compare" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.CompareVehiclesCommand(facade))));
+                    case "checklist", "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
                     default -> {
                         if (command.startsWith("strategy ")) {
@@ -82,6 +89,26 @@ public final class UsedCarCLI {
         }
         if (conflictCheck) output.println(ResultFormatter.format(facade.checkConflict(PreparationForm.vehicle(facade, values))));
         else displayResult(submit(PreparationForm.command(facade, values)));
+    }
+
+    private void enterComparisonVehicle() {
+        if(facade.currentVehicle().isEmpty()) throw new IllegalStateException("Save Vehicle A first using prepare or a confirmed listing.");
+        output.println("Enter Vehicle B in CAD, km and L/100 km. Vehicle A, preferences and common cost assumptions are preserved.");
+        output.println(":keep retains a saved B field; blank clears; :cancel cancels without saving.");
+        var values=facade.comparisonVehicle().map(PreparationForm::vehicleValues).orElseGet(LinkedHashMap::new);
+        for(var field:PreparationForm.FIELDS) {
+            if(!field.section().equals("Vehicle")) continue;
+            output.print(field.label()+" [B="+values.getOrDefault(field.key(),"")+"]: "); output.flush();
+            if(!input.hasNextLine()) { output.println("Cancelled; saved vehicles preserved."); return; }
+            String value=input.nextLine();
+            if(value.equalsIgnoreCase(":cancel")) { output.println("Cancelled; saved vehicles preserved."); return; }
+            if(!value.equalsIgnoreCase(":keep")) values.put(field.key(),value);
+        }
+        var vehicle=PreparationForm.comparisonVehicle(facade,values);
+        output.println(vehicle); output.println("Save Vehicle B? Type yes; any other input cancels.");
+        if(input.hasNextLine() && input.nextLine().strip().equalsIgnoreCase("yes")) {
+            facade.saveComparisonVehicle(vehicle); output.println("Vehicle B saved; Vehicle A and preferences preserved.");
+        } else output.println("Cancelled; saved vehicles preserved.");
     }
 
     private void enterPreferences() {
@@ -141,8 +168,8 @@ public final class UsedCarCLI {
     }
 
     private void help() {
-        output.println("Commands: evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
+        output.println("Commands: comparison-set (save B), comparison-show (saved pair/assumptions), compare (one AI request when sufficient), evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
-        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison/checklist/clarification/report remain PLANNED.");
+        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist/clarification/report remain PLANNED.");
     }
 }

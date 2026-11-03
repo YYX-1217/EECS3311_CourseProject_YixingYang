@@ -68,7 +68,7 @@ public final class UsedCarApplicationFacade {
     }
     public CostEstimate estimateCost(Vehicle vehicle, CostAssumptions assumptions) {
         var result=agent.estimateCost(vehicle, assumptions);
-        if(currentVehicle().filter(vehicle::equals).isPresent()){session.setCost(result);contextVersion.incrementAndGet();}
+        if(currentVehicle().filter(vehicle::equals).isPresent()){session.setCost(result);session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();}
         return result;
     }
     public RiskAssessment evaluateVehicle(Vehicle vehicle) { return agent.assessRisk(vehicle,preferences()); }
@@ -83,12 +83,32 @@ public final class UsedCarApplicationFacade {
         session.setRisk(result);return result;
     }
 
+    public Vehicle saveComparisonVehicle(Vehicle vehicle) {
+        if(currentVehicle().isEmpty()) throw new IllegalStateException("Save Vehicle A before entering comparison Vehicle B.");
+        session.setComparisonVehicle(vehicle); contextVersion.incrementAndGet(); return vehicle;
+    }
+    public Optional<Vehicle> comparisonVehicle() { return session.getComparisonVehicle(); }
+    public Optional<CostAssumptions> costAssumptions() { return session.getCostAssumptions(); }
+    public VehicleComparison compareVehicles(Vehicle first, Vehicle second) { return compareWithEvidence(first,second).comparison(); }
+    public ComparisonEvaluation compareCurrentVehicles() {
+        long version=contextVersion.get();
+        var first=currentVehicle().orElseThrow(()->new IllegalStateException("Save Vehicle A before comparison."));
+        var second=comparisonVehicle().orElseThrow(()->new IllegalStateException("Save comparison Vehicle B before comparison."));
+        var result=compareWithEvidence(first,second);
+        if(version!=contextVersion.get()) return new ComparisonEvaluation("STALE",result.evidence().deterministic(),result.evidence(),
+                "Saved comparison context changed during the request. This is the old deterministic snapshot; compare again. AI narrative withheld.");
+        return result;
+    }
+    public ComparisonEvaluation compareWithEvidence(Vehicle first, Vehicle second) {
+        return agent.compare(first,second,preferences(),session.getCostAssumptions().orElse(null));
+    }
+
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {
         // Compute before committing session changes so a failed request preserves the previous state.
         PreparationResult result = agent.prepareEvaluation(vehicle, preference, assumptions);
         saveVehicle(vehicle);
         savePreferences(preference);
-        session.setCost(result.cost());contextVersion.incrementAndGet();
+        session.setCost(result.cost());session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();
         return result;
     }
 }

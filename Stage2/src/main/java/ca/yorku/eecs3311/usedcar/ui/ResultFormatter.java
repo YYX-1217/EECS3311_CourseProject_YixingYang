@@ -83,4 +83,26 @@ public final class ResultFormatter {
                 .append("\nPriority guidance: ").append(e.priorityGuidance()).append("\nLimitations: ").append(e.limitations());
         return out.toString();
     }
+    public static String format(ca.yorku.eecs3311.usedcar.result.ComparisonEvaluation evaluation) {
+        var result=evaluation.comparison(); var evidence=evaluation.evidence();
+        var out=new StringBuilder("F09 TWO-VEHICLE COMPARISON - ").append(evaluation.status()).append("\n").append(evaluation.message()).append("\n");
+        out.append("Vehicle A ID: ").append(result.firstVehicleId()).append("\nVehicle B ID: ").append(result.secondVehicleId())
+                .append("\nDETERMINISTIC SIDE-BY-SIDE METRICS (CAD / km / L/100 km)\n");
+        result.metricSummary().forEach((key,value)->out.append(key).append(": ").append(value).append("\n"));
+        out.append("Common cost assumptions: ").append(evidence.assumptions()==null?"UNAVAILABLE":evidence.assumptions()).append("\n")
+                .append("Costs exclude financing, depreciation, registration and other unlisted expenses. Equal allowances are scenario assumptions.\n");
+        int i=0;
+        for(var side:java.util.List.of(evidence.first(),evidence.second())) {
+            out.append("\nVehicle ").append(i++==0?"A":"B").append(" EVIDENCE\n")
+                    .append("Buyer preferences: ").append(side.preference()).append("\n").append(format(side.missing()))
+                    .append("Constraints: ").append(side.constraintsAvailable()?side.violations():"UNAVAILABLE").append("\n")
+                    .append("Local knowledge: ").append(side.knowledge()==null?"UNAVAILABLE":side.knowledge()).append("\n")
+                    .append("Cost details: ").append(side.cost()==null?"UNAVAILABLE":side.cost()).append("\n")
+                    .append("Uncertainties/source limits: ").append(side.requiredUncertainties()).append("\n");
+        }
+        if(result.explanation().isBlank()) out.append("\nAI narrative: UNAVAILABLE. No preferred vehicle identified.\n");
+        else out.append("\nAI trade-off explanation (advisory): ").append(result.explanation())
+                .append("\nPreferred vehicle ID: ").append(result.preferredVehicleId().isEmpty()?"NONE - no defensible preference":result.preferredVehicleId()).append("\n");
+        return out.toString();
+    }
 }

@@ -110,4 +110,70 @@ public final class ResponseParser {
             throw new IllegalArgumentException("Risk narrative contradicts maintenance evidence.");
         return assessment;
     }
+    public VehicleComparison parseComparison(String response) {
+        final JsonObject root;
+        try {
+            if(response==null || response.isBlank() || response.length()>64000) throw new IllegalArgumentException();
+            try(var reader=JSON.newJsonReader(new java.io.StringReader(response))) {
+                root=readComparisonObject(reader,0);
+                if(reader.peek()!=com.google.gson.stream.JsonToken.END_DOCUMENT) throw new IllegalArgumentException();
+            }
+            if(root==null || !root.keySet().equals(Set.of("firstVehicleId","secondVehicleId","metricSummary","preferredVehicleId","explanation")))
+                throw new IllegalArgumentException();
+        } catch(RuntimeException | java.io.IOException e) { throw comparisonError("root must be one JSON object with exactly the five comparison properties; duplicate properties are forbidden."); }
+        String first=comparisonText(root.get("firstVehicleId"),"firstVehicleId",false);
+        String second=comparisonText(root.get("secondVehicleId"),"secondVehicleId",false);
+        String preferred=comparisonText(root.get("preferredVehicleId"),"preferredVehicleId",true);
+        String explanation=comparisonText(root.get("explanation"),"explanation",false);
+        if(first.equals(second)) throw comparisonError("firstVehicleId and secondVehicleId must differ.");
+        if(!preferred.isEmpty() && !preferred.equals(first) && !preferred.equals(second))
+            throw comparisonError("preferredVehicleId must match one of the two IDs or be empty.");
+        if(!root.get("metricSummary").isJsonObject() || root.getAsJsonObject("metricSummary").isEmpty())
+            throw comparisonError("metricSummary must be a nonempty object of strings.");
+        var metrics=new LinkedHashMap<String,String>();
+        for(var entry:root.getAsJsonObject("metricSummary").entrySet()) {
+            if(entry.getKey().isBlank()) throw comparisonError("metricSummary contains an empty metric name.");
+            metrics.put(entry.getKey(),comparisonText(entry.getValue(),"metricSummary value",false));
+        }
+        return new VehicleComparison(first,second,metrics,preferred,explanation);
+    }
+    private static JsonObject readComparisonObject(com.google.gson.stream.JsonReader reader,int depth) throws java.io.IOException {
+        if(depth>1) throw comparisonError("nested metric objects are unsupported.");
+        var object=new JsonObject(); reader.beginObject();
+        while(reader.hasNext()) {
+            String key=reader.nextName();
+            if(object.has(key)) throw comparisonError("duplicate properties are forbidden.");
+            var token=reader.peek();
+            if(token==com.google.gson.stream.JsonToken.BEGIN_ARRAY) throw comparisonError("arrays are unsupported.");
+            object.add(key,token==com.google.gson.stream.JsonToken.BEGIN_OBJECT ? readComparisonObject(reader,depth+1) : JSON.fromJson(reader,JsonElement.class));
+        }
+        reader.endObject();return object;
+    }
+    public VehicleComparison validateComparison(VehicleComparison result, ComparisonEvidence evidence) {
+        if(!result.firstVehicleId().equals(evidence.first().vehicle().id()) || !result.secondVehicleId().equals(evidence.second().vehicle().id()))
+            throw comparisonError("vehicle IDs do not match the requested ordered pair.");
+        if(!result.metricSummary().equals(evidence.metrics())) throw comparisonError("metricSummary changed, omitted or added deterministic metrics.");
+        if(!evidence.sufficient() && !result.preferredVehicleId().isEmpty())
+            throw comparisonError("preferredVehicleId is unsupported by insufficient evidence.");
+        String narrative=result.explanation().toLowerCase(Locale.ROOT);
+        boolean conflicts=!evidence.first().requiredRisks().isEmpty() || !evidence.second().requiredRisks().isEmpty();
+        if(conflicts && (narrative.contains("both vehicles meet all constraints") || narrative.contains("no constraint conflicts")))
+            throw comparisonError("explanation contradicts known buyer constraints.");
+        if((reportedAccident(evidence.first()) || reportedAccident(evidence.second()))
+                && (narrative.contains("both vehicles are accident-free") || narrative.contains("neither vehicle has reported accidents")))
+            throw comparisonError("explanation contradicts reported accident history.");
+        if((missingRecords(evidence.first()) || missingRecords(evidence.second())) && narrative.contains("both vehicles have complete service history"))
+            throw comparisonError("explanation contradicts maintenance records.");
+        return result;
+    }
+    private static boolean reportedAccident(RiskEvidence e) { return Set.of("YES","ACCIDENT_REPORTED","HAS_ACCIDENTS").contains(e.vehicle().accidentHistory()); }
+    private static boolean missingRecords(RiskEvidence e) { return Set.of("NONE","PARTIAL").contains(e.vehicle().maintenanceHistory()); }
+    private static String comparisonText(JsonElement value,String field,boolean emptyAllowed) {
+        if(value==null || !value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString()
+                || (!emptyAllowed && value.getAsString().isBlank())) throw comparisonError(field+" must be "+(emptyAllowed?"a string.":"nonblank text."));
+        return value.getAsString();
+    }
+    private static IllegalArgumentException comparisonError(String reason) {
+        return new IllegalArgumentException("Invalid comparison JSON: "+reason); // Fixed diagnostics; no model text/values.
+    }
 }

@@ -76,11 +76,27 @@ public final class PreparationForm {
 
     public static Vehicle vehicle(UsedCarApplicationFacade facade, Map<String, String> values) {
         String id = facade.currentVehicle().map(Vehicle::id).orElseGet(() -> UUID.randomUUID().toString());
+        return vehicle(id,values);
+    }
+    public static Vehicle comparisonVehicle(UsedCarApplicationFacade facade, Map<String,String> values) {
+        String id=facade.comparisonVehicle().map(Vehicle::id).orElseGet(()->UUID.randomUUID().toString());
+        return vehicle(id,values);
+    }
+    public static Vehicle vehicle(String id, Map<String,String> values) {
         Vehicle vehicle = new Vehicle(id, integer(values, "year", true), values.get("make"), values.get("model"),
                 values.get("trim"), integer(values, "mileage", true), decimal(values, "price", true),
                 values.get("transmission"), values.get("fuelType"), values.get("accident"), values.get("maintenance"),
                 decimal(values, "consumption", false), values.get("notes"));
         return vehicle;
+    }
+
+    public static Map<String,String> vehicleValues(Vehicle v) {
+        var values=new LinkedHashMap<String,String>();
+        values.put("year",Integer.toString(v.year())); values.put("make",v.make()); values.put("model",v.model());
+        values.put("trim",v.trim()); values.put("mileage",Integer.toString(v.mileage())); values.put("price",v.askingPrice().toPlainString());
+        values.put("transmission",v.transmission()); values.put("fuelType",v.fuelType()); values.put("accident",v.accidentHistory());
+        values.put("maintenance",v.maintenanceHistory()); values.put("consumption",v.fuelConsumption()==null?"":v.fuelConsumption().toPlainString());
+        values.put("notes",v.notes()); return values;
     }
 
     private static BigDecimal decimal(Map<String, String> values, String key, boolean required) {

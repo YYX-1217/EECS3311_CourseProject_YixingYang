@@ -129,4 +129,28 @@ public final class FoundationTest {
     @Test public void riskMissingKey() { RiskChecks.missingKey(); }
     @Test public void riskNeutral() { RiskChecks.neutral(); }
     @Test public void riskCli() { RiskChecks.cli(); }
+    @Test public void comparisonStorage() { ComparisonChecks.storage(); }
+    @Test public void comparisonMetrics() { ComparisonChecks.metrics(); }
+    @Test public void comparisonConstraints() { ComparisonChecks.constraints(); }
+    @Test public void comparisonCosts() { ComparisonChecks.costs(); }
+    @Test public void comparisonMissingCosts() { ComparisonChecks.missingCosts(); }
+    @Test public void comparisonKnowledge() { ComparisonChecks.knowledge(); }
+    @Test public void comparisonPartial() { ComparisonChecks.partial(); }
+    @Test public void comparisonSameVehicle() { ComparisonChecks.sameVehicle(); }
+    @Test public void comparisonMissingVehicles() { ComparisonChecks.missingVehicles(); }
+    @Test public void comparisonInvalidVehicle() { ComparisonChecks.invalidVehicle(); }
+    @Test public void comparisonUnits() { ComparisonChecks.units(); }
+    @Test public void comparisonOrder() { ComparisonChecks.order(); }
+    @Test public void comparisonPrompt() { ComparisonChecks.prompt(); }
+    @Test public void comparisonParserValid() { ComparisonChecks.parserValid(); }
+    @Test public void comparisonMalformed() { ComparisonChecks.malformed(); }
+    @Test public void comparisonFields() { ComparisonChecks.fields(); }
+    @Test public void comparisonIdentifiers() { ComparisonChecks.identifiers(); }
+    @Test public void comparisonChangedMetrics() { ComparisonChecks.changedMetrics(); }
+    @Test public void comparisonContradictions() { ComparisonChecks.contradictions(); }
+    @Test public void comparisonProviderFailures() { ComparisonChecks.providerFailures(); }
+    @Test public void comparisonToolFailures() { ComparisonChecks.toolFailures(); }
+    @Test public void comparisonStale() { ComparisonChecks.stale(); }
+    @Test public void comparisonCli() { ComparisonChecks.cli(); }
+    @Test public void comparisonGeminiTransport() { ca.yorku.eecs3311.usedcar.llm.ComparisonGeminiChecks.workflow(); }
 }
