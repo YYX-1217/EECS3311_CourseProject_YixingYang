@@ -1,6 +1,7 @@
 package ca.yorku.eecs3311.usedcar.llm;
 import ca.yorku.eecs3311.usedcar.domain.*;
 import com.google.gson.*;
+import ca.yorku.eecs3311.usedcar.result.*;
 import java.util.*;
 import java.math.BigDecimal;
 import java.time.Year;
@@ -71,5 +72,42 @@ public final class ResponseParser {
         }
         if(!values.get("transmission").isBlank())values.put("transmission",Values.transmission(values.get("transmission")));
         return new VehicleDraft(source,values,evidence,uncertain);
+    }
+    public RiskAssessment parseRiskAssessment(String response) {
+        final JsonObject root;
+        try {
+            if(response==null||response.isBlank()||response.length()>64000)throw new IllegalArgumentException();
+            root=JSON.fromJson(response,JsonObject.class);
+            if(root==null||!root.keySet().equals(Set.of("riskLevel","strengths","risks","uncertainties","explanation")))throw new IllegalArgumentException();
+        }catch(RuntimeException e){throw new IllegalArgumentException("Invalid risk JSON: expected exactly the five risk-assessment properties.");}
+        String level=riskText(root.get("riskLevel"),"riskLevel");
+        String explanation=riskText(root.get("explanation"),"explanation");
+        var lists=new ArrayList<List<String>>();
+        for(String field:List.of("strengths","risks","uncertainties")){
+            if(!root.get(field).isJsonArray())throw new IllegalArgumentException("Invalid risk JSON: "+field+" must be an array.");
+            var items=new ArrayList<String>();for(var item:root.getAsJsonArray(field))items.add(riskText(item,field));lists.add(items);
+        }
+        return new RiskAssessment(level,lists.get(0),lists.get(1),lists.get(2),explanation);
+    }
+    private static String riskText(JsonElement value,String field){
+        if(value==null||!value.isJsonPrimitive()||!value.getAsJsonPrimitive().isString()||value.getAsString().isBlank())
+            throw new IllegalArgumentException("Invalid risk JSON: "+field+" must contain nonblank text.");
+        return value.getAsString();
+    }
+    public RiskAssessment validateRiskAssessment(RiskAssessment assessment,RiskEvidence evidence){
+        if(!assessment.risks().containsAll(evidence.requiredRisks()))throw new IllegalArgumentException("Risk response omitted or altered deterministic conflicts.");
+        if(!assessment.uncertainties().containsAll(evidence.requiredUncertainties()))throw new IllegalArgumentException("Risk response omitted or altered required uncertainties/source limitations.");
+        if(assessment.riskLevel().equals("Low")&&!evidence.requiredRisks().isEmpty())throw new IllegalArgumentException("Low risk contradicts unresolved buyer constraints.");
+        if(!evidence.missing().sufficient()&&!assessment.riskLevel().equals("Insufficient Information"))throw new IllegalArgumentException("Risk category contradicts insufficient essential evidence.");
+        String narrative=(String.join(" ",assessment.strengths())+" "+assessment.explanation()).toLowerCase(Locale.ROOT);
+        if(!evidence.requiredRisks().isEmpty()&&(narrative.contains("no constraint conflicts")||narrative.contains("all constraints satisfied")))
+            throw new IllegalArgumentException("Risk narrative contradicts deterministic constraints.");
+        if(Set.of("YES","ACCIDENT_REPORTED","HAS_ACCIDENTS").contains(evidence.vehicle().accidentHistory())
+                &&(narrative.contains("accident-free")||narrative.contains("no accidents")))
+            throw new IllegalArgumentException("Risk narrative contradicts reported accident history.");
+        if(Set.of("NONE","PARTIAL").contains(evidence.vehicle().maintenanceHistory())
+                &&(narrative.contains("complete service history")||narrative.contains("full maintenance records")))
+            throw new IllegalArgumentException("Risk narrative contradicts maintenance evidence.");
+        return assessment;
     }
 }

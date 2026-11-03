@@ -68,4 +68,19 @@ public final class ResultFormatter {
                 .append(result.llmStatus()).append('\n').append("Session is in memory only; closing the application discards it.\n");
         return text.toString();
     }
+    public static String format(ca.yorku.eecs3311.usedcar.result.RiskEvaluation evaluation) {
+        var out=new StringBuilder("F08 RISK ASSESSMENT - ").append(evaluation.status()).append("\n").append(evaluation.message()).append("\n");
+        var risk=evaluation.assessment();
+        if(risk!=null)out.append("Risk level: ").append(risk.riskLevel()).append("\nStrengths: ").append(risk.strengths())
+                .append("\nRisks: ").append(risk.risks()).append("\nUncertainties: ").append(risk.uncertainties()).append("\nExplanation: ").append(risk.explanation()).append("\n");
+        else out.append("No validated AI risk category is available.\n");
+        var e=evaluation.evidence();
+        out.append("\nDETERMINISTIC EVIDENCE SNAPSHOT (not overwritten by AI)\n")
+                .append("Vehicle: ").append(e.vehicle()).append("\nSaved preferences: ").append(e.preference()).append("\n")
+                .append(format(e.missing())).append("\nConstraints: ").append(e.violations()).append("\nConstraint tool available: ").append(e.constraintsAvailable())
+                .append("\nLocal knowledge: ").append(e.knowledge()==null?"UNAVAILABLE":e.knowledge())
+                .append("\nCost estimate: ").append(e.cost()==null?"UNAVAILABLE":e.cost())
+                .append("\nPriority guidance: ").append(e.priorityGuidance()).append("\nLimitations: ").append(e.limitations());
+        return out.toString();
+    }
 }

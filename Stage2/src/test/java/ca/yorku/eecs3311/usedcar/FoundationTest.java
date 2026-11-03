@@ -109,4 +109,24 @@ public final class FoundationTest {
     @Test public void listingDiagnostics() { ListingChecks.diagnostics(); }
     @Test public void listingOptionalAndFences() { ListingChecks.optionalAndFences(); }
     @Test public void listingStructuredDispatch() { ListingChecks.structuredDispatch(); }
+    @Test public void riskParserValid() { RiskChecks.parserValid(); }
+    @Test public void riskCategory() { RiskChecks.category(); }
+    @Test public void riskMalformed() { RiskChecks.malformed(); }
+    @Test public void riskFields() { RiskChecks.fields(); }
+    @Test public void riskMissingVehicle() { RiskChecks.missingVehicle(); }
+    @Test public void riskInsufficient() { RiskChecks.insufficient(); }
+    @Test public void riskKnowledge() { RiskChecks.knowledge(); }
+    @Test public void riskNoKnowledge() { RiskChecks.noKnowledge(); }
+    @Test public void riskConflicts() { RiskChecks.conflicts(); }
+    @Test public void riskPreferences() { RiskChecks.preferences(); }
+    @Test public void riskManual() { RiskChecks.manual(); }
+    @Test public void riskOrder() { RiskChecks.order(); }
+    @Test public void riskPrompt() { RiskChecks.prompt(); }
+    @Test public void riskProviderFailure() { RiskChecks.providerFailure(); }
+    @Test public void riskRejectedResponse() { RiskChecks.rejectedResponse(); }
+    @Test public void riskToolFailures() { RiskChecks.toolFailures(); }
+    @Test public void riskCosts() { RiskChecks.costs(); }
+    @Test public void riskMissingKey() { RiskChecks.missingKey(); }
+    @Test public void riskNeutral() { RiskChecks.neutral(); }
+    @Test public void riskCli() { RiskChecks.cli(); }
 }

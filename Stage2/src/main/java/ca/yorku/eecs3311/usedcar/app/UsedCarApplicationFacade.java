@@ -11,6 +11,7 @@ import java.util.Locale;
 
 /** Shared application API for both interfaces. No UI code or provider protocol here. */
 public final class UsedCarApplicationFacade {
+    private final java.util.concurrent.atomic.AtomicLong contextVersion = new java.util.concurrent.atomic.AtomicLong();
     private final UsedCarAgent agent;
     private final EvaluationSession session;
 
@@ -19,8 +20,8 @@ public final class UsedCarApplicationFacade {
         this.session = Objects.requireNonNull(session);
     }
 
-    public Vehicle saveVehicle(Vehicle vehicle) { session.setCurrentVehicle(vehicle); return vehicle; }
-    public void savePreferences(UserPreference preference) { session.setPreference(preference); }
+    public Vehicle saveVehicle(Vehicle vehicle) { session.setCurrentVehicle(vehicle); contextVersion.incrementAndGet(); return vehicle; }
+    public void savePreferences(UserPreference preference) { session.setPreference(preference); contextVersion.incrementAndGet(); }
     public Optional<Vehicle> currentVehicle() { return session.getCurrentVehicle(); }
     public UserPreference preferences() { return session.getPreference(); }
     public VehicleKnowledge retrieveKnowledge(Vehicle vehicle) { return agent.retrieveKnowledge(vehicle); }
@@ -31,6 +32,7 @@ public final class UsedCarApplicationFacade {
     public void selectStrategy(String mode) {
         if (mode != null && mode.strip().toLowerCase(Locale.ROOT).equals("auto")) agent.useAutomaticStrategy();
         else agent.selectManualStrategy(mode);
+        session.clearRisk();contextVersion.incrementAndGet();
     }
     public String previewPriorityGuidance() { return agent.buildPriorityGuidance(preferences()); }
     public ListingAnalysisResult analyzeListing(String text) {
@@ -64,13 +66,29 @@ public final class UsedCarApplicationFacade {
             throw new IllegalArgumentException("Annual distance and fuel price must be finite numbers.");
         return estimateCost(vehicle, new CostAssumptions(BigDecimal.valueOf(annualKm), BigDecimal.valueOf(fuelPrice), null, null, null));
     }
-    public CostEstimate estimateCost(Vehicle vehicle, CostAssumptions assumptions) { return agent.estimateCost(vehicle, assumptions); }
+    public CostEstimate estimateCost(Vehicle vehicle, CostAssumptions assumptions) {
+        var result=agent.estimateCost(vehicle, assumptions);
+        if(currentVehicle().filter(vehicle::equals).isPresent()){session.setCost(result);contextVersion.incrementAndGet();}
+        return result;
+    }
+    public RiskAssessment evaluateVehicle(Vehicle vehicle) { return agent.assessRisk(vehicle,preferences()); }
+    public Optional<RiskEvaluation> lastRiskEvaluation(){return session.getRisk();}
+    public RiskEvaluation evaluateCurrentVehicle(){
+        long version=contextVersion.get();
+        var vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before evaluation."));
+        var profile=preferences();session.clearRisk();
+        var result=agent.evaluateRisk(vehicle,profile,session.getCost().orElse(null));
+        if(version!=contextVersion.get()||!currentVehicle().filter(vehicle::equals).isPresent()||!preferences().equals(profile))
+            return new RiskEvaluation("STALE",null,result.evidence(),"Saved vehicle/preferences changed during evaluation. Review the evidence snapshot and evaluate again.");
+        session.setRisk(result);return result;
+    }
 
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {
         // Compute before committing session changes so a failed request preserves the previous state.
         PreparationResult result = agent.prepareEvaluation(vehicle, preference, assumptions);
         saveVehicle(vehicle);
         savePreferences(preference);
+        session.setCost(result.cost());contextVersion.incrementAndGet();
         return result;
     }
 }
