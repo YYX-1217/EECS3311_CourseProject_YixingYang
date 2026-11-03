@@ -622,6 +622,7 @@ public final class FoundationChecks {
         strategySafetyAndConstraints(); strategyAgentPolymorphism(); strategyFacadeState(); strategyDoesNotChangeF07(); strategyCliFlow();
         FactoryChecks.runAll();
         ca.yorku.eecs3311.usedcar.llm.GeminiChecks.runAll();
-        System.out.println("PASS: 86 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        ListingChecks.runAll();
+        System.out.println("PASS: 106 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

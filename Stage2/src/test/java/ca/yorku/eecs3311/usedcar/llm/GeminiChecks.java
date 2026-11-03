@@ -58,8 +58,14 @@ public final class GeminiChecks {
             check(method.get().equals("POST") && auth.get().equals(KEY), "POST/header authentication mismatch");
             JsonObject json = JsonParser.parseString(body.get()).getAsJsonObject();
             check(json.getAsJsonArray("contents").get(0).getAsJsonObject().getAsJsonArray("parts").get(0).getAsJsonObject().get("text").getAsString().equals(prompt), "JSON escaping/structure mismatch");
-            check(json.getAsJsonObject("generationConfig").get("maxOutputTokens").getAsInt() == 512, "Output limit missing");
+            check(json.getAsJsonObject("generationConfig").get("maxOutputTokens").getAsInt() == 4096, "Output limit missing");
             check(adapter.status().contains("VERIFIED"), "Successful response must update session status");
+            check(!json.getAsJsonObject("generationConfig").has("responseMimeType"), "Ordinary text generation must remain unchanged");
+            adapter.generateStructured(prompt, ListingExtractionSchema.json());
+            var structured=JsonParser.parseString(body.get()).getAsJsonObject().getAsJsonObject("generationConfig");
+            check(structured.get("responseMimeType").getAsString().equals("application/json")
+                    &&structured.getAsJsonObject("responseJsonSchema").equals(JsonParser.parseString(ListingExtractionSchema.json())),
+                    "HTTP request must contain the exact structured JSON contract");
         } catch (IOException e) { throw new AssertionError(e); }
         finally { if (server != null) server.stop(0); }
     }

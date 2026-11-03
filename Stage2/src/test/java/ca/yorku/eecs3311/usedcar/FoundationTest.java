@@ -89,4 +89,24 @@ public final class FoundationTest {
     @Test public void geminiRedaction() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.redaction(); }
     @Test public void geminiCliIntegration() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.cliIntegration(); }
     @Test public void geminiFailureState() { ca.yorku.eecs3311.usedcar.llm.GeminiChecks.failureState(); }
+    @Test public void listingPrompt() { ListingChecks.prompt(); }
+    @Test public void listingComplete() { ListingChecks.complete(); }
+    @Test public void listingMissingAccident() { ListingChecks.missingAccident(); }
+    @Test public void listingMissingMaintenance() { ListingChecks.missingMaintenance(); }
+    @Test public void listingPartial() { ListingChecks.partial(); }
+    @Test public void listingNormalization() { ListingChecks.normalization(); }
+    @Test public void listingInvalidNumbers() { ListingChecks.invalidNumbers(); }
+    @Test public void listingMalformed() { ListingChecks.malformed(); }
+    @Test public void listingSchema() { ListingChecks.schema(); }
+    @Test public void listingUnits() { ListingChecks.units(); }
+    @Test public void listingUncertain() { ListingChecks.uncertain(); }
+    @Test public void listingConfirmation() { ListingChecks.confirmation(); }
+    @Test public void listingCancellation() { ListingChecks.cancellation(); }
+    @Test public void listingConflicts() { ListingChecks.conflicts(); }
+    @Test public void listingFailures() { ListingChecks.failures(); }
+    @Test public void listingCli() { ListingChecks.cli(); }
+    @Test public void listingCorollaRegression() { ListingChecks.corollaRegression(); }
+    @Test public void listingDiagnostics() { ListingChecks.diagnostics(); }
+    @Test public void listingOptionalAndFences() { ListingChecks.optionalAndFences(); }
+    @Test public void listingStructuredDispatch() { ListingChecks.structuredDispatch(); }
 }

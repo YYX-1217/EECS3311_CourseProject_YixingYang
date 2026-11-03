@@ -1,7 +1,7 @@
 package ca.yorku.eecs3311.usedcar.agent;
 
 import ca.yorku.eecs3311.usedcar.domain.*;
-import ca.yorku.eecs3311.usedcar.llm.LLMClient;
+import ca.yorku.eecs3311.usedcar.llm.*;
 import ca.yorku.eecs3311.usedcar.result.*;
 import ca.yorku.eecs3311.usedcar.tool.*;
 import ca.yorku.eecs3311.usedcar.strategy.*;
@@ -54,6 +54,11 @@ public final class UsedCarAgent {
         }
         if (strategy == null) throw new IllegalStateException("Select a strategy first: auto, balanced, budget or reliability.");
         return strategy.buildPriorityGuidance(Objects.requireNonNull(preference));
+    }
+    public ListingAnalysisResult analyzeListing(String text, Vehicle baseline) {
+        String prompt = new PromptBuilder().buildListingExtractionPrompt(text);
+        VehicleDraft draft = new ResponseParser().parseVehicle(llmClient.generateStructured(prompt, ListingExtractionSchema.json()), text);
+        return new ListingAnalysisResult(draft, dataQualityChecker.check(draft, baseline), baseline);
     }
     public String testLlmConnection() { return llmClient.generate("Reply with one short greeting sentence. This is a connection test."); }
     public String llmStatus() { return llmClient.status(); }

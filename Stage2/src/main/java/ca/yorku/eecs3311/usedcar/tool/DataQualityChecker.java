@@ -1,6 +1,7 @@
 package ca.yorku.eecs3311.usedcar.tool;
 
 import ca.yorku.eecs3311.usedcar.domain.Vehicle;
+import ca.yorku.eecs3311.usedcar.domain.VehicleDraft;
 import ca.yorku.eecs3311.usedcar.result.MissingInformationResult;
 import java.math.BigDecimal;
 import java.util.*;
@@ -43,6 +44,28 @@ public final class DataQualityChecker {
         });
         return new MissingInformationResult(missing, uncertain, conflicts,
                 manual.sufficient() && extracted.sufficient() && conflicts.isEmpty());
+    }
+
+    /** F04 rules applied to partial draft fields without inventing a confirmed Vehicle. */
+    public MissingInformationResult check(VehicleDraft draft, Vehicle baseline) {
+        var labels = List.of("Year","Make","Model","Trim","Mileage","Asking price","Transmission","Fuel type","Accident history","Maintenance history","Fuel consumption");
+        var missing = new ArrayList<String>(); var uncertain = new ArrayList<String>(); var conflicts = new ArrayList<String>();
+        Map<String,Object> previous = baseline == null ? Map.of() : fields(baseline);
+        for (int i=0; i<labels.size(); i++) {
+            String key = VehicleDraft.FIELDS.get(i), label = labels.get(i), raw = draft.values().get(key);
+            if (raw.isBlank()) { missing.add(label); if (draft.uncertainFields().contains(key)) uncertain.add(label); continue; }
+            Object value = switch(key) {
+                case "year", "mileage" -> Integer.valueOf(raw);
+                case "price", "consumption" -> new BigDecimal(raw);
+                default -> raw;
+            };
+            Object normalized = known(label,value);
+            if (draft.unresolved(key) || normalized == null) { uncertain.add(label); continue; }
+            Object prior = known(label,previous.get(label));
+            if (prior != null && !prior.equals(normalized)) conflicts.add(label + " | manual=" + previous.get(label) + " | extracted=" + raw);
+        }
+        return new MissingInformationResult(missing,uncertain,conflicts,
+                missing.stream().noneMatch(ESSENTIAL::contains) && uncertain.stream().noneMatch(ESSENTIAL::contains) && conflicts.isEmpty());
     }
 
     private static Map<String, Object> fields(Vehicle v) {

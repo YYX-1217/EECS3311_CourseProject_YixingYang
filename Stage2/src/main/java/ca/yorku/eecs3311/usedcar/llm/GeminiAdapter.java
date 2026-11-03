@@ -55,12 +55,26 @@ public final class GeminiAdapter implements LLMClient {
         state = "REQUEST FAILED: " + reason;
         return new IllegalStateException(safe(state)); // Never propagate provider bodies or exception causes.
     }
-    @Override public String generate(String prompt) {
+    @Override public String generate(String prompt) { return generateRequest(prompt, null); }
+    @Override public String generateStructured(String prompt, String jsonSchema) {
+        if (jsonSchema == null || jsonSchema.isBlank()) throw new IllegalArgumentException("JSON schema is required.");
+        return generateRequest(prompt, jsonSchema);
+    }
+    private String generateRequest(String prompt, String jsonSchema) {
         String error = configurationError();
         if (error != null) throw new IllegalStateException(safe(error));
         if (prompt == null || prompt.isBlank()) throw new IllegalArgumentException("Prompt must not be blank.");
+        var config = new LinkedHashMap<String,Object>(); config.put("maxOutputTokens",4096);
+        if (jsonSchema != null) {
+            final JsonObject schema;
+            try { schema = JSON.fromJson(jsonSchema, JsonObject.class); }
+            catch (RuntimeException e) { throw new IllegalArgumentException("Invalid structured response schema."); }
+            if (schema == null) throw new IllegalArgumentException("JSON object schema is required.");
+            config.put("responseMimeType", "application/json");
+            config.put("responseJsonSchema", schema);
+        }
         String body = JSON.toJson(Map.of("contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))),
-                "generationConfig", Map.of("maxOutputTokens", 512)));
+                "generationConfig", config));
         var request = HttpRequest.newBuilder(URI.create("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent"))
                 .timeout(Duration.ofSeconds(30)).header("Content-Type", "application/json; charset=utf-8")
                 .header("x-goog-api-key", key).POST(HttpRequest.BodyPublishers.ofString(body)).build();

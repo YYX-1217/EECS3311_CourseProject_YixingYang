@@ -3,7 +3,7 @@ package ca.yorku.eecs3311.usedcar.domain;
 import java.math.BigDecimal;
 import java.time.Year;
 
-/** Confirmed manual record. Missing listing drafts are a separate, planned concern. */
+/** Confirmed manual record. Partial listing drafts use VehicleDraft until explicitly confirmed. */
 public record Vehicle(String id, int year, String make, String model, String trim,
                       int mileage, BigDecimal askingPrice, String transmission, String fuelType,
                       String accidentHistory, String maintenanceHistory,

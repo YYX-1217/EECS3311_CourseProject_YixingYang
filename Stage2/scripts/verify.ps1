@@ -34,5 +34,7 @@ try {
     if ($Gui) {
         & (Join-Path $jdk 'bin\java.exe') -cp $classPath ca.yorku.eecs3311.usedcar.GuiSmoke
         Assert-Stage2Exit 'GUI smoke verification'
+        & (Join-Path $jdk 'bin\java.exe') -cp $classPath ca.yorku.eecs3311.usedcar.ListingGuiSmoke
+        Assert-Stage2Exit 'Listing GUI smoke verification'
     }
 } finally { Pop-Location }

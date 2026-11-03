@@ -7,9 +7,9 @@ Updated: 2026-11-02 (America/New_York; same local date as Toronto). This remains
 | Feature | Status | Actually working | Still required |
 |---|---|---|---|
 | F01 | WORKING SUBSET | Manual fields, validation/normalization, create/replace current vehicle through GUI/CLI, identity retained for edit | Independent vehicle-add/edit/save controls; explicit provenance; multi-vehicle storage |
-| F02 | PLANNED | None | Listing extraction, schema validation, uncertainty and confirmation before save |
+| F02 | IMPLEMENTED; LIVE EXTRACTION UNVERIFIED | Gemini-backed command/agent/prompt/parser/draft/F04 flow; CLI and background Swing review/edit/confirm/cancel; source retention and stale-baseline protection | Real Gemini F02 quality verification; no independent verification of seller claims |
 | F03 | WORKING SUBSET | All seven validated preferences, independent CLI/GUI save/load, neutral values and in-memory storage | Local persistence and full downstream AI use |
-| F04 | WORKING SUBSET | Missing/uncertain fields, conservative sufficiency and structured source conflicts through CLI/GUI | Incomplete drafts, prioritized gaps, uncertain source text and dedicated source resolution |
+| F04 | WORKING SUBSET | Missing/uncertain fields, conservative sufficiency and structured source conflicts through CLI/GUI | Prioritized gaps and broader uncertain-source interpretation; F02 now supports partial drafts and manual review of conflicts |
 | F05 | WORKING SUBSET | Local CSV repository, source labels, normalized lookup, no-match and malformed/I/O handling | Real curated data and downstream AI integration |
 | F06 | WORKING SUBSET | Fuel, optional tax and complete-input first-year estimate; exact decimal arithmetic; unknown components preserved | Independent estimate-cost command/panel; reusable stored assumptions/results; wider formats/units |
 | F07 | WORKING SUBSET | Budget, mileage, transmission and accident rules; distinct UNKNOWN and CONFLICT findings | Dedicated controls and downstream AI integration |
@@ -37,8 +37,12 @@ Automatic mode chooses Reliability Focused only for two specified priorities wit
 
 ## Verification boundary
 
-Java 21 compilation, executable JAR/demo, 86 JUnit tests (72 previous tests plus 14 adapter tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
+Java 21 compilation, executable JAR/demo, 106 JUnit tests (86 pre-F02 tests plus 20 F02 tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
 
 Maven CLI was unavailable, so Maven compilation/test execution is unverified. The dependency-free runner is for environments without JUnit and is not a substitute for Stage 3 JUnit coverage, KUMA agent validation or failure analysis.
 
 No final implementation report, videos, weekly commit history, repository upload or submission has been produced by this task.
+
+F02 verification also runs ListingGuiSmoke with an injected offline LLM: background request, responsive event thread, unconfirmed draft, rejected/corrected fields, explicit approval and cancellation. No live F02 request was made. A prior live connection success is user-reported, not a new independently observed extraction result.
+
+F02 JSON compatibility: structured output is requested through the existing LLM boundary; field-specific safe validation diagnostics replace the generic error. The supplied Corolla advertisement is covered by offline regression tests, including unknown accident history, unavailable maintenance records, optional nulls and explicit confirmation. The exact original response failure and the repaired live F02 request remain unverified.

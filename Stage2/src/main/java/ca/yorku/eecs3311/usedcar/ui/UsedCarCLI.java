@@ -48,7 +48,8 @@ public final class UsedCarCLI {
                     case "strategy" -> output.println(facade.previewPriorityGuidance());
                     case "llm-test" -> { output.println(facade.testLlmConnection()); output.println(facade.llmStatus()); }
                     case "status" -> output.println(facade.llmStatus());
-                    case "evaluate", "analyze-listing", "compare", "checklist", "report", "clarify" ->
+                    case "analyze-listing" -> analyzeListing();
+                    case "evaluate", "compare", "checklist", "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
                     default -> {
                         if (command.startsWith("strategy ")) {
@@ -98,8 +99,48 @@ public final class UsedCarCLI {
         output.println(ResultFormatter.format(facade.preferences()));
     }
 
+    private void analyzeListing() {
+        output.println("Paste listing text; end with a line containing :end. :cancel aborts. This explicitly requests Gemini analysis.");
+        var text = new StringBuilder(); boolean ended = false;
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.equals(":cancel")) return;
+            if (line.equals(":end")) { ended = true; break; }
+            text.append(line).append("\n");
+            if (text.length() > 16000) throw new IllegalArgumentException("Listing exceeds 16000 characters.");
+        }
+        if (!ended) { output.println("Cancelled at end of input; saved vehicle unchanged."); return; }
+        var analysis = submit(new ca.yorku.eecs3311.usedcar.command.AnalyzeListingCommand(facade,text.toString()));
+        output.println(analysis.draft().describe()); output.println(ResultFormatter.format(analysis.quality()));
+        output.println("Only explicit canonical units can prefill CAD/km/L/100km fields. Correct uncertain or unsupported units yourself.");
+        var values = analysis.draft().formValues();
+        while (input.hasNextLine()) {
+            output.println("Choose confirm, edit, or cancel (saved vehicle is unchanged until final yes):");
+            String action = input.nextLine().strip().toLowerCase(Locale.ROOT);
+            if (action.equals("cancel")) return;
+            if (action.equals("edit")) {
+                for (var field : PreparationForm.FIELDS) {
+                    if (!field.section().equals("Vehicle")) continue;
+                    output.println(field.label() + " [draft=" + values.get(field.key()) + "] (:keep retains, blank clears, :cancel cancels):");
+                    if (!input.hasNextLine()) return;
+                    String value = input.nextLine(); if (value.equals(":cancel")) return;
+                    if (!value.equals(":keep")) values.put(field.key(),value);
+                }
+            } else if (!action.equals("confirm")) continue;
+            try {
+                var candidate = PreparationForm.vehicle(facade,values);
+                output.println(candidate); output.println(ResultFormatter.format(facade.reviewListing(analysis,candidate)));
+                output.println("Save these reviewed claims and replace the current vehicle, if any? Type yes; anything else keeps the draft unsaved.");
+                if (!input.hasNextLine()) return;
+                if (input.nextLine().strip().equalsIgnoreCase("yes")) {
+                    facade.confirmListing(analysis,candidate,true); output.println("User-confirmed listing saved; buyer preferences preserved."); return;
+                }
+            } catch (IllegalArgumentException | IllegalStateException e) { output.println("ERROR: " + e.getMessage()); }
+        }
+    }
+
     private void help() {
-        output.println("Commands: prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
+        output.println("Commands: analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
         output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. AI and vehicle comparison are PLANNED.");
     }

@@ -33,6 +33,24 @@ public final class UsedCarApplicationFacade {
         else agent.selectManualStrategy(mode);
     }
     public String previewPriorityGuidance() { return agent.buildPriorityGuidance(preferences()); }
+    public ListingAnalysisResult analyzeListing(String text) {
+        return agent.analyzeListing(text, currentVehicle().orElse(null));
+    }
+    public MissingInformationResult reviewListing(ListingAnalysisResult result, Vehicle corrected) {
+        if (!Objects.equals(result.baseline(), currentVehicle().orElse(null)))
+            throw new IllegalStateException("Saved vehicle changed after analysis. Cancel and analyze again before replacing it.");
+        return result.baseline() == null ? agent.checkMissingInformation(corrected)
+                : agent.checkConflict(result.baseline(), corrected);
+    }
+    public Vehicle confirmListing(ListingAnalysisResult result, Vehicle corrected, boolean approved) {
+        if (!approved) throw new IllegalArgumentException("Explicit user confirmation is required.");
+        reviewListing(result, corrected);
+        String notes = corrected.notes() + "\nUser-reviewed listing claims (not independently verified). Original extraction:\n" + result.draft().describe();
+        var saved = new Vehicle(corrected.id(),corrected.year(),corrected.make(),corrected.model(),corrected.trim(),
+                corrected.mileage(),corrected.askingPrice(),corrected.transmission(),corrected.fuelType(),
+                corrected.accidentHistory(),corrected.maintenanceHistory(),corrected.fuelConsumption(),notes);
+        return saveVehicle(saved);
+    }
     public String testLlmConnection() { return agent.testLlmConnection(); }
     public String llmStatus() { return agent.llmStatus(); }
     public MissingInformationResult checkMissingInformation(Vehicle vehicle) { return agent.checkMissingInformation(vehicle); }
