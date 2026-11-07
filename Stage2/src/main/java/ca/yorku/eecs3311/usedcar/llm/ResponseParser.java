@@ -176,4 +176,61 @@ public final class ResponseParser {
     private static IllegalArgumentException comparisonError(String reason) {
         return new IllegalArgumentException("Invalid comparison JSON: "+reason); // Fixed diagnostics; no model text/values.
     }
+    public InspectionChecklist parseChecklist(String response) {
+        try {
+            if(response==null||response.isBlank()||response.length()>64000)throw new IllegalArgumentException();
+            JsonObject root;
+            try(var reader=JSON.newJsonReader(new java.io.StringReader(response))){
+                root=readChecklistJson(reader,0).getAsJsonObject();
+                if(reader.peek()!=com.google.gson.stream.JsonToken.END_DOCUMENT)throw new IllegalArgumentException();
+            }
+            if(!root.keySet().equals(Set.of("sections")))throw new IllegalArgumentException();
+            var sections=root.getAsJsonObject("sections");
+            if(!sections.keySet().equals(new HashSet<>(InspectionChecklist.SECTIONS)))throw new IllegalArgumentException();
+            var result=new LinkedHashMap<String,List<InspectionChecklistItem>>();
+            for(String section:InspectionChecklist.SECTIONS){
+                var items=new ArrayList<InspectionChecklistItem>();
+                for(var value:sections.getAsJsonArray(section)){
+                    var item=value.getAsJsonObject();
+                    if(!item.keySet().equals(Set.of("id","action","priority","reason","source")))throw new IllegalArgumentException();
+                    for(var field:item.entrySet())if(!field.getValue().isJsonPrimitive()||!field.getValue().getAsJsonPrimitive().isString())throw new IllegalArgumentException();
+                    items.add(new InspectionChecklistItem(item.get("id").getAsString(),item.get("action").getAsString(),item.get("priority").getAsString(),item.get("reason").getAsString(),item.get("source").getAsString()));
+                }
+                result.put(section,items);
+            }
+            return new InspectionChecklist(result);
+        }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid checklist JSON: require six nonempty sections, unique IDs and exactly five typed item fields with supported priorities; duplicate properties are forbidden.");}
+    }
+    private static JsonElement readChecklistJson(com.google.gson.stream.JsonReader reader,int depth)throws java.io.IOException {
+        if(depth>5)throw new IllegalArgumentException();
+        switch(reader.peek()){
+            case BEGIN_OBJECT: {
+                var object=new JsonObject();reader.beginObject();
+                while(reader.hasNext()){String key=reader.nextName();if(object.has(key))throw new IllegalArgumentException();object.add(key,readChecklistJson(reader,depth+1));}
+                reader.endObject();return object;
+            }
+            case BEGIN_ARRAY: {
+                var array=new JsonArray();reader.beginArray();while(reader.hasNext()){if(array.size()>=40)throw new IllegalArgumentException();array.add(readChecklistJson(reader,depth+1));}reader.endArray();return array;
+            }
+            case STRING: return new JsonPrimitive(reader.nextString());
+            default: throw new IllegalArgumentException();
+        }
+    }
+    public InspectionChecklist validateChecklist(InspectionChecklist result,InspectionChecklist required){
+        for(String section:InspectionChecklist.SECTIONS){
+            var expected=new LinkedHashMap<String,InspectionChecklistItem>();required.sections().get(section).forEach(i->expected.put(i.id(),i));
+            if(result.sections().get(section).size()!=expected.size())throw new IllegalArgumentException("Checklist omitted or added required inspection actions.");
+            for(var item:result.sections().get(section)){
+                var original=expected.get(item.id());
+                if(original==null||!item.action().equals(original.action())||!item.source().equals(original.source())
+                        ||priorityRank(item.priority())<priorityRank(original.priority()))
+                    throw new IllegalArgumentException("Checklist changed an evidence-grounded action, source, section or minimum priority.");
+                String text=item.reason().toLowerCase(Locale.ROOT);
+                for(String claim:List.of("accident-free","no accidents","complete service history","full maintenance records","mechanically sound","is reliable","is defective","guaranteed","confirmed defect"))
+                    if(text.contains(claim))throw new IllegalArgumentException("Checklist reason contains an unsupported condition/history claim.");
+            }
+        }
+        return result;
+    }
+    private static int priorityRank(String priority){return switch(priority){case "High"->3;case "Medium"->2;default->1;};}
 }

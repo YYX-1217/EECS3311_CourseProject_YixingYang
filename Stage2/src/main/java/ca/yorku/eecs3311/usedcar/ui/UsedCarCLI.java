@@ -57,10 +57,17 @@ public final class UsedCarCLI {
                         output.println("Common cost assumptions: "+facade.costAssumptions().map(Object::toString).orElse("UNAVAILABLE"));
                     }
                     case "compare" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.CompareVehiclesCommand(facade))));
-                    case "checklist", "report", "clarify" ->
+                    case "checklist" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.GenerateChecklistCommand(facade))));
+                    case "checklist-show" -> output.println(ResultFormatter.format(facade.currentChecklist().orElseThrow(()->new IllegalStateException("No current checklist; run checklist first."))));
+                    case "report", "clarify" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
                     default -> {
-                        if (command.startsWith("strategy ")) {
+                        if (command.startsWith("checklist-mark ") || command.startsWith("checklist-unmark ")) {
+                            String[] parts=command.split("\\s+");
+                            if(parts.length!=2)throw new IllegalArgumentException("Use checklist-mark <id> or checklist-unmark <id>.");
+                            var saved=facade.currentChecklist().orElseThrow(()->new IllegalStateException("No current checklist; run checklist first."));
+                            output.println(ResultFormatter.format(facade.completeChecklistItem(saved.generationId(),parts[1],parts[0].equals("checklist-mark"))));
+                        } else if (command.startsWith("strategy ")) {
                             facade.selectStrategy(command.substring("strategy ".length()));
                             output.println(facade.previewPriorityGuidance());
                         } else output.println("Unknown command. Type help.");
@@ -168,8 +175,8 @@ public final class UsedCarCLI {
     }
 
     private void help() {
-        output.println("Commands: comparison-set (save B), comparison-show (saved pair/assumptions), compare (one AI request when sufficient), evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
+        output.println("Commands: checklist (generate; may request AI), checklist-show (cached), checklist-mark <id>, checklist-unmark <id>, comparison-set (save B), comparison-show (saved pair/assumptions), compare (one AI request when sufficient), evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
-        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist/clarification/report remain PLANNED.");
+        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist supports AI/fallback and local completion; clarification/report remain PLANNED.");
     }
 }

@@ -105,4 +105,15 @@ public final class ResultFormatter {
                 .append("\nPreferred vehicle ID: ").append(result.preferredVehicleId().isEmpty()?"NONE - no defensible preference":result.preferredVehicleId()).append("\n");
         return out.toString();
     }
+    public static String format(ca.yorku.eecs3311.usedcar.result.ChecklistEvaluation result){
+        var out=new StringBuilder("F10 INSPECTION CHECKLIST - ").append(result.status()).append("\n")
+                .append("Vehicle: ").append(result.vehicle().year()).append(" ").append(result.vehicle().make()).append(" ").append(result.vehicle().model()).append(" [").append(result.vehicle().id()).append("]\n")
+                .append(result.message()).append("\n").append(result.knowledgeStatus()).append("\n").append(format(result.missing()));
+        result.checklist().sections().forEach((section,items)->{
+            out.append("\n").append(section).append("\n");
+            for(var item:items)out.append(result.completed().contains(item.id())?"[x] ":"[ ] ").append(item.id()).append(" | ").append(item.priority()).append(" | ").append(item.action())
+                    .append("\n  Reason: ").append(item.reason().isEmpty()?"Not supplied":item.reason()).append("\n  Source: ").append(item.source()).append("\n");
+        });
+        return out.append("Completion records your inspection progress only; it does not verify vehicle condition. Session only.\n").toString();
+    }
 }

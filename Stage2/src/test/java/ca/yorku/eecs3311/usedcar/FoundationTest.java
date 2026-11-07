@@ -153,4 +153,22 @@ public final class FoundationTest {
     @Test public void comparisonStale() { ComparisonChecks.stale(); }
     @Test public void comparisonCli() { ComparisonChecks.cli(); }
     @Test public void comparisonGeminiTransport() { ca.yorku.eecs3311.usedcar.llm.ComparisonGeminiChecks.workflow(); }
+    @Test public void checklistValid(){ ChecklistChecks.valid(); }
+    @Test public void checklistMissingHistory(){ ChecklistChecks.missingHistory(); }
+    @Test public void checklistKnowledge(){ ChecklistChecks.knowledge(); }
+    @Test public void checklistNoKnowledge(){ ChecklistChecks.noKnowledge(); }
+    @Test public void checklistTransmissions(){ ChecklistChecks.transmissions(); }
+    @Test public void checklistMalformed(){ ChecklistChecks.malformed(); }
+    @Test public void checklistFields(){ ChecklistChecks.fields(); }
+    @Test public void checklistGrounding(){ ChecklistChecks.grounding(); }
+    @Test public void checklistClaims(){ ChecklistChecks.claims(); }
+    @Test public void checklistProviderFailure(){ ChecklistChecks.providerFailure(); }
+    @Test public void checklistMissingVehicle(){ ChecklistChecks.missingVehicle(); }
+    @Test public void checklistCompletion(){ ChecklistChecks.completion(); }
+    @Test public void checklistIsolation(){ ChecklistChecks.isolation(); }
+    @Test public void checklistInvalidation(){ ChecklistChecks.invalidation(); }
+    @Test public void checklistRegeneration(){ ChecklistChecks.regeneration(); }
+    @Test public void checklistTools(){ ChecklistChecks.tools(); }
+    @Test public void checklistStale(){ ChecklistChecks.stale(); }
+    @Test public void checklistCli(){ ChecklistChecks.cli(); }
 }

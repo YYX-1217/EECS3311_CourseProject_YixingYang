@@ -148,4 +148,26 @@ public final class UsedCarAgent {
         var constraints = checkConstraints(vehicle, preference);
         return new PreparationResult(vehicle, preference, assumptions, cost, constraints, missing, llmStatus());
     }
+    public InspectionChecklist generateChecklist(Vehicle vehicle){return generateChecklistWithEvidence(vehicle).checklist();}
+    public ChecklistEvaluation generateChecklistWithEvidence(Vehicle vehicle){
+        if(vehicle==null)throw new IllegalStateException("Save a vehicle before generating an inspection checklist.");
+        var missing=checkMissingInformation(vehicle);VehicleKnowledge knowledge=null;
+        String knowledgeStatus="Model-specific local knowledge unavailable; general inspection guidance only.";
+        try{
+            knowledge=retrieveKnowledge(vehicle);
+            if(knowledge!=null&&!knowledge.equals(VehicleKnowledge.noData()))knowledgeStatus="Local instructional knowledge used (not independently verified research): "+knowledge.sourceLabel();
+        }catch(RuntimeException e){knowledgeStatus="Local knowledge tool failed; general inspection guidance only.";}
+        var planner=new ChecklistPlanner();InspectionChecklist baseline;
+        try{baseline=planner.build(vehicle,knowledge,missing);}catch(IllegalArgumentException e){knowledge=null;knowledgeStatus="Local notes could not be represented safely; general inspection guidance only.";baseline=planner.build(vehicle,null,missing);}
+        InspectionChecklist result=baseline;String status="FALLBACK";
+        String message="Deterministic checklist; AI unavailable or not configured. No automatic retry. This does not replace a professional pre-purchase inspection.";
+        final String response;
+        try{response=llmClient.generateStructured(new PromptBuilder().buildChecklistPrompt(vehicle,knowledge,missing,baseline),ChecklistSchema.json());}
+        catch(RuntimeException e){return new ChecklistEvaluation(java.util.UUID.randomUUID().toString(),vehicle,result,status,message,knowledgeStatus,missing,java.util.Set.of());}
+        try{
+            var parser=new ResponseParser();result=parser.validateChecklist(parser.parseChecklist(response),baseline);status="AI_SUCCESS";
+            message="AI-assisted prioritization and reasons for evidence-grounded inspection actions. Advisory; does not replace a professional pre-purchase inspection.";
+        }catch(IllegalArgumentException e){message="Deterministic fallback: AI output failed checklist structure/evidence checks. No automatic retry. This does not replace a professional pre-purchase inspection.";}
+        return new ChecklistEvaluation(java.util.UUID.randomUUID().toString(),vehicle,result,status,message,knowledgeStatus,missing,java.util.Set.of());
+    }
 }

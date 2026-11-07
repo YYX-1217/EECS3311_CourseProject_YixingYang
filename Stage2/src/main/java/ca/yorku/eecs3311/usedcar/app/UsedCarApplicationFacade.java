@@ -111,4 +111,12 @@ public final class UsedCarApplicationFacade {
         session.setCost(result.cost());session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();
         return result;
     }
+    public InspectionChecklist generateChecklist(Vehicle vehicle){return agent.generateChecklist(vehicle);}
+    public ChecklistEvaluation generateCurrentChecklist(){
+        var vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before generating an inspection checklist."));
+        long revision=session.beginChecklist(vehicle);
+        var result=agent.generateChecklistWithEvidence(vehicle);session.saveChecklist(revision,result);return result;
+    }
+    public Optional<ChecklistEvaluation> currentChecklist(){return session.getChecklist();}
+    public ChecklistEvaluation completeChecklistItem(String generationId,String itemId,boolean done){return session.completeChecklistItem(generationId,itemId,done);}
 }
