@@ -2,7 +2,7 @@
 
 ## Project overview
 
-This project is the **initial Stage 2 foundation** for the EECS3311 Fall 2026 course project. It supports a working deterministic workflow through a command-line interface (CLI) and a Swing graphical user interface (GUI): vehicle entry, session-based buyer preferences, ownership-cost estimation, data-quality checks, and buyer constraint checks. F02 listing analysis, F08 risk assessment, F09 two-vehicle comparison, F10 inspection checklists and F11 clarification/follow-up also have working shared GUI/CLI and Gemini integration paths verified with offline fixtures. It is not a fully implemented Stage 2 application; real-model F09 behavior remains unverified.
+This project is the **initial Stage 2 foundation** for the EECS3311 Fall 2026 course project. It supports a working deterministic workflow through a command-line interface (CLI) and a Swing graphical user interface (GUI): vehicle entry, session-based buyer preferences, ownership-cost estimation, data-quality checks, and buyer constraint checks. F02 listing analysis, F08 risk assessment, F09 two-vehicle comparison, F10 inspection checklists, F11 clarification/follow-up and F12 personalized recommendation reports also have working shared GUI/CLI and Gemini integration paths verified with offline fixtures. It is not a fully implemented Stage 2 application; real-model F09 behavior remains unverified.
 
 The `Stage2` directory is part of the existing course-project repository. The original `Project-Stage2-Instruction.pdf` is retained. The foundation was developed without modifying the Stage 1 materials, repository-root README, or Git configuration. No particular checkout location or personal Windows directory is required.
 
@@ -153,7 +153,7 @@ In a terminal that permits script execution, the available verification modes ar
 & .\scripts\verify.ps1 -Gui             # Also open a real GUI, test its buttons, and close it
 ```
 
-The 204 tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
+The 274 tests cover negative and malformed inputs, required fields and year validation, exact cost calculations, optional values, unknown fuel consumption, constraint boundaries, zero values and rounding, session preservation after rejected updates, tool/LLM boundaries, and interactive CLI processing, including transmission matching/mismatching, multiple accepted types, accident tolerance, neutral preferences, unknown values, and invalid preference input.
 
 Ten F04 tests additionally cover missing versus unknown histories, complete and insufficient essential data, optional omissions, matching and conflicting sources, unknown values without false conflicts, session preservation, and the interactive conflict-check command.
 
@@ -190,7 +190,7 @@ The prompt treats advertisements as untrusted data and forbids following embedde
 
 The confirmed vehicle retains source text, extraction claims and uncertainty in its notes, labeled as original unverified extraction; corrected current fields take precedence. No preference, cost formula or F07 rule changes. Drafts and saved vehicles remain in memory. There is no site scraping, file-import command, VIN lookup, independent seller verification, risk rating or recommendation. Malformed model output/API failure produces an error and requires an explicit user retry; no fake fallback and no automatic paid retry occurs. The provider output cap is now 4096 tokens to accommodate structured fields and quotations; truncated responses remain errors.
 
-Verification: 16 new JUnit groups cover prompt constraints, complete/partial extraction, missing histories, normalization, invalid numbers/JSON/types/evidence, units, uncertainty, no-auto-save, approved save, cancellation, conflicts/stale baselines, missing configuration and CLI edit/confirm. `verify.ps1 -Gui` additionally runs a fixture-backed Swing test for background analysis, responsive UI, correction, confirmation and cancellation. The current suite contains 204 passing JUnit tests, including F09/F10/F11 regression groups. The user reports a prior successful live connection test; **no live F02 extraction was performed during this increment**, so real-model extraction quality remains unverified.
+Verification: 16 new JUnit groups cover prompt constraints, complete/partial extraction, missing histories, normalization, invalid numbers/JSON/types/evidence, units, uncertainty, no-auto-save, approved save, cancellation, conflicts/stale baselines, missing configuration and CLI edit/confirm. `verify.ps1 -Gui` additionally runs a fixture-backed Swing test for background analysis, responsive UI, correction, confirmation and cancellation. The current suite contains 274 passing JUnit tests, including F09/F10/F11/F12 regression groups. The user reports a prior successful live connection test; **no live F02 extraction was performed during this increment**, so real-model extraction quality remains unverified.
 
 ## F03 buyer preference management
 
@@ -241,7 +241,7 @@ The Preferences tab includes a mode selector (`auto`, `balanced`, `budget`, `rel
 
 All modes retain explicit mileage, transmission, body-type and accident preferences, preserve neutral values, and prohibit invented history or risk ratings. Guidance is deterministic instruction text, not a completed AI assessment, inspection checklist, or purchase recommendation. F07 decisions are unchanged.
 
-The implementation preserves Stage 1 `EvaluationStrategy.buildPriorityGuidance(UserPreference): String`, the three named concrete strategies, and `UsedCarAgent.setStrategy(EvaluationStrategy)`. The agent holds the interface and dispatches polymorphically. A package-private `PriorityGuidance` helper shares preference rendering and safeguards. `EvaluationStrategyFactory.createStrategy(UserPreference)` now centralizes automatic construction. The agent obtains the product and invokes its guidance through `EvaluationStrategy`; CLI and GUI use the same facade. Manual construction also resides in the factory. This preview implements the strategy-selection portion of SD03/SD06; F08 now uses this strategy-selection chain; F12 remains planned.
+The implementation preserves Stage 1 `EvaluationStrategy.buildPriorityGuidance(UserPreference): String`, the three named concrete strategies, and `UsedCarAgent.setStrategy(EvaluationStrategy)`. The agent holds the interface and dispatches polymorphically. A package-private `PriorityGuidance` helper shares preference rendering and safeguards. `EvaluationStrategyFactory.createStrategy(UserPreference)` now centralizes automatic construction. The agent obtains the product and invokes its guidance through `EvaluationStrategy`; CLI and GUI use the same facade. Manual construction also resides in the factory. This preview implements the strategy-selection portion of SD03/SD06; F08 now uses this strategy-selection chain; F12 is implemented below with live verification outstanding.
 
 ### Automatic selection and manual override
 
@@ -283,7 +283,7 @@ The agent runs F04 data-quality checks, calls `vehicleKnowledge` and `constraint
 
 Missing local knowledge is explicitly labeled; optional knowledge-tool failure does not erase other evidence. Instructional CSV notes are always labeled as such, not real-world reliability research. Confirmed structured inputs and seller notes are still unverified user/seller claims. Gemini receives those sources as data with instructions to ignore embedded commands. Constraint conflicts must appear verbatim in the response risks, and missing information, tool failures, unavailable costs and source limitations must appear verbatim in uncertainties. Java rejects altered/omitted required entries, unsupported categories/types and Low with unresolved buyer constraint conflicts. Additional conservative phrase checks reject obvious accident/maintenance/constraint contradictions. Costs and violations are displayed separately from AI prose and cannot be replaced by model fields. These checks cannot establish the semantic truth of all generated prose; users must review the assessment against the evidence.
 
-The original `assessRisk(vehicle, preference)`, `evaluateVehicle(vehicle)`, `buildRiskPrompt(vehicle, knowledge, missing, violations)` and `parseRiskAssessment(response)` contracts are retained. The current-session command uses additional envelope/context methods for costs, safe errors and freshness. D12 records these extensions and the explicit no-retry decision. Successful/current results are held only in memory and invalidated when inputs change; F09 is documented below; F10 is implemented below; F11 is implemented below; F12 remains planned.
+The original `assessRisk(vehicle, preference)`, `evaluateVehicle(vehicle)`, `buildRiskPrompt(vehicle, knowledge, missing, violations)` and `parseRiskAssessment(response)` contracts are retained. The current-session command uses additional envelope/context methods for costs, safe errors and freshness. D12 records these extensions and the explicit no-retry decision. Successful/current results are held only in memory and invalidated when inputs change; F09 is documented below; F10 is implemented below; F11 is implemented below; F12 is implemented below with live verification outstanding.
 
 Verification: 20 new JUnit groups plus all 106 earlier tests pass (**126 at the F08 increment; 150 after F09**). Tests cover schema/category errors, no vehicle, sufficiency gate, knowledge/no-match, tool sequencing, constraints, neutral/saved preferences, automatic/manual strategy, cost reuse/invalidation, rejected/provider responses and shared CLI behavior. `verify.ps1 -Gui` runs the existing GUI/F02 checks and RiskGuiSmoke, exercising background evaluation, responsive EDT, stale-context handling, success and failure with retained evidence. **No live F08 Gemini request was performed; real-model end-to-end behavior remains unverified.** Run `evaluate` manually with local credentials only when ready to authorize the request.
 
@@ -316,7 +316,7 @@ Missing local knowledge or optional cost-tool failure is labeled and does not er
 
 **Verification:** Java 21 build/JAR and **150 JUnit tests passed, 0 failed** (126 earlier + 24 F09 groups). ComparisonChecks exercises production tools, symmetric costs/constraints, session preservation, partial/missing inputs, unit-text rejection, schema/ID/metric validation, provider failure and actual CLI commands. ComparisonGeminiChecks verifies real adapter request serialization, response-envelope parsing, HTTP failure and timeout with injected transport. ComparisonGuiSmoke exercises B entry/edit/cancel, background execution, responsiveness, stale-result handling and safe failure. Existing GUI/F02/F08 checks also pass. All fixtures are offline; no real API key or Gemini request is used.
 
-**Manual live F09 retry:** follow the hidden-key setup under API key security below and launch CLI from Stage2 with `& .\scripts\run.ps1 -Mode cli`. Save real A using `prepare` or confirm an F02 draft; keep genuinely unknown history unknown. Save B with `comparison-set`, inspect `comparison-show`, then enter `status` and `compare` when ready to authorize one live request. `llm-test` is optional and is not an F09 test. With insufficient essential history, `compare` deliberately makes no request. **No live F09 success is claimed.** F10 is implemented below; F11 is implemented below; F12 remains planned.
+**Manual live F09 retry:** follow the hidden-key setup under API key security below and launch CLI from Stage2 with `& .\scripts\run.ps1 -Mode cli`. Save real A using `prepare` or confirm an F02 draft; keep genuinely unknown history unknown. Save B with `comparison-set`, inspect `comparison-show`, then enter `status` and `compare` when ready to authorize one live request. `llm-test` is optional and is not an F09 test. With insufficient essential history, `compare` deliberately makes no request. **No live F09 success is claimed.** F10 is implemented below; F11 is implemented below; F12 is implemented below with live verification outstanding.
 
 ## F10 vehicle-specific inspection checklist — UC10 / SD05
 
@@ -328,7 +328,7 @@ The existing agent first runs DataQualityChecker and retrieves VehicleKnowledge 
 
 The existing PromptBuilder/LLMClient/GeminiAdapter/ResponseParser chain provides AI-assisted prioritization and brief reasons. Model output must preserve required IDs, actions, sections and sources and cannot lower minimum priorities. This intentionally bounds model freedom: it may reorder items, raise priorities and explain relevance, but cannot add unsupported mechanical claims or discard necessary questions. Structural validation rejects empty/missing/extra sections, duplicate IDs/properties, wrong fields/types/priorities and altered evidence. Selected obvious unsupported claims in model reasons are rejected; arbitrary prose cannot be proven true. User review and a professional pre-purchase inspection remain necessary.
 
-`AI_SUCCESS` identifies validated AI-assisted priorities/reasons. `FALLBACK` identifies a practical non-AI checklist after missing credentials, request failure, timeout, malformed/unsupported output or failed evidence validation. Fallback retains generic inspection actions, missing-information questions, applicable transmission guidance and available attributed notes. Knowledge failure/no-match is disclosed separately from AI status. There are no automatic retries. F11 below adds the clarification loop; F12 reports remain planned.
+`AI_SUCCESS` identifies validated AI-assisted priorities/reasons. `FALLBACK` identifies a practical non-AI checklist after missing credentials, request failure, timeout, malformed/unsupported output or failed evidence validation. Fallback retains generic inspection actions, missing-information questions, applicable transmission guidance and available attributed notes. Knowledge failure/no-match is disclosed separately from AI status. There are no automatic retries. F11 below adds the clarification loop; F12 reports are implemented below.
 
 ### Reproducible fictional demonstration
 
@@ -448,7 +448,134 @@ To test real F11 later, use the hidden-key setup below in a fresh terminal, laun
 
 Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify.ps1 -Gui` from Stage2. The observed baseline was 168 passing JUnit tests; F11 adds 36 tests, for **204 passed, 0 failed**. All six GUI smoke entry points, including the actual integrated F11 Swing frame with fictional Corolla input, pass offline. The packaged CLI scenario above also passes. Tests use provider doubles or an explicitly empty-key adapter; no real Gemini request was made.
 
-Memory/history is in-process only. Question wording is deliberately bounded, not a general chatbot. Saved Vehicle requires core numeric fields; incomplete F02 drafts must be corrected and explicitly confirmed in the existing listing workflow before F11, rather than inventing zero mileage/price. F11 can explicitly revisit these known fields. Changed external vehicle records reset history; no cross-session restoration or automatic provenance verification exists. The model's selection quality and live schema acceptance remain unverified. Existing advisory/knowledge limitations remain; F12 is still planned and the full Stage2 submission is not claimed complete.
+Memory/history is in-process only. Question wording is deliberately bounded, not a general chatbot. Saved Vehicle requires core numeric fields; incomplete F02 drafts must be corrected and explicitly confirmed in the existing listing workflow before F11, rather than inventing zero mileage/price. F11 can explicitly revisit these known fields. Changed external vehicle records reset history; no cross-session restoration or automatic provenance verification exists. The model's selection quality and live schema acceptance remain unverified. Existing advisory/knowledge limitations remain; F12 is implemented below; the full Stage2 submission is not claimed complete.
+
+
+## F12 personalized purchase recommendation and evaluation report
+
+F12 implements **F12 → UC12 → SD06** through the existing Java architecture. It produces the original advisory categories **Strong Candidate**, **Consider with Caution**, **High Risk**, and **Insufficient Information**, with strengths, risks, missing information, explicit buyer conflicts, ownership costs, inspection priorities, next steps and explanation. This is the application's buyer-facing report, not the professor's `stage2-report` submission document.
+
+### Evidence and agent workflow
+
+GUI/CLI → `GenerateReportCommand` → `UsedCarApplicationFacade.generateCurrentReport` → session snapshot → `UsedCarAgent.generateRecommendation` → current F04/constraint/local-knowledge tools and available costs/risk → existing Strategy/Simple Factory → `PromptBuilder.buildRecommendationPrompt` → `LLMClient.generateStructured` / unchanged `GeminiAdapter` → `ResponseParser.parseReport` and evidence validation → session storage → shared `ReportText` output. Original `generateReport(Vehicle)`, `generateRecommendation(Vehicle, UserPreference)` and four-argument recommendation-prompt contracts remain available; current-session overloads carry the complete evidence and failure status.
+
+Java evidence is authoritative. Costs already valid for the current vehicle are reused; missing cached costs are calculated only when saved assumptions exist. F04, constraint and local-knowledge checks are refreshed using existing tools. A saved F08 assessment is reused only when its vehicle, preferences, strategy guidance, cost, missing information, constraints and knowledge still match. Otherwise it is explicitly unavailable. F12 does not silently call F08 or F10 AI generation. It uses the existing deterministic inspection planner, ignoring completion checkboxes as proof of condition. One explicit report generation makes **at most one recommendation request**, with no automatic retry.
+
+The report displays **A. Deterministic evidence** and **B. Gemini-assisted interpretation** separately. Gemini selects supported strengths, orders the supplied evidence/inspection/next-step sections, and synthesizes the advisory category and explanation. Required risks, uncertainties, conflicts, cost summary and inspection actions must match Java's supplied values; the model cannot remove or rewrite them. Exact schema/type/category validation rejects missing/extra/duplicate fields and unsupported additions. A favorable `Strong Candidate` requires sufficient evidence, no constraint conflicts or unknown constraint checks, a matching saved Low risk category and a complete cost estimate; it is never assigned just because a car is within budget.
+
+Essential missing information, unresolved F11 conflicts/listing claims, unavailable mandatory constraint checks, or a current F08 Insufficient Information assessment produce **INSUFFICIENT_INFORMATION** without a recommendation request. Configuration/transport/output validation failures produce **AI_UNAVAILABLE**, retain all deterministic evidence and do not fabricate a category or narrative. **AI_SUCCESS** means the response passed application validation, not that the vehicle's history or condition was independently verified.
+
+The model-year difference is calculated by Java as `reference year - model year` and labeled as different from exact in-service age. F12 does not forward or display arbitrary F08 explanatory prose. Numerical/age assertions and selected unsupported condition/certification claims in the new explanation are rejected. Supported evidence sections are exact; validation cannot prove every possible statement in free-form explanatory prose true. Human review remains necessary. The guards are conservative and may also reject cautious wording containing restricted terms; retry is always explicit.
+
+### Diagnosing F12 AI_UNAVAILABLE safely
+
+The earlier generic "configuration or request failure" message discarded the request-stage failure category. The user has now reproduced **HTTP 400** after diagnostic improvements, while reporting successful F08/F11 requests with the same configuration. HTTP rejection is confirmed by the user; the server's detailed reason was discarded by the previous adapter and cannot be recovered from that status alone. Live F12 success remains unverified.
+
+F12 now preserves sanitized typed failure metadata from the existing GeminiAdapter, while unknown exception text remains hidden. The same message is displayed in GUI, CLI, cached review and explicit export. No request bodies, provider error bodies, credentials or raw exception causes are logged or displayed.
+
+| Diagnostic | Meaning / next check |
+|---|---|
+| `NOT_CONFIGURED`, `INVALID_CONFIGURATION` | Check the environment of the terminal that launches the application; restart after correcting it. Do not share keys. |
+| `INVALID_REQUEST_SCHEMA`, `REQUEST_BUILD` | Local request/schema construction failure before transport; report the code for a code-level investigation. |
+| `PROVIDER_HTTP_400` | HTTP request rejected. A second allowlisted code may identify the provider's reason: `SCHEMA_COMPLEXITY`, `SCHEMA_FIELD`, `RESPONSE_CONFIGURATION`, `INVALID_ARGUMENT` or `FAILED_PRECONDITION`. No raw server message or private field value is displayed. |
+| `PROVIDER_HTTP_401` / `403` | Authorization denied; check account/key permissions locally. |
+| `PROVIDER_HTTP_404` | Check model identifier and account access. |
+| `PROVIDER_HTTP_429` | Check quota/rate limits before explicitly retrying. |
+| `PROVIDER_HTTP_5xx` | Provider server error. |
+| `TIMEOUT`, `TRANSPORT_ERROR`, `INTERRUPTED` | Timeout, network failure or interrupted request, respectively. |
+| `OUTPUT_LIMIT` | Provider returned `MAX_TOKENS`; incomplete output is rejected even if its text happens to parse. |
+| `BLOCKED_RESPONSE`, `INCOMPLETE_RESPONSE`, `INVALID_RESPONSE` | Blocked/non-final output or an unusable provider envelope, before report JSON parsing. |
+| `REPORT_STRUCTURE` | Generated report JSON failed required fields/types/category/bounds/duplicate checks. |
+| `REPORT_EVIDENCE` | Parsed report contradicted authoritative evidence; the diagnostic names the relevant field/rule without displaying the rejected value. |
+| `REQUEST_FAILURE` | An unclassified client error; its raw message is deliberately withheld. |
+
+Retest: close the old application, build, launch from the terminal with the locally configured key, save the fictional Corolla/profile/cost assumptions below, then select **Recommendation / Report → Generate / Regenerate Report** once. Inspect F12's own status and diagnostic line. **Show saved report** does not retry. If it fails, share only the diagnostic code and its sanitized sentence, not a full private report, environment dump or HTTP log. A previously successful F08/F11 request does not establish F12 success. Inspect account configuration locally for configuration/HTTP codes; output-limit, schema and report-validation codes identify the next focused engineering investigation.
+
+The compatibility correction changes the F12 request itself: its provider schema now follows F08's compact structural pattern, with nine required fields, string arrays and only the four advisory categories as an enum. It removes long evidence-dependent enums, the single-cost-string enum and all six dynamic array bounds (including `maxItems: 0` for no buyer conflicts). Evidence remains in the prompt; Java still enforces exact costs, required evidence, constraints, supported strengths, category safety, array/string limits and duplicates. No evidence is silently repaired or dropped. The schema is sent only in `generationConfig.responseJsonSchema`, no longer duplicated in the prompt. The prompt explicitly requests a report matching that schema.
+
+For the fictional Corolla, measured schema size falls from 3458 to 751 characters, enum entries from 29 to 4, and array bounds from 6 to 0. F08 is 423 characters and F11 is 963 for the measured three-question fixture. All three use the same adapter, model selection, endpoint, JSON serializer, `application/json` MIME setting, 4096-token limit and timeout. No conflicting `responseSchema`/`responseFormat` field is sent. These are offline serialization observations, not a replay of private live requests.
+
+The [Gemini API structured-output documentation](https://ai.google.dev/gemini-api/docs/structured-output) warns that schema complexity can cause rejection. Google's [structured-output guidance](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/multimodal/control-generated-output) recommends reducing enum/constraint complexity after a valid schema receives HTTP 400. This justifies the small structural contract, but does not prove the precise server rule that rejected the old request. `enum` and `maxItems` are supported features in general; zero-length bounds are not claimed universally invalid. Excessive combined constraints are the working hypothesis pending live retest.
+
+The adapter classifies only bounded error JSON into fixed labels using recognized status/field metadata and message patterns. Unknown, malformed or unrecognized errors retain a generic status; provider text is never echoed or logged. If the new request fails, share only its diagnostic codes and sanitized sentence. Successful offline fixtures verify serialization, envelope extraction and unchanged Java validation, not live provider acceptance.
+
+### Report memory and export
+
+Reports are in-memory snapshots for the saved current vehicle. Vehicle changes, relevant preferences/strategy/cost/risk changes, and F11 history/response changes invalidate the report. Generation revisions reject late results, including when inputs change and later change back. Reopening **Show saved report** or `report-show` never calls Gemini. An updated calendar reference year invalidates the saved report as well.
+
+Export uses the same displayed report text in UTF-8. It requires a user-chosen new `.txt` path in an existing writable folder; existing files (including links) are never overwritten. A stale report cannot be exported as current. Export contains vehicle/preferences/history data: select a private location deliberately. Nothing is automatically exported into the repository, and there is no report import/session restoration feature.
+
+### GUI manual verification
+
+In a terminal whose current directory is Stage2:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode gui
+```
+
+Close any previously running instance before rebuilding; Windows can lock the executable JAR.
+
+1. Enter **Vehicle**: 2018, Toyota, Corolla, LE, mileage 125000, price 12500, AUTOMATIC, GASOLINE, accident NO, maintenance DOCUMENTED, consumption 7.2; leave notes blank.
+2. Enter **Preferences**: budget 15000, maximum mileage 150000, accepted transmission AUTOMATIC, accident tolerance blank, body type SEDAN, reliability 5, fuel economy 3.
+3. Enter **Cost assumptions**: annual km 15000, fuel price 1.65, tax fraction 0.13, maintenance allowance 1000, insurance allowance 1800. Select **Save and calculate**.
+4. Check **1080 L**, **CAD 1782 fuel**, **CAD 1625 tax**, and **CAD 18707 first-year estimate**. These are fictional supplied assumptions, not insurance quotations or market valuation.
+5. Open **Recommendation / Report** → **Generate / Regenerate Report**. The category/summary appears first, followed by evidence and interpretation. No matching local Corolla knowledge is disclosed, as are unverified seller history and the unverified body-type preference.
+6. Select **Show saved report** to reuse the snapshot. Select **Export UTF-8 text...**, choose a new `.txt` filename outside the repository if it contains private data, and save. Choosing an existing filename must fail without overwriting it.
+7. Change and save a preference; the report becomes unavailable until regenerated. Or use **Clarification → Revisit field → MILEAGE**, answer 130000, then **Accept new**; the old report is invalidated and a new report must show 130000.
+
+For an offline test, open a new PowerShell terminal, set `$env:GEMINI_API_KEY = ''`, then launch the GUI. Complete input gives **AI_UNAVAILABLE** with exact deterministic results. Change maintenance to UNKNOWN and save: report generation must give **INSUFFICIENT_INFORMATION**. Set budget to 10000: buyer-budget conflict must remain visible, even when Gemini is unavailable. No positive recommendation is invented.
+
+For a live test, use the hidden-key setup under API key security, launch a fresh application, save the same fictional input, and explicitly run **Risk Assessment → Evaluate Vehicle**, followed by **Generate / Regenerate Report**. These are separate authorized requests. A valid current risk may be reused; if the F08 result is unavailable, the report labels that limitation. Verify F12's own **AI_SUCCESS**, preserved costs, source limitations and all sections. A previous `llm-test` or F11 AI_SUCCESS is not proof of F12 success. **No real Gemini request was made during this increment.**
+
+### CLI commands and complete offline example
+
+```text
+report                         Generate/regenerate for current saved data; at most one AI request
+report-show                    View the saved current report; no AI request
+report-save <new-file.txt>      Export UTF-8 text; path may contain spaces; never overwrite
+```
+
+Launch interactively with `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode cli`. Use `prepare` and enter the values above in prompt order. For a complete copyable offline exercise from Stage2:
+
+```powershell
+$env:GEMINI_API_KEY = ''
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
+. .\scripts\common.ps1
+$f12Jdk = Find-Stage2Jdk
+$f12Export = Join-Path $env:TEMP ('Corolla-F12-' + [guid]::NewGuid().ToString('N') + '.txt')
+@(
+    'prepare'
+    '2018'; 'Toyota'; 'Corolla'; 'LE'; '125000'; '12500'
+    'AUTOMATIC'; 'GASOLINE'; 'NO'; 'DOCUMENTED'; '7.2'; ''
+    '15000'; '150000'; 'AUTOMATIC'; ''; 'SEDAN'; '5'; '3'
+    '15000'; '1.65'; '0.13'; '1000'; '1800'
+    'report'
+    'report-show'
+    "report-save $f12Export"
+    'clarify-field consumption'
+    'clarify-answer consumption 8'
+    'clarify-resolve consumption accept'
+    'report-show'
+    'report'
+    'quit'
+) | & (Join-Path $f12Jdk 'bin\java.exe') -jar .\build\used-car-assistant.jar --cli
+Write-Host "First report exported to: $f12Export"
+```
+
+The first report preserves CAD 18707. The intentional second `report-show` after accepting new consumption reports **No current report**; this proves invalidation. Regeneration uses 1200 L, CAD 1980 fuel and CAD 18905 first-year estimate. The existing export remains the earlier snapshot. Direct Java invocation is used for piped input because `run.ps1` does not forward the PowerShell pipeline to the child process; interactive `run.ps1` remains supported.
+
+For live CLI acceptance, configure the key locally as described below, then use `prepare`, optionally `strategy auto`, explicitly `evaluate`, `report`, and `report-show`. `report-save C:\path\you\choose\new-report.txt` accepts the entire remainder as the filename, optionally surrounded by quotes. After an F11 accepted change, `clarify-continue risk` recalculates costs and explicitly runs F08; then `report` can reuse that fresh risk. Repeating `report` is an explicit retry/regeneration, not a cached read.
+
+### Verification and remaining limits
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify.ps1 -Gui
+```
+
+Observed F11 baseline: **204 JUnit passed**. Initial F12 suite: **245 passed, 0 failed** (41 new tests). The subsequent F12 diagnostic correction adds 19 adapter-to-report regression groups: **264 passed, 0 failed**. The request-compatibility correction adds ten contract/strict-validation/server-error regression groups: **274 passed, 0 failed**. All seven actual-frame Swing smoke entry points pass, including the report tab, asynchronous generation, stale-result rejection, cached view, UTF-8/no-overwrite export, F11 updates and unavailable/insufficient states. The packaged CLI passes the fictional Corolla, budget-conflict and unknown-maintenance scenarios with exact recalculation and export. Provider doubles and explicitly unconfigured adapters were used; live F12 quality/schema acceptance remains unverified.
+
+The existing F08 free-form explanation can still contain unsupported age assertions; that separate validation defect was not broadly refactored here. F12 isolates it and rejects age assertions in its own explanation. The existing factory is an argument-based **Simple Factory**, not strict GoF Factory Method. Reports remain advisory, local knowledge is instructional, body-type matching is not implemented by the existing constraint checker, units remain CAD/km/L-per-100-km, and sessions are not restored from exports. The final course implementation report, updated submission diagrams, demonstration videos, GitHub review and grading acceptance remain separate work.
 
 ## Gemini API integration status
 
@@ -460,7 +587,7 @@ Connection timeout is 10 seconds; request timeout is 30 seconds. HTTP errors dis
 
 `status` distinguishes missing/invalid configuration, configured but not live-verified, last successful generation in this session, and last request failure. A configured key does not prove connectivity. **No real Gemini request was made during this increment; live connectivity remains unverified.** Offline fixtures are test data, not live evidence.
 
-The explicit CLI `llm-test` command follows facade -> agent -> LLMClient -> GeminiAdapter, sends a short greeting prompt and displays the actual returned response plus model/status. It does not send or change the saved vehicle or buyer preferences. The GUI includes the F02 Listing Analyzer using a background worker; deterministic controls remain available. F02 listing extraction/review uses this integration as described above. F08 now coordinates evidence-grounded risk assessment as described above; F09 now adds symmetric comparison; F10 adds inspection planning and local completion; F11 adds bounded clarification and real resumption; broader AI-assisted F04 interpretation and F12 remain incomplete.
+The explicit CLI `llm-test` command follows facade -> agent -> LLMClient -> GeminiAdapter, sends a short greeting prompt and displays the actual returned response plus model/status. It does not send or change the saved vehicle or buyer preferences. The GUI includes the F02 Listing Analyzer using a background worker; deterministic controls remain available. F02 listing extraction/review uses this integration as described above. F08 now coordinates evidence-grounded risk assessment as described above; F09 now adds symmetric comparison; F10 adds inspection planning and local completion; F11 adds bounded clarification and real resumption; F12 now adds validated recommendation reports; broader AI-assisted F04 interpretation remains limited.
 
 ## API key security and optional live test
 
@@ -495,11 +622,11 @@ Fourteen adapter test groups exercise loopback HTTP requests, JSON escaping, end
 | Status | Features or components |
 |---|---|
 | **Implemented initial subsets** | F11 clarification with session memory, explicit conflict resolution and real F08/F10 continuation (offline verified; live F11 unverified); F10 inspection checklists with local completion and deterministic fallback (offline verified; live F10 unverified); F09 two-vehicle comparison (offline verified; live F09 unverified); F08 coordinated risk assessment (offline verified; live F08 unverified); F02 listing extraction with draft review and explicit confirmation (offline verified; live F02 unverified); F01 vehicle information entry and management; F03 buyer preference profile; F04 missing-information detection; F05 local CSV knowledge retrieval; F06 ownership-cost estimation; F07 buyer constraint checking. These subsets operate through shared application services and do not complete the full original feature specifications. |
-| **Planned features** | F12 personalized recommendation and evaluation report. |
+| **F12 implemented; live unverified** | Personalized recommendation with the original four categories, deterministic evidence, cached session view and explicit UTF-8 export. Real-provider quality and final course deliverables still require separate acceptance. |
 | **Operational pattern relationships** | Facade and Command have working workflows; Strategy and a Simple Factory are operational for both priority-guidance previews and F08 assessment. |
 | **Implemented provider adapter; live unverified** | Adapter performs HTTP/JSON adaptation behind LLMClient; explicit CLI connection test is available. |
-| **Planned design patterns** | Formal GoF Factory Method is not implemented or claimed. Strategy/Factory integration into F08 is implemented; F12 report generation remains planned. |
+| **Planned design patterns** | Formal GoF Factory Method is not implemented or claimed. Strategy/Factory integration into F08 is implemented; F12 now uses the same Strategy/Simple Factory roles; no strict GoF Factory Method is claimed. |
 
-The application does not currently provide reliability ratings, purchase recommendations, disk persistence, or complete evaluation reports. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; F08 and F09 reuse these findings. Dedicated constraint controls remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
+The application provides advisory F12 recommendations and explicit text export, but does not provide verified reliability ratings, automatic durable session storage, or the professor's final implementation report. Buyer constraint checks cover budget, mileage, accepted transmissions, and accident-history tolerance; session data remains in memory. Both the CLI `prepare` prompts and GUI Preferences tab accept comma-separated AUTOMATIC, MANUAL, or CVT preferences (existing AUTO/AT/MT aliases are normalized). Leave transmission preferences blank to skip the check. Accident tolerance accepts `NO_ACCIDENTS` or `ANY`; blank/UNKNOWN is neutral. Enter explicit accident history as YES or NO. Unknown or unrecognized vehicle values produce findings with severity `UNKNOWN` when the corresponding preference is set, distinct from `CONFLICT`. This increment implements the deterministic F07 rules in the preparation workflow; F08 and F09 reuse these findings. Dedicated constraint controls remain planned. This repository content is an initial foundation, not a fully implemented Stage 2 submission.
 
 For further detail, see [Implementation Status](docs/IMPLEMENTATION_STATUS.md), [Stage 1 Traceability](docs/STAGE1_TRACEABILITY.md), [Design Decisions](docs/DESIGN_DECISIONS.md), [Development and Verification Log](docs/DEVELOPMENT_LOG.md), and [Next Steps](docs/NEXT_STEPS.md).

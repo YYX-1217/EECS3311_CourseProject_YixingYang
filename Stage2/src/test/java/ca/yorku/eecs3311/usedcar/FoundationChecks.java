@@ -167,7 +167,7 @@ public final class FoundationChecks {
         String output = bytes.toString(java.nio.charset.StandardCharsets.UTF_8);
         check(output.contains("24922.00") && output.contains("CONFLICT: Maximum budget"), "Interactive CLI must calculate entered input.");
         check(output.contains("CONFLICT: Transmission") && output.contains("CONFLICT: Accident history"), "CLI must invoke the new checks.");
-        check(output.contains("PLANNED"), "AI status must be explicit.");
+        check(output.contains("F08 RISK ASSESSMENT - INSUFFICIENT_INFORMATION") && output.contains("not an AI-generated assessment"), "CLI must display the actual safe AI sufficiency status, independently of help text.");
         check(facade.currentVehicle().isPresent(), "CLI must save the vehicle through the shared facade.");
     }
 
@@ -624,7 +624,7 @@ public final class FoundationChecks {
         ca.yorku.eecs3311.usedcar.llm.GeminiChecks.runAll();
         ListingChecks.runAll();
         RiskChecks.runAll(); ComparisonChecks.runAll(); ChecklistChecks.runAll();
-        ClarificationChecks.runAll();
-        System.out.println("PASS: 204 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        ClarificationChecks.runAll(); ReportChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.runAll();
+        System.out.println("PASS: 274 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

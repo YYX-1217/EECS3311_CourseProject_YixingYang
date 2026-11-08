@@ -197,4 +197,50 @@ public final class UsedCarAgent {
         listingNeeds.forEach(f->{uncertain.add(f.label());uncertain.add("unresolved listing claim: "+f.label());});
         return new MissingInformationResult(missing.missingFields(),List.copyOf(uncertain),missing.conflicts(),false);
     }
+
+    public EvaluationReport generateRecommendation(Vehicle vehicle,UserPreference preference){
+        return generateRecommendation(vehicle,preference,null,null,null,null,java.util.Set.of()).requireReport();
+    }
+    public ReportEvaluation generateRecommendation(Vehicle vehicle,UserPreference preference,CostEstimate cost,
+            CostAssumptions assumptions,RiskEvaluation savedRisk,ClarificationState clarification,java.util.Set<ClarificationField> listingNeeds){
+        boolean costFailed=false;
+        if(cost==null&&assumptions!=null){try{cost=estimateCost(vehicle,assumptions);}catch(RuntimeException e){costFailed=true;}}
+        var original=collectEvidence(vehicle,preference,cost);
+        var limits=new ArrayList<>(original.limitations());if(costFailed)limits.add("Ownership-cost tool failed; cost evidence is unavailable.");
+        var missing=withListingNeeds(original.missing(),listingNeeds);
+        var deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable());
+        RiskAssessment risk=null;String riskStatus="Current AI risk assessment unavailable. Run Evaluate explicitly if needed; no automatic risk request was made.";
+        if(savedRisk!=null&&savedRisk.status().equals("AI_SUCCESS")&&savedRisk.assessment()!=null&&savedRisk.evidence()!=null&&savedRisk.evidence().vehicle().equals(vehicle)&&savedRisk.evidence().preference().equals(preference)
+                &&savedRisk.evidence().priorityGuidance().equals(deterministic.priorityGuidance())&&Objects.equals(savedRisk.evidence().cost(),cost)&&savedRisk.evidence().missing().equals(missing)
+                &&savedRisk.evidence().violations().equals(deterministic.violations())&&Objects.equals(savedRisk.evidence().knowledge(),deterministic.knowledge())){
+            risk=savedRisk.assessment();riskStatus="Current saved F08 AI risk category reused; explanatory prose is not treated as verified evidence.";
+        }
+        var conflicts=new ArrayList<String>();List<String> history=List.of();
+        if(clarification!=null&&clarification.vehicle().equals(vehicle)){
+            history=clarification.history();clarification.responses().forEach((field,response)->{if(response.status().equals("CONFLICT"))conflicts.add("Unresolved clarification conflict: "+field.label()+"; existing="+response.existing()+"; proposed="+response.proposed()+". Existing value retained pending explicit resolution.");});
+        }
+        InspectionChecklist inspection;
+        try{inspection=new ChecklistPlanner().build(vehicle,deterministic.knowledge(),missing);}
+        catch(RuntimeException e){inspection=new ChecklistPlanner().build(vehicle,null,missing);limits.add("Local inspection notes unavailable; general inspection priorities retained.");deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable());}
+        var evidence=new ReportEvidence(deterministic,assumptions,risk,riskStatus,inspection,history,conflicts,java.time.Year.now().getValue());
+        String id=java.util.UUID.randomUUID().toString();
+        if(!evidence.sufficient())return new ReportEvaluation(id,"INSUFFICIENT_INFORMATION",evidence.insufficient(),evidence,"Java sufficiency gate; no AI recommendation request was made.");
+        final String prompt, schema;
+        try{prompt=new PromptBuilder().buildRecommendationPrompt(evidence);schema=ReportSchema.json(evidence);}
+        catch(RuntimeException e){return reportFailure(id,evidence,"[REQUEST_BUILD] Local report prompt/schema construction failed; no request was made.");}
+        final String response;
+        try{response=llmClient.generateStructured(prompt,schema);}
+        catch(LLMFailure e){return reportFailure(id,evidence,e.diagnostic());}
+        catch(RuntimeException e){return reportFailure(id,evidence,"[REQUEST_FAILURE] Unclassified client/request failure; raw exception details were withheld.");}
+        var parser=new ResponseParser();final EvaluationReport parsed;
+        try{parsed=parser.parseReport(response);}
+        catch(IllegalArgumentException e){return reportFailure(id,evidence,"[REPORT_STRUCTURE] Generated text failed report JSON/schema validation (fields, types, category, bounds or duplicates).");}
+        try{var report=parser.validateReport(parsed,evidence);return new ReportEvaluation(id,"AI_SUCCESS",report,evidence,"Validated Gemini-assisted advisory interpretation. User claims and mechanical condition are not independently verified.");}
+        // validateReport emits only fixed application messages, never provider text or field values.
+        catch(IllegalArgumentException e){return reportFailure(id,evidence,"[REPORT_EVIDENCE] "+e.getMessage());}
+    }
+    private static ReportEvaluation reportFailure(String id,ReportEvidence evidence,String diagnostic){
+        return new ReportEvaluation(id,"AI_UNAVAILABLE",null,evidence,"AI recommendation unavailable: "+diagnostic+" Deterministic evidence remains available; retry explicitly.");
+    }
+
 }

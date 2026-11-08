@@ -16,23 +16,23 @@ public final class EvaluationSession {
     private RiskEvaluation risk;
     private UserPreference preference = UserPreference.limits(null, null);
 
-    public synchronized void setCurrentVehicle(Vehicle vehicle) { Objects.requireNonNull(vehicle); if(comparisonVehicle!=null && comparisonVehicle.id().equals(vehicle.id())) throw new IllegalArgumentException("Current and comparison vehicles must have different IDs."); if(!vehicle.equals(currentVehicle)){resetClarification();cost=null;risk=null;checklist=null;checklistRevision++;} currentVehicle=vehicle; }
+    public synchronized void setCurrentVehicle(Vehicle vehicle) { Objects.requireNonNull(vehicle); if(comparisonVehicle!=null && comparisonVehicle.id().equals(vehicle.id())) throw new IllegalArgumentException("Current and comparison vehicles must have different IDs."); if(!vehicle.equals(currentVehicle)){resetClarification();invalidateReport();cost=null;risk=null;checklist=null;checklistRevision++;} currentVehicle=vehicle; }
     public synchronized Optional<Vehicle> getCurrentVehicle() { return Optional.ofNullable(currentVehicle); }
-    public void setPreference(UserPreference value) { preference = Objects.requireNonNull(value); risk=null; }
-    public Optional<CostEstimate> getCost(){return Optional.ofNullable(cost);}
-    public void setCost(CostEstimate value){cost=value;risk=null;}
-    public void setRisk(RiskEvaluation value){risk=value;}
-    public Optional<RiskEvaluation> getRisk(){return Optional.ofNullable(risk);}
-    public void clearRisk(){risk=null;}
+    public synchronized void setPreference(UserPreference value) { preference = Objects.requireNonNull(value); risk=null;invalidateReport(); }
+    public synchronized Optional<CostEstimate> getCost(){return Optional.ofNullable(cost);}
+    public synchronized void setCost(CostEstimate value){cost=value;risk=null;invalidateReport();}
+    public synchronized void setRisk(RiskEvaluation value){risk=value;invalidateReport();}
+    public synchronized Optional<RiskEvaluation> getRisk(){return Optional.ofNullable(risk);}
+    public synchronized void clearRisk(){risk=null;invalidateReport();}
     public void setComparisonVehicle(Vehicle vehicle) {
         Objects.requireNonNull(vehicle);
         if(currentVehicle!=null && currentVehicle.id().equals(vehicle.id())) throw new IllegalArgumentException("A vehicle cannot be compared with itself.");
         comparisonVehicle=vehicle;
     }
     public Optional<Vehicle> getComparisonVehicle() { return Optional.ofNullable(comparisonVehicle); }
-    public void setCostAssumptions(CostAssumptions value) { costAssumptions=Objects.requireNonNull(value); }
-    public Optional<CostAssumptions> getCostAssumptions() { return Optional.ofNullable(costAssumptions); }
-    public UserPreference getPreference() { return preference; }
+    public synchronized void setCostAssumptions(CostAssumptions value) { costAssumptions=Objects.requireNonNull(value);invalidateReport(); }
+    public synchronized Optional<CostAssumptions> getCostAssumptions() { return Optional.ofNullable(costAssumptions); }
+    public synchronized UserPreference getPreference() { return preference; }
     public synchronized long beginChecklist(Vehicle vehicle){
         if(!Objects.equals(currentVehicle,vehicle))throw new IllegalStateException("Saved vehicle changed; generate the checklist again.");
         checklist=null;return ++checklistRevision;
@@ -59,7 +59,7 @@ public final class EvaluationSession {
     public synchronized java.util.Set<ClarificationField> listingClarifications(){return java.util.Set.copyOf(listingNeeds);}
     public synchronized boolean registerListingNeeds(Vehicle baseline,java.util.Set<ClarificationField> needs){
         if(baseline==null||!Objects.equals(baseline,currentVehicle)||needs.isEmpty())return false;
-        listingNeeds.addAll(needs);risk=null;checklist=null;checklistRevision++;
+        listingNeeds.addAll(needs);invalidateReport();risk=null;checklist=null;checklistRevision++;
         // An already displayed cycle stays valid; new listing gaps are offered in the next cycle.
         asked.removeAll(needs);return true;
     }
@@ -80,7 +80,7 @@ public final class EvaluationSession {
         if(clarification==null||!clarification.cycleId().equals(cycle)||!clarification.vehicle().equals(currentVehicle))throw new IllegalStateException("Clarification is no longer current. Show or start clarification for the saved vehicle.");
         return clarification;
     }
-    public synchronized void recordClarification(String text){clarificationHistory.add(text);}
+    public synchronized void recordClarification(String text){clarificationHistory.add(text);invalidateReport();}
     public synchronized ClarificationState respond(String cycle,ClarificationField field,ClarificationResponse response,Vehicle updated){
         var previous=requireClarification(cycle);
         if(!previous.responses().containsKey(field))throw new IllegalArgumentException("Field is not in the current clarification cycle.");
@@ -97,5 +97,26 @@ public final class EvaluationSession {
     public synchronized void recordResume(String cycle,String target){
         var s=requireClarification(cycle);recordClarification("Continued "+target+" with remaining uncertainty preserved."+(listingNeeds.isEmpty()?"":" Unresolved listing claims: "+listingNeeds+"; saved values retained, not independently verified."));
         clarification=new ClarificationState(cycle,currentVehicle,s.batch(),s.responses(),clarificationHistory);
+    }
+
+    private ReportEvaluation report;
+    private long reportRevision;
+    private boolean reportBusy;
+    public synchronized void invalidateReport(){report=null;reportRevision++;reportBusy=false;}
+    public synchronized long beginReport(){
+        if(currentVehicle==null)throw new IllegalStateException("Save a vehicle before generating a report.");
+        if(reportBusy)throw new IllegalStateException("Report generation is already in progress.");
+        report=null;reportBusy=true;return ++reportRevision;
+    }
+    public synchronized void finishReport(long revision,ReportEvaluation value){
+        if(revision!=reportRevision||!value.evidence().deterministic().vehicle().equals(currentVehicle)||!value.evidence().deterministic().preference().equals(preference))
+            throw new IllegalStateException("Report evidence changed during generation; old report discarded. Generate again.");
+        reportBusy=false;report=value;
+        if(cost==null)cost=value.evidence().deterministic().cost();
+    }
+    public synchronized void failReport(long revision){if(revision==reportRevision){reportBusy=false;report=null;}}
+    public synchronized Optional<ReportEvaluation> getReport(){
+        if(report!=null&&report.evidence().referenceYear()!=java.time.Year.now().getValue())invalidateReport();
+        return Optional.ofNullable(report);
     }
 }

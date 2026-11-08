@@ -201,16 +201,17 @@ public final class ResponseParser {
             return new InspectionChecklist(result);
         }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid checklist JSON: require six nonempty sections, unique IDs and exactly five typed item fields with supported priorities; duplicate properties are forbidden.");}
     }
-    private static JsonElement readChecklistJson(com.google.gson.stream.JsonReader reader,int depth)throws java.io.IOException {
+    private static JsonElement readChecklistJson(com.google.gson.stream.JsonReader reader,int depth)throws java.io.IOException {return readChecklistJson(reader,depth,40);}
+    private static JsonElement readChecklistJson(com.google.gson.stream.JsonReader reader,int depth,int maxItems)throws java.io.IOException {
         if(depth>5)throw new IllegalArgumentException();
         switch(reader.peek()){
             case BEGIN_OBJECT: {
                 var object=new JsonObject();reader.beginObject();
-                while(reader.hasNext()){String key=reader.nextName();if(object.has(key))throw new IllegalArgumentException();object.add(key,readChecklistJson(reader,depth+1));}
+                while(reader.hasNext()){String key=reader.nextName();if(object.has(key))throw new IllegalArgumentException();object.add(key,readChecklistJson(reader,depth+1,maxItems));}
                 reader.endObject();return object;
             }
             case BEGIN_ARRAY: {
-                var array=new JsonArray();reader.beginArray();while(reader.hasNext()){if(array.size()>=40)throw new IllegalArgumentException();array.add(readChecklistJson(reader,depth+1));}reader.endArray();return array;
+                var array=new JsonArray();reader.beginArray();while(reader.hasNext()){if(array.size()>=maxItems)throw new IllegalArgumentException();array.add(readChecklistJson(reader,depth+1,maxItems));}reader.endArray();return array;
             }
             case STRING: return new JsonPrimitive(reader.nextString());
             default: throw new IllegalArgumentException();
@@ -262,4 +263,29 @@ public final class ResponseParser {
             return java.util.List.copyOf(result);
         }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid clarification JSON: expected 1-3 distinct allowed fields, approved question/reason text and valid priorities.");}
     }
+
+    public EvaluationReport parseReport(String response){
+        try{
+            if(response==null||response.isBlank()||response.length()>64000)throw new IllegalArgumentException();
+            JsonObject root;
+            try(var reader=JSON.newJsonReader(new java.io.StringReader(response))){root=readChecklistJson(reader,0,64).getAsJsonObject();if(reader.peek()!=com.google.gson.stream.JsonToken.END_DOCUMENT)throw new IllegalArgumentException();}
+            if(!root.keySet().equals(Set.of("category","strengths","risks","missingInformation","costSummary","constraintConflicts","inspectionPriorities","nextSteps","explanation")))throw new IllegalArgumentException();
+            return new EvaluationReport(reportString(root.get("category")),reportList(root.get("strengths")),reportList(root.get("risks")),reportList(root.get("missingInformation")),reportString(root.get("costSummary")),reportList(root.get("constraintConflicts")),reportList(root.get("inspectionPriorities")),reportList(root.get("nextSteps")),reportString(root.get("explanation")));
+        }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid report JSON: require the exact report fields, allowed category and bounded string sections; duplicate properties/items are forbidden.");}
+    }
+    private static String reportString(JsonElement value){if(!value.isJsonPrimitive()||!value.getAsJsonPrimitive().isString())throw new IllegalArgumentException();return value.getAsString();}
+    private static List<String> reportList(JsonElement value){var list=new ArrayList<String>();for(var item:value.getAsJsonArray())list.add(reportString(item));return list;}
+    public EvaluationReport validateReport(EvaluationReport report,ReportEvidence evidence){
+        if(!evidence.sufficient()&&!report.category().equals("Insufficient Information"))throw new IllegalArgumentException("Report category contradicts insufficient evidence.");
+        if(report.category().equals("Strong Candidate")&&!evidence.strongAllowed())throw new IllegalArgumentException("Strong Candidate is unsupported by current risk, constraints or evidence.");
+        if(!evidence.costSummary().equals(report.costSummary()))throw new IllegalArgumentException("Report field costSummary changed authoritative costs.");
+        if(!evidence.strengths().containsAll(report.strengths()))throw new IllegalArgumentException("Report field strengths introduced unsupported evidence.");
+        reportSet("risks",report.risks(),evidence.risks());reportSet("constraintConflicts",report.constraintConflicts(),evidence.conflicts());reportSet("missingInformation",report.missingInformation(),evidence.uncertainties());
+        reportSet("inspectionPriorities",report.inspectionPriorities(),evidence.priorities());reportSet("nextSteps",report.nextSteps(),evidence.nextSteps());
+        String prose=report.explanation().toLowerCase(Locale.ROOT);
+        if(prose.codePoints().anyMatch(Character::isDigit)||prose.matches("(?s).*\\b(age|aged|years?|engine|transmission|brakes?|tires?|battery|frame|rust|damage|defects?|faults?|certification|carfax|certified|guaranteed|guarantee|roadworthy|accident[- ]free|mechanically sound|no defects|complete service history|insurance quote|market value)\\b.*"))throw new IllegalArgumentException("Report explanation contains unsupported numeric, age, certification or condition claims.");
+        if(!evidence.conflicts().isEmpty()&&prose.matches("(?s).*(no (buyer |budget |constraint )?conflicts|all (buyer )?constraints (are )?(met|satisfied)|within (your|the) budget).*"))throw new IllegalArgumentException("Report explanation contradicts buyer constraints.");
+        return report;
+    }
+    private static void reportSet(String field,List<String> actual,List<String> expected){if(!new HashSet<>(actual).equals(new HashSet<>(expected)))throw new IllegalArgumentException("Report field "+field+" omitted or changed required evidence.");}
 }

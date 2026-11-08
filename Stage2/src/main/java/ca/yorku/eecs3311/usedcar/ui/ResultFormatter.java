@@ -132,4 +132,6 @@ public final class ResultFormatter {
         if(result instanceof ca.yorku.eecs3311.usedcar.result.ChecklistEvaluation checklist)return format(checklist);
         throw new IllegalArgumentException("Unsupported clarification continuation result.");
     }
+
+    public static String format(ca.yorku.eecs3311.usedcar.result.ReportEvaluation report){return ca.yorku.eecs3311.usedcar.result.ReportText.format(report);}
 }

@@ -21,7 +21,7 @@ public final class UsedCarApplicationFacade {
     }
 
     public Vehicle saveVehicle(Vehicle vehicle) { synchronized(session){session.setCurrentVehicle(vehicle); contextVersion.incrementAndGet(); return vehicle;} }
-    public void savePreferences(UserPreference preference) { session.setPreference(preference); contextVersion.incrementAndGet(); }
+    public void savePreferences(UserPreference preference) { synchronized(session){session.setPreference(preference); contextVersion.incrementAndGet();} }
     public Optional<Vehicle> currentVehicle() { return session.getCurrentVehicle(); }
     public UserPreference preferences() { return session.getPreference(); }
     public VehicleKnowledge retrieveKnowledge(Vehicle vehicle) { return agent.retrieveKnowledge(vehicle); }
@@ -72,7 +72,9 @@ public final class UsedCarApplicationFacade {
     }
     public CostEstimate estimateCost(Vehicle vehicle, CostAssumptions assumptions) {
         var result=agent.estimateCost(vehicle, assumptions);
-        if(currentVehicle().filter(vehicle::equals).isPresent()){session.setCost(result);session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();}
+        synchronized(session){
+            if(currentVehicle().filter(vehicle::equals).isPresent()){session.setCost(result);session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();}
+        }
         return result;
     }
     public RiskAssessment evaluateVehicle(Vehicle vehicle) { return agent.assessRisk(vehicle,preferences()); }
@@ -116,9 +118,11 @@ public final class UsedCarApplicationFacade {
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {
         // Compute before committing session changes so a failed request preserves the previous state.
         PreparationResult result = agent.prepareEvaluation(vehicle, preference, assumptions);
-        saveVehicle(vehicle);
-        savePreferences(preference);
-        session.setCost(result.cost());session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();
+        synchronized(session){
+            saveVehicle(vehicle);
+            savePreferences(preference);
+            session.setCost(result.cost());session.setCostAssumptions(assumptions);contextVersion.incrementAndGet();
+        }
         return result;
     }
     public InspectionChecklist generateChecklist(Vehicle vehicle){return agent.generateChecklist(vehicle);}
@@ -191,5 +195,38 @@ public final class UsedCarApplicationFacade {
         Object result=checklist?generateCurrentChecklist(vehicle):evaluateCurrentVehicle(vehicle);
         synchronized(session){session.requireClarification(cycle);session.recordResume(cycle,checklist?"F10 checklist":"F08 risk evaluation");}
         return result;
+    }
+
+    /** Original Stage 1 entry point; only the currently saved vehicle can generate its session report. */
+    public EvaluationReport generateReport(Vehicle vehicle){
+        return generateReportEvaluation(vehicle).requireReport();
+    }
+    public ReportEvaluation generateCurrentReport(){return generateReportEvaluation(null);}
+    private ReportEvaluation generateReportEvaluation(Vehicle expected){
+        final long revision;final Vehicle vehicle;final UserPreference profile;final CostEstimate cost;
+        final CostAssumptions assumptions;final RiskEvaluation risk;final ClarificationState clarification;
+        final java.util.Set<ClarificationField> listingNeeds;
+        synchronized(session){
+            vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before generating a report."));
+            if(expected!=null&&!expected.equals(vehicle))throw new IllegalStateException("Generate the report for the currently saved vehicle.");
+            revision=session.beginReport();profile=preferences();cost=session.getCost().orElse(null);assumptions=session.getCostAssumptions().orElse(null);
+            risk=session.getRisk().orElse(null);clarification=session.getClarification().orElse(null);listingNeeds=session.listingClarifications();
+        }
+        try{
+            var result=agent.generateRecommendation(vehicle,profile,cost,assumptions,risk,clarification,listingNeeds);
+            session.finishReport(revision,result);return result;
+        }catch(RuntimeException e){session.failReport(revision);throw e;}
+    }
+    public Optional<ReportEvaluation> currentReport(){return session.getReport();}
+    public java.nio.file.Path exportReport(String generationId,java.nio.file.Path destination){
+        synchronized(session){
+            var result=session.getReport().filter(r->r.generationId().equals(generationId)).orElseThrow(()->new IllegalStateException("Report is no longer current. Generate or show the saved report again."));
+            if(destination==null)throw new IllegalArgumentException("Choose a new local text file for export.");
+            var path=destination.toAbsolutePath().normalize();
+            if(path.getFileName()==null||!path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".txt"))throw new IllegalArgumentException("Choose a .txt file for UTF-8 report export.");
+            try{return java.nio.file.Files.writeString(path,ReportText.format(result),java.nio.charset.StandardCharsets.UTF_8,java.nio.file.StandardOpenOption.CREATE_NEW,java.nio.file.StandardOpenOption.WRITE);}
+            catch(java.nio.file.FileAlreadyExistsException e){throw new IllegalStateException("Export destination already exists. Choose a new filename; existing files are never overwritten.");}
+            catch(java.io.IOException|SecurityException e){throw new IllegalStateException("Report export failed. Choose a writable existing folder and a new .txt filename.");}
+        }
     }
 }

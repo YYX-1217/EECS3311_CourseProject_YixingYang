@@ -61,10 +61,16 @@ public final class UsedCarCLI {
                     case "compare" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.CompareVehiclesCommand(facade))));
                     case "checklist" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.GenerateChecklistCommand(facade))));
                     case "checklist-show" -> output.println(ResultFormatter.format(facade.currentChecklist().orElseThrow(()->new IllegalStateException("No current checklist; run checklist first."))));
-                    case "report" ->
-                            output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
+                    case "report" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.GenerateReportCommand(facade))));
+                    case "report-show" -> output.println(ResultFormatter.format(facade.currentReport().orElseThrow(()->new IllegalStateException("No current report. Run report first."))));
                     default -> {
-                        if (command.startsWith("checklist-mark ") || command.startsWith("checklist-unmark ")) {
+                        if(command.startsWith("report-save ")){
+                            String path=raw.substring("report-save ".length()).strip();
+                            if(path.startsWith("\"")&&path.endsWith("\"")&&path.length()>1)path=path.substring(1,path.length()-1);
+                            var saved=facade.currentReport().orElseThrow(()->new IllegalStateException("No current report. Run report first."));
+                            try{output.println("Report exported: "+facade.exportReport(saved.generationId(),java.nio.file.Path.of(path)));}
+                            catch(java.nio.file.InvalidPathException e){throw new IllegalArgumentException("Use report-save <new-file.txt> with a valid local path.");}
+                        } else if (command.startsWith("checklist-mark ") || command.startsWith("checklist-unmark ")) {
                             String[] parts=command.split("\\s+");
                             if(parts.length!=2)throw new IllegalArgumentException("Use checklist-mark <id> or checklist-unmark <id>.");
                             var saved=facade.currentChecklist().orElseThrow(()->new IllegalStateException("No current checklist; run checklist first."));
@@ -198,9 +204,10 @@ public final class UsedCarCLI {
     }
     private static void arity(String[] parts,int expected){if(parts.length!=expected)throw new IllegalArgumentException("Incorrect clarification arguments. Type help for syntax.");}
     private void help() {
+        output.println("F12: report (generate/regenerate; at most one recommendation request), report-show (cached, no API), report-save <new-file.txt> (UTF-8; never overwrites). Save input changes before regeneration. Export may contain private vehicle data; choose a local location deliberately.");
         output.println("Commands: checklist (generate; may request AI), checklist-show (cached), checklist-mark <id>, checklist-unmark <id>, comparison-set (save B), comparison-show (saved pair/assumptions), compare (one AI request when sufficient), evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
         output.println("F11: clarify (start/reopen cached; may request AI), clarify-next (next unasked gaps), clarify-show, clarify-answer <field> <value>, clarify-skip <field>, clarify-unknown <field>, clarify-resolve <field> keep|accept, clarify-field <field> (explicit revisit/correction), clarify-continue [risk|checklist] (real evaluation; may request AI). Finish each cycle before next/revisit/continue. Fields: accident, maintenance, mileage, price, transmission, consumption, fuelType, year, make, model, trim. Units: CAD, km, L/100 km; no commas or unit symbols in numeric answers.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
-        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist supports AI/fallback and local completion; clarification supports validated answers, memory and resume; report remains PLANNED.");
+        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist supports AI/fallback and local completion; clarification supports validated answers, memory and resume; report supports evidence-based recommendation, cached viewing and explicit UTF-8 export.");
     }
 }
