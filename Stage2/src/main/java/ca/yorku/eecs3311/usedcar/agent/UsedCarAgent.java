@@ -68,7 +68,11 @@ public final class UsedCarAgent {
         return evaluateRisk(vehicle,preference,null).requireAssessment();
     }
     public RiskEvaluation evaluateRisk(Vehicle vehicle, UserPreference preference, CostEstimate availableCost) {
-        var evidence=collectEvidence(vehicle,preference,availableCost);
+        return evaluateRisk(vehicle,preference,availableCost,java.util.Set.of());
+    }
+    public RiskEvaluation evaluateRisk(Vehicle vehicle,UserPreference preference,CostEstimate availableCost,java.util.Set<ClarificationField> listingNeeds){
+        var original=collectEvidence(vehicle,preference,availableCost);
+        var evidence=listingNeeds.isEmpty()?original:new RiskEvidence(vehicle,original.preference(),withListingNeeds(original.missing(),listingNeeds),original.knowledge(),original.violations(),original.cost(),original.priorityGuidance(),original.limitations(),original.constraintsAvailable());
         var missing=evidence.missing(); boolean constraintsAvailable=evidence.constraintsAvailable();
         if(!missing.sufficient()||!constraintsAvailable){
             var result=new RiskAssessment("Insufficient Information",List.of(),evidence.requiredRisks(),evidence.requiredUncertainties(),
@@ -150,8 +154,11 @@ public final class UsedCarAgent {
     }
     public InspectionChecklist generateChecklist(Vehicle vehicle){return generateChecklistWithEvidence(vehicle).checklist();}
     public ChecklistEvaluation generateChecklistWithEvidence(Vehicle vehicle){
+        return generateChecklistWithEvidence(vehicle,java.util.Set.of());
+    }
+    public ChecklistEvaluation generateChecklistWithEvidence(Vehicle vehicle,java.util.Set<ClarificationField> listingNeeds){
         if(vehicle==null)throw new IllegalStateException("Save a vehicle before generating an inspection checklist.");
-        var missing=checkMissingInformation(vehicle);VehicleKnowledge knowledge=null;
+        var missing=withListingNeeds(checkMissingInformation(vehicle),listingNeeds);VehicleKnowledge knowledge=null;
         String knowledgeStatus="Model-specific local knowledge unavailable; general inspection guidance only.";
         try{
             knowledge=retrieveKnowledge(vehicle);
@@ -169,5 +176,25 @@ public final class UsedCarAgent {
             message="AI-assisted prioritization and reasons for evidence-grounded inspection actions. Advisory; does not replace a professional pre-purchase inspection.";
         }catch(IllegalArgumentException e){message="Deterministic fallback: AI output failed checklist structure/evidence checks. No automatic retry. This does not replace a professional pre-purchase inspection.";}
         return new ChecklistEvaluation(java.util.UUID.randomUUID().toString(),vehicle,result,status,message,knowledgeStatus,missing,java.util.Set.of());
+    }
+
+    public ClarificationBatch generateClarificationQuestions(Vehicle vehicle,UserPreference preference,
+            java.util.Set<ClarificationField> asked,java.util.Set<ClarificationField> listingNeeds){
+        var missing=checkMissingInformation(vehicle);
+        var targets=java.util.Arrays.stream(ClarificationField.values()).filter(f->!asked.contains(f))
+            .filter(f->missing.missingFields().contains(f.label())||missing.uncertainFields().contains(f.label())||listingNeeds.contains(f)).limit(3).toList();
+        if(targets.isEmpty())return new ClarificationBatch("COMPLETE","No unasked supported gaps. Skipped/unknown fields remain uncertain; explicitly revisit a field if new evidence becomes available.",List.of());
+        try{
+            String prompt=new PromptBuilder().buildClarificationPrompt(missing,preference,targets,listingNeeds);
+            var questions=new ResponseParser().parseClarificationQuestions(llmClient.generateStructured(prompt,ClarificationSchema.json(targets)),targets);
+            return new ClarificationBatch("AI_SUCCESS","AI prioritized approved, grounded questions; answers require user input and deterministic validation.",questions);
+        }catch(RuntimeException e){return new ClarificationBatch("FALLBACK","Deterministic questions: AI unavailable or response rejected. No automatic retry; no vehicle values inferred.",targets.stream().map(ClarificationQuestion::fallback).toList());}
+    }
+
+    private MissingInformationResult withListingNeeds(MissingInformationResult missing,java.util.Set<ClarificationField> listingNeeds){
+        if(listingNeeds.isEmpty())return missing;
+        var uncertain=new java.util.LinkedHashSet<>(missing.uncertainFields());
+        listingNeeds.forEach(f->{uncertain.add(f.label());uncertain.add("unresolved listing claim: "+f.label());});
+        return new MissingInformationResult(missing.missingFields(),List.copyOf(uncertain),missing.conflicts(),false);
     }
 }

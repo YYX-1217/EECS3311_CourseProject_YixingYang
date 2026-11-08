@@ -233,4 +233,33 @@ public final class ResponseParser {
         return result;
     }
     private static int priorityRank(String priority){return switch(priority){case "High"->3;case "Medium"->2;default->1;};}
+
+    public java.util.List<ClarificationQuestion> parseClarificationQuestions(String response,
+            java.util.List<ca.yorku.eecs3311.usedcar.domain.ClarificationField> allowed){
+        try{
+            if(response==null||response.isBlank()||response.length()>8000)throw new IllegalArgumentException();
+            JsonObject root;
+            try(var reader=JSON.newJsonReader(new java.io.StringReader(response))){
+                root=readChecklistJson(reader,0).getAsJsonObject();
+                if(reader.peek()!=com.google.gson.stream.JsonToken.END_DOCUMENT)throw new IllegalArgumentException();
+            }
+            if(!root.keySet().equals(java.util.Set.of("questions")))throw new IllegalArgumentException();
+            var array=root.getAsJsonArray("questions");
+            if(array.isEmpty()||array.size()>3||array.size()!=allowed.size())throw new IllegalArgumentException();
+            var result=new java.util.ArrayList<ClarificationQuestion>();var seen=new java.util.HashSet<ca.yorku.eecs3311.usedcar.domain.ClarificationField>();
+            for(var value:array){
+                var item=value.getAsJsonObject();
+                if(!item.keySet().equals(java.util.Set.of("field","question","priority","reason")))throw new IllegalArgumentException();
+                for(var entry:item.entrySet())if(!entry.getValue().isJsonPrimitive()||!entry.getValue().getAsJsonPrimitive().isString())throw new IllegalArgumentException();
+                var field=ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(item.get("field").getAsString());
+                if(!allowed.contains(field)||!seen.add(field))throw new IllegalArgumentException();
+                var q=new ClarificationQuestion(field,item.get("question").getAsString(),item.get("priority").getAsString(),item.get("reason").getAsString());
+                if(!ClarificationQuestion.wordings(field).contains(q.question())||!q.reason().equals(ClarificationQuestion.REASON))throw new IllegalArgumentException();
+                if((field.key().equals("accident")||field.key().equals("maintenance"))&&!q.priority().equals("High"))throw new IllegalArgumentException();
+                result.add(q);
+            }
+            result.sort(java.util.Comparator.comparingInt(q->java.util.List.of("High","Medium","Low").indexOf(q.priority())));
+            return java.util.List.copyOf(result);
+        }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid clarification JSON: expected 1-3 distinct allowed fields, approved question/reason text and valid priorities.");}
+    }
 }

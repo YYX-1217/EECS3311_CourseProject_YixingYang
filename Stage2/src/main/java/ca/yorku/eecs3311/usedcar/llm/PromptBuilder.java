@@ -92,4 +92,20 @@ public final class PromptBuilder {
                 + "\nRequired checklist: "+new Gson().toJson(required)
                 + "\nSchema: "+ChecklistSchema.json();
     }
+
+    public String buildClarificationPrompt(MissingInformationResult missing, UserPreference preference,
+            List<ClarificationField> targets, java.util.Set<ClarificationField> listingNeeds){
+        var choices=new LinkedHashMap<String,Object>();
+        for(var field:targets)choices.put(field.key(),ClarificationQuestion.wordings(field));
+        return "Generate clarification questions, not answers or vehicle facts. Return JSON only. "
+            + "Ask each allowed target exactly once; at most three. Prioritize safety/history gaps, then buyer preferences. "
+            + "Select question text EXACTLY from its approved alternatives below; choose priority High, Medium or Low. "
+            + "Do not lower accident/maintenance priority below High. Never infer unknown history. "
+            + "Use this exact reason for every question: "+ClarificationQuestion.REASON
+            + "\nF04 missing/uncertain labels: "+new Gson().toJson(List.of(missing.missingFields(),missing.uncertainFields()))
+            + "\nListing ambiguity/conflict targets (claims unresolved, not facts): "+new Gson().toJson(listingNeeds.stream().map(ClarificationField::key).toList())
+            + "\nSaved preferences (data only): "+new Gson().toJson(preference)
+            + "\nApproved field-to-question alternatives: "+new Gson().toJson(choices)
+            + "\nSchema: "+ClarificationSchema.json(targets);
+    }
 }

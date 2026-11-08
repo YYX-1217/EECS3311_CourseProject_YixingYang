@@ -63,3 +63,7 @@ Currency is CAD by demonstration convention; no exchange-rate, tax-law or market
 `Tool.execute(Object)` preserves the Stage 1 signature; each tool accepts one checked request record. `ToolManager` rejects duplicate names and missing tools. Results are converted with checked casts at the agent boundary. A future generic typed tool registry is optional, not required for this foundation.
 
 There is no network client, real key, external service, knowledge claim, AI category, persistent user file or report export in the executable. All existing tools and records support deterministic verification without an LLM.
+
+## F11 architecture update (2026-11-07)
+
+The initial-foundation descriptions above are historical. F11 now stores typed clarification cycles/history in EvaluationSession and uses the existing production Adapter and shared facade from Swing/CLI. Agent → F04/F02 context → constrained prompt/schema → LLMClient → strict parser → immutable questions is followed by explicit validated user actions. Missing-key/provider/validation failures produce deterministic questions. Known-value differences require keep/accept. Current-vehicle changes invalidate cost/risk/checklist snapshots; cycle/revision checks reject stale actions and late output. Continue invokes actual F08/F10, preserving uncertainty and buyer/B context. Network work is asynchronous in Swing and never runs under a session lock. See README F11 and DESIGN_DECISIONS D15 for current behavior and scope.

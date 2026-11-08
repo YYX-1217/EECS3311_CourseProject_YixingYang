@@ -20,7 +20,7 @@ public final class UsedCarApplicationFacade {
         this.session = Objects.requireNonNull(session);
     }
 
-    public Vehicle saveVehicle(Vehicle vehicle) { session.setCurrentVehicle(vehicle); contextVersion.incrementAndGet(); return vehicle; }
+    public Vehicle saveVehicle(Vehicle vehicle) { synchronized(session){session.setCurrentVehicle(vehicle); contextVersion.incrementAndGet(); return vehicle;} }
     public void savePreferences(UserPreference preference) { session.setPreference(preference); contextVersion.incrementAndGet(); }
     public Optional<Vehicle> currentVehicle() { return session.getCurrentVehicle(); }
     public UserPreference preferences() { return session.getPreference(); }
@@ -36,7 +36,11 @@ public final class UsedCarApplicationFacade {
     }
     public String previewPriorityGuidance() { return agent.buildPriorityGuidance(preferences()); }
     public ListingAnalysisResult analyzeListing(String text) {
-        return agent.analyzeListing(text, currentVehicle().orElse(null));
+        var result=agent.analyzeListing(text, currentVehicle().orElse(null));
+        var needs=new java.util.LinkedHashSet<ClarificationField>();
+        for(var field:ClarificationField.values())if(result.quality().uncertainFields().contains(field.label())||result.quality().conflicts().stream().anyMatch(c->c.startsWith(field.label()+" |")))needs.add(field);
+        synchronized(session){if(session.registerListingNeeds(result.baseline(),needs))contextVersion.incrementAndGet();}
+        return result;
     }
     public MissingInformationResult reviewListing(ListingAnalysisResult result, Vehicle corrected) {
         if (!Objects.equals(result.baseline(), currentVehicle().orElse(null)))
@@ -73,14 +77,20 @@ public final class UsedCarApplicationFacade {
     }
     public RiskAssessment evaluateVehicle(Vehicle vehicle) { return agent.assessRisk(vehicle,preferences()); }
     public Optional<RiskEvaluation> lastRiskEvaluation(){return session.getRisk();}
-    public RiskEvaluation evaluateCurrentVehicle(){
-        long version=contextVersion.get();
-        var vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before evaluation."));
-        var profile=preferences();session.clearRisk();
-        var result=agent.evaluateRisk(vehicle,profile,session.getCost().orElse(null));
-        if(version!=contextVersion.get()||!currentVehicle().filter(vehicle::equals).isPresent()||!preferences().equals(profile))
-            return new RiskEvaluation("STALE",null,result.evidence(),"Saved vehicle/preferences changed during evaluation. Review the evidence snapshot and evaluate again.");
-        session.setRisk(result);return result;
+    public RiskEvaluation evaluateCurrentVehicle(){return evaluateCurrentVehicle(null);}
+    private RiskEvaluation evaluateCurrentVehicle(Vehicle expected){
+        final long version;final Vehicle vehicle;final UserPreference profile;final java.util.Set<ClarificationField> listingNeeds;
+        synchronized(session){
+            version=contextVersion.get();vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before evaluation."));
+            if(expected!=null&&!expected.equals(vehicle))throw new IllegalStateException("Vehicle changed before resuming evaluation.");
+            profile=preferences();listingNeeds=session.listingClarifications();session.clearRisk();
+        }
+        var result=agent.evaluateRisk(vehicle,profile,session.getCost().orElse(null),listingNeeds);
+        synchronized(session){
+            if(version!=contextVersion.get()||!currentVehicle().filter(vehicle::equals).isPresent()||!preferences().equals(profile))
+                return new RiskEvaluation("STALE",null,result.evidence(),"Saved vehicle/preferences changed during evaluation. Review the evidence snapshot and evaluate again.");
+            session.setRisk(result);return result;
+        }
     }
 
     public Vehicle saveComparisonVehicle(Vehicle vehicle) {
@@ -112,11 +122,74 @@ public final class UsedCarApplicationFacade {
         return result;
     }
     public InspectionChecklist generateChecklist(Vehicle vehicle){return agent.generateChecklist(vehicle);}
-    public ChecklistEvaluation generateCurrentChecklist(){
-        var vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before generating an inspection checklist."));
-        long revision=session.beginChecklist(vehicle);
-        var result=agent.generateChecklistWithEvidence(vehicle);session.saveChecklist(revision,result);return result;
+    public ChecklistEvaluation generateCurrentChecklist(){return generateCurrentChecklist(null);}
+    private ChecklistEvaluation generateCurrentChecklist(Vehicle expected){
+        final Vehicle vehicle;final long revision;final java.util.Set<ClarificationField> listingNeeds;
+        synchronized(session){
+            vehicle=currentVehicle().orElseThrow(()->new IllegalStateException("Save a vehicle before generating an inspection checklist."));
+            if(expected!=null&&!expected.equals(vehicle))throw new IllegalStateException("Vehicle changed before resuming checklist.");
+            revision=session.beginChecklist(vehicle);listingNeeds=session.listingClarifications();
+        }
+        var result=agent.generateChecklistWithEvidence(vehicle,listingNeeds);session.saveChecklist(revision,result);return result;
     }
     public Optional<ChecklistEvaluation> currentChecklist(){return session.getChecklist();}
     public ChecklistEvaluation completeChecklistItem(String generationId,String itemId,boolean done){return session.completeChecklistItem(generationId,itemId,done);}
+
+    public Optional<ClarificationState> currentClarification(){return session.getClarification();}
+    public ClarificationState startClarification(boolean next){
+        final Vehicle vehicle;final long revision;final UserPreference profile;
+        final java.util.Set<ClarificationField> asked,listing;
+        synchronized(session){
+            if(!next&&session.getClarification().isPresent())return session.getClarification().get();
+            revision=session.beginClarification(next);vehicle=currentVehicle().orElseThrow();profile=preferences();
+            asked=session.askedClarifications();listing=session.listingClarifications();
+        }
+        var batch=agent.generateClarificationQuestions(vehicle,profile,asked,listing);
+        return session.finishClarification(revision,vehicle,batch);
+    }
+    public ClarificationState revisitClarification(ClarificationField field){
+        synchronized(session){
+            long revision=session.beginClarification(true);var vehicle=currentVehicle().orElseThrow();
+            return session.finishClarification(revision,vehicle,new ClarificationBatch("USER_REQUESTED","Explicit local correction/revisit. Known values require conflict resolution.",List.of(ClarificationQuestion.fallback(field))));
+        }
+    }
+    private ClarificationResponse pendingResponse(ClarificationState state,ClarificationField field){
+        var response=state.responses().get(field);
+        if(response==null)throw new IllegalArgumentException("Field is not in this cycle.");
+        if(!response.status().equals("PENDING"))throw new IllegalStateException("Question already answered or pending conflict resolution. Resolve the conflict or explicitly revisit after finishing the cycle.");
+        return response;
+    }
+    public ClarificationState submitClarification(String cycle,ClarificationField field,String answer){
+        synchronized(session){
+            var state=session.requireClarification(cycle);pendingResponse(state,field);
+            var candidate=field.apply(state.vehicle(),answer);
+            boolean conflict=!agent.checkConflict(state.vehicle(),candidate).conflicts().isEmpty();
+            var response=new ClarificationResponse(conflict?"CONFLICT":"ANSWERED",field.read(candidate),field.read(state.vehicle()),field.read(candidate));
+            var result=session.respond(cycle,field,response,conflict?null:candidate);
+            if(!conflict)contextVersion.incrementAndGet();return result;
+        }
+    }
+    public ClarificationState skipClarification(String cycle,ClarificationField field,boolean unknown){
+        synchronized(session){var state=session.requireClarification(cycle);pendingResponse(state,field);
+            return session.respond(cycle,field,new ClarificationResponse(unknown?"UNKNOWN":"SKIPPED","","",""),null);}
+    }
+    public ClarificationState resolveClarification(String cycle,ClarificationField field,boolean accept){
+        synchronized(session){var state=session.requireClarification(cycle);var previous=state.responses().get(field);
+            if(previous==null||!previous.status().equals("CONFLICT"))throw new IllegalStateException("No pending conflict for this field.");
+            var candidate=accept?field.apply(state.vehicle(),previous.proposed()):null;
+            var result=session.respond(cycle,field,new ClarificationResponse(accept?"ACCEPTED":"KEPT",previous.answer(),previous.existing(),previous.proposed()),candidate);
+            contextVersion.incrementAndGet();return result;}
+    }
+    public Object continueClarification(String cycle,boolean checklist){
+        final Vehicle vehicle;
+        synchronized(session){var state=session.requireClarification(cycle);
+            if(!state.settled())throw new IllegalStateException("Answer, skip or mark all questions unknown and resolve conflicts before continuing.");
+            vehicle=state.vehicle();
+            if(!checklist&&session.getCostAssumptions().isPresent())estimateCost(vehicle,session.getCostAssumptions().get());
+        }
+        // Existing F08/F10 entry points retain their own late-result guards; expected snapshot guards the start too.
+        Object result=checklist?generateCurrentChecklist(vehicle):evaluateCurrentVehicle(vehicle);
+        synchronized(session){session.requireClarification(cycle);session.recordResume(cycle,checklist?"F10 checklist":"F08 risk evaluation");}
+        return result;
+    }
 }

@@ -171,4 +171,40 @@ public final class FoundationTest {
     @Test public void checklistTools(){ ChecklistChecks.tools(); }
     @Test public void checklistStale(){ ChecklistChecks.stale(); }
     @Test public void checklistCli(){ ChecklistChecks.cli(); }
+    @Test public void clarificationDetection(){ClarificationChecks.detection();}
+    @Test public void clarificationParsing(){ClarificationChecks.parsing();}
+    @Test public void clarificationExcessive(){ClarificationChecks.excessive();}
+    @Test public void clarificationDuplicates(){ClarificationChecks.duplicates();}
+    @Test public void clarificationUnsupported(){ClarificationChecks.unsupported();}
+    @Test public void clarificationMalformed(){ClarificationChecks.malformed();}
+    @Test public void clarificationTypes(){ClarificationChecks.types();}
+    @Test public void clarificationInjection(){ClarificationChecks.injection();}
+    @Test public void clarificationFallback(){ClarificationChecks.fallback();}
+    @Test public void clarificationMissingKey(){ClarificationChecks.missingKey();}
+    @Test public void clarificationPrompt(){ClarificationChecks.prompt();}
+    @Test public void clarificationAnswer(){ClarificationChecks.answer();}
+    @Test public void clarificationInvalidEnum(){ClarificationChecks.invalidEnum();}
+    @Test public void clarificationInvalidNumeric(){ClarificationChecks.invalidNumeric();}
+    @Test public void clarificationSkipUnknown(){ClarificationChecks.skipUnknown();}
+    @Test public void clarificationConflict(){ClarificationChecks.conflict();}
+    @Test public void clarificationKeep(){ClarificationChecks.keep();}
+    @Test public void clarificationAccept(){ClarificationChecks.accept();}
+    @Test public void clarificationKnownUnknown(){ClarificationChecks.knownUnknown();}
+    @Test public void clarificationHistory(){ClarificationChecks.history();}
+    @Test public void clarificationMemory(){ClarificationChecks.memory();}
+    @Test public void clarificationNextCycle(){ClarificationChecks.nextCycle();}
+    @Test public void clarificationSwitchVehicle(){ClarificationChecks.switchVehicle();}
+    @Test public void clarificationStaleGeneration(){ClarificationChecks.staleGeneration();}
+    @Test public void clarificationDuplicateGeneration(){ClarificationChecks.duplicateGeneration();}
+    @Test public void clarificationResumeIncomplete(){ClarificationChecks.resumeIncomplete();}
+    @Test public void clarificationResumeUpdated(){ClarificationChecks.resumeUpdated();}
+    @Test public void clarificationInvalidation(){ClarificationChecks.invalidation();}
+    @Test public void clarificationResumeChecklist(){ClarificationChecks.resumeChecklist();}
+    @Test public void clarificationListingAmbiguity(){ClarificationChecks.listingAmbiguity();}
+    @Test public void clarificationCli(){ClarificationChecks.cli();}
+    @Test public void clarificationNoVehicle(){ClarificationChecks.noVehicle();}
+    @Test public void clarificationPreservedContext(){ClarificationChecks.preservedContext();}
+    @Test public void clarificationListingFreshness(){ClarificationChecks.listingFreshness();}
+    @Test public void clarificationInvalidClaims(){ClarificationChecks.invalidClaims();}
+    @Test public void clarificationListingChecklist(){ClarificationChecks.listingChecklist();}
 }

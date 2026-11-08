@@ -18,7 +18,7 @@ public final class UsedCarCLI {
     }
     public <R> R submit(Command<R> command) { return command.execute(); }
     public void displayResult(PreparationResult result) { output.println(ResultFormatter.format(result)); }
-    public String readCommand() { return input.hasNextLine() ? input.nextLine().strip().toLowerCase(Locale.ROOT) : "quit"; }
+    public String readCommand() { return input.hasNextLine() ? input.nextLine().strip() : "quit"; }
 
     public void demo() {
         output.println("EXAMPLE INPUT: fictional vehicle and explicit sample assumptions, not real market data.");
@@ -30,8 +30,10 @@ public final class UsedCarCLI {
         help();
         while (true) {
             output.print("usedcar> "); output.flush();
-            String command = readCommand();
+            String raw = readCommand();
+            String command=raw.toLowerCase(Locale.ROOT);
             try {
+                if(command.equals("clarify")||command.startsWith("clarify-")){clarification(raw);continue;}
                 switch (command) {
                     case "quit", "exit" -> { return; }
                     case "help", "" -> help();
@@ -59,7 +61,7 @@ public final class UsedCarCLI {
                     case "compare" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.CompareVehiclesCommand(facade))));
                     case "checklist" -> output.println(ResultFormatter.format(submit(new ca.yorku.eecs3311.usedcar.command.GenerateChecklistCommand(facade))));
                     case "checklist-show" -> output.println(ResultFormatter.format(facade.currentChecklist().orElseThrow(()->new IllegalStateException("No current checklist; run checklist first."))));
-                    case "report", "clarify" ->
+                    case "report" ->
                             output.println("PLANNED: this feature is not implemented. " + facade.llmStatus());
                     default -> {
                         if (command.startsWith("checklist-mark ") || command.startsWith("checklist-unmark ")) {
@@ -174,9 +176,31 @@ public final class UsedCarCLI {
         }
     }
 
+    private String clarificationCycle;
+    private void clarification(String raw){
+        String[] p=raw.split("\\s+",3);String action=p[0].toLowerCase(Locale.ROOT);
+        ca.yorku.eecs3311.usedcar.result.ClarificationState state;
+        switch(action){
+            case "clarify","clarify-next" -> {arity(p,1);state=facade.startClarification(action.equals("clarify-next"));}
+            case "clarify-show" -> {arity(p,1);state=facade.currentClarification().orElseThrow(()->new IllegalStateException("Run clarify first."));}
+            case "clarify-field" -> {arity(p,2);state=facade.revisitClarification(ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(p[1]));}
+            case "clarify-answer" -> {arity(p,3);state=facade.submitClarification(clarificationCycle,ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(p[1]),p[2]);}
+            case "clarify-skip","clarify-unknown" -> {arity(p,2);state=facade.skipClarification(clarificationCycle,ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(p[1]),action.equals("clarify-unknown"));}
+            case "clarify-resolve" -> {arity(p,3);if(!p[2].equalsIgnoreCase("keep")&&!p[2].equalsIgnoreCase("accept"))throw new IllegalArgumentException("Use clarify-resolve <field> keep|accept.");
+                state=facade.resolveClarification(clarificationCycle,ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(p[1]),p[2].equalsIgnoreCase("accept"));}
+            case "clarify-continue" -> {
+                if(p.length>2||p.length==2&&!p[1].equalsIgnoreCase("risk")&&!p[1].equalsIgnoreCase("checklist"))throw new IllegalArgumentException("Use clarify-continue [risk|checklist].");
+                output.println(ResultFormatter.formatClarificationContinuation(facade.continueClarification(clarificationCycle,p.length==2&&p[1].equalsIgnoreCase("checklist"))));return;
+            }
+            default -> throw new IllegalArgumentException("Unknown clarification command. Type help.");
+        }
+        clarificationCycle=state.cycleId();output.println(ResultFormatter.format(state));
+    }
+    private static void arity(String[] parts,int expected){if(parts.length!=expected)throw new IllegalArgumentException("Incorrect clarification arguments. Type help for syntax.");}
     private void help() {
         output.println("Commands: checklist (generate; may request AI), checklist-show (cached), checklist-mark <id>, checklist-unmark <id>, comparison-set (save B), comparison-show (saved pair/assumptions), compare (one AI request when sufficient), evaluate (saved vehicle risk/evidence), analyze-listing (paste through :end, review/edit/confirm), prepare (enter/edit and calculate), demo (fictional input), check-conflicts (second structured record), knowledge (saved vehicle), profile-set, profile-show, show, status, llm-test (one live request), help, quit.");
+        output.println("F11: clarify (start/reopen cached; may request AI), clarify-next (next unasked gaps), clarify-show, clarify-answer <field> <value>, clarify-skip <field>, clarify-unknown <field>, clarify-resolve <field> keep|accept, clarify-field <field> (explicit revisit/correction), clarify-continue [risk|checklist] (real evaluation; may request AI). Finish each cycle before next/revisit/continue. Fields: accident, maintenance, mileage, price, transmission, consumption, fuelType, year, make, model, trim. Units: CAD, km, L/100 km; no commas or unit symbols in numeric answers.");
         output.println("strategy auto|balanced|budget|reliability selects and previews priority guidance; auto reselects from saved preferences, manual choices override it. strategy previews the retained mode.");
-        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist supports AI/fallback and local completion; clarification/report remain PLANNED.");
+        output.println("prepare covers initial F01/F03/F04/F06/F07 slices. Local knowledge retrieval uses instructional CSV data. Listing analysis and risk assessment use explicit AI requests when evidence permits; comparison uses symmetric tools and explicit AI; checklist supports AI/fallback and local completion; clarification supports validated answers, memory and resume; report remains PLANNED.");
     }
 }

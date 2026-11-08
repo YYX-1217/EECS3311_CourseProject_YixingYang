@@ -116,4 +116,20 @@ public final class ResultFormatter {
         });
         return out.append("Completion records your inspection progress only; it does not verify vehicle condition. Session only.\n").toString();
     }
+
+    public static String format(ca.yorku.eecs3311.usedcar.result.ClarificationState state){
+        var text=new StringBuilder("F11 CLARIFICATION - ").append(state.batch().status()).append("\n").append(state.batch().message())
+            .append("\nVehicle: ").append(state.vehicle().year()).append(" ").append(state.vehicle().make()).append(" ").append(state.vehicle().model()).append(" [").append(state.vehicle().id()).append("]\n");
+        for(var q:state.batch().questions()){
+            var r=state.responses().get(q.field());text.append(q.id()).append(" | ").append(q.priority()).append(" | ").append(r.status()).append("\n  ").append(q.question()).append("\n  ").append(q.reason()).append("\n");
+            if(r.status().equals("CONFLICT"))text.append("  CONFLICT: existing=").append(r.existing()).append(" | proposed=").append(r.proposed()).append(". Choose keep or accept; existing value is preserved.\n");
+        }
+        text.append(state.settled()?"Ready to continue; remaining uncertainty is preserved.\n":"Answer, skip or mark unknown; resolve every conflict before continuing.\n");
+        text.append("History (this vehicle/session only):\n");state.history().forEach(h->text.append("- ").append(h).append("\n"));return text.toString();
+    }
+    public static String formatClarificationContinuation(Object result){
+        if(result instanceof ca.yorku.eecs3311.usedcar.result.RiskEvaluation risk)return format(risk);
+        if(result instanceof ca.yorku.eecs3311.usedcar.result.ChecklistEvaluation checklist)return format(checklist);
+        throw new IllegalArgumentException("Unsupported clarification continuation result.");
+    }
 }

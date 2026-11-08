@@ -74,6 +74,10 @@ public final class UsedCarGUI {
             tabs.addTab(section, new JScrollPane(holder));
         }
         PreparationForm.preferenceValues(facade.preferences()).forEach((key, value) -> fields.get(key).setText(value));
+        tabs.addTab("Clarification", new ClarificationPanel(facade,()->{
+            facade.currentVehicle().ifPresent(v->PreparationForm.vehicleValues(v).forEach((key,value)->fields.get(key).setText(value)));
+            output.setText("Clarification uses the saved vehicle; Vehicle fields refreshed. Previous displayed calculations are historical. Use Continue Risk Evaluation or Continue Checklist for current evidence.");
+        }));
         tabs.addTab("Inspection Checklist", new ChecklistPanel(facade));
         tabs.addTab("Comparison", new ComparisonPanel(facade));
         tabs.addTab("Risk Assessment", new RiskEvaluationPanel(facade));
