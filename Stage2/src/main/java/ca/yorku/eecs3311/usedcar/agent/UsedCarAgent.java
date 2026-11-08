@@ -17,8 +17,13 @@ public final class UsedCarAgent {
     private final ToolManager toolManager;
     private final LLMClient llmClient;
     private final DataQualityChecker dataQualityChecker;
+    private final java.time.Clock clock;
 
     public UsedCarAgent(ToolManager tools, LLMClient llmClient, DataQualityChecker checker) {
+        this(tools,llmClient,checker,java.time.Clock.systemDefaultZone());
+    }
+    public UsedCarAgent(ToolManager tools,LLMClient llmClient,DataQualityChecker checker,java.time.Clock clock){
+        this.clock=Objects.requireNonNull(clock);
         this.toolManager = Objects.requireNonNull(tools);
         this.llmClient = Objects.requireNonNull(llmClient);
         this.dataQualityChecker = Objects.requireNonNull(checker);
@@ -72,7 +77,7 @@ public final class UsedCarAgent {
     }
     public RiskEvaluation evaluateRisk(Vehicle vehicle,UserPreference preference,CostEstimate availableCost,java.util.Set<ClarificationField> listingNeeds){
         var original=collectEvidence(vehicle,preference,availableCost);
-        var evidence=listingNeeds.isEmpty()?original:new RiskEvidence(vehicle,original.preference(),withListingNeeds(original.missing(),listingNeeds),original.knowledge(),original.violations(),original.cost(),original.priorityGuidance(),original.limitations(),original.constraintsAvailable());
+        var evidence=listingNeeds.isEmpty()?original:new RiskEvidence(vehicle,original.preference(),withListingNeeds(original.missing(),listingNeeds),original.knowledge(),original.violations(),original.cost(),original.priorityGuidance(),original.limitations(),original.constraintsAvailable(),original.referenceYear());
         var missing=evidence.missing(); boolean constraintsAvailable=evidence.constraintsAvailable();
         if(!missing.sufficient()||!constraintsAvailable){
             var result=new RiskAssessment("Insufficient Information",List.of(),evidence.requiredRisks(),evidence.requiredUncertainties(),
@@ -83,7 +88,8 @@ public final class UsedCarAgent {
             var parser=new ResponseParser();String prompt=new PromptBuilder().buildRiskPrompt(evidence);
             var assessment=parser.validateRiskAssessment(parser.parseRiskAssessment(llmClient.generateStructured(prompt,RiskAssessmentSchema.json())),evidence);
             return new RiskEvaluation("AI_SUCCESS",assessment,evidence,"AI interpretation of the displayed evidence; advisory only.");
-        }catch(IllegalArgumentException e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,"Risk response rejected by structural/evidence validation. Deterministic evidence remains available; retry explicitly.");}
+        }catch(RiskAgeValidator.Rejected e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,e.getMessage()+" Deterministic evidence remains available; retry explicitly. No automatic retry.");}
+        catch(IllegalArgumentException e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,"Risk response rejected by structural/evidence validation. Deterministic evidence remains available; retry explicitly.");}
         catch(RuntimeException e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,"AI request failed or is not configured. Check status/configuration; deterministic evidence remains available. No automatic retry.");}
     }
 
@@ -106,7 +112,7 @@ public final class UsedCarAgent {
         final String guidance;
         if(strategy==null&&!automaticStrategy)guidance=strategyFactory.selectionBasis(profile)+strategyFactory.createStrategy(profile).buildPriorityGuidance(profile);
         else guidance=buildPriorityGuidance(profile);
-        return new RiskEvidence(vehicle,profile,missing,knowledge,violations,availableCost,guidance,limits,constraintsAvailable);
+        return new RiskEvidence(vehicle,profile,missing,knowledge,violations,availableCost,guidance,limits,constraintsAvailable,java.time.Year.now(clock).getValue());
     }
 
     public VehicleComparison compare(Vehicle first, Vehicle second, UserPreference preference) {
@@ -143,7 +149,7 @@ public final class UsedCarAgent {
         else limits.add("Costs use the same supplied scenario for both vehicles; equal maintenance/insurance allowances are assumptions, not vehicle-specific quotations.");
         if(costFailed) limits.add("Cost tool failed for this vehicle; costs are unavailable.");
         return new RiskEvidence(vehicle,evidence.preference(),evidence.missing(),evidence.knowledge(),evidence.violations(),cost,
-                evidence.priorityGuidance(),limits,evidence.constraintsAvailable());
+                evidence.priorityGuidance(),limits,evidence.constraintsAvailable(),evidence.referenceYear());
     }
 
     public PreparationResult prepareEvaluation(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {
@@ -208,10 +214,10 @@ public final class UsedCarAgent {
         var original=collectEvidence(vehicle,preference,cost);
         var limits=new ArrayList<>(original.limitations());if(costFailed)limits.add("Ownership-cost tool failed; cost evidence is unavailable.");
         var missing=withListingNeeds(original.missing(),listingNeeds);
-        var deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable());
+        var deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable(),original.referenceYear());
         RiskAssessment risk=null;String riskStatus="Current AI risk assessment unavailable. Run Evaluate explicitly if needed; no automatic risk request was made.";
         if(savedRisk!=null&&savedRisk.status().equals("AI_SUCCESS")&&savedRisk.assessment()!=null&&savedRisk.evidence()!=null&&savedRisk.evidence().vehicle().equals(vehicle)&&savedRisk.evidence().preference().equals(preference)
-                &&savedRisk.evidence().priorityGuidance().equals(deterministic.priorityGuidance())&&Objects.equals(savedRisk.evidence().cost(),cost)&&savedRisk.evidence().missing().equals(missing)
+                &&savedRisk.evidence().referenceYear()==deterministic.referenceYear()&&savedRisk.evidence().priorityGuidance().equals(deterministic.priorityGuidance())&&Objects.equals(savedRisk.evidence().cost(),cost)&&savedRisk.evidence().missing().equals(missing)
                 &&savedRisk.evidence().violations().equals(deterministic.violations())&&Objects.equals(savedRisk.evidence().knowledge(),deterministic.knowledge())){
             risk=savedRisk.assessment();riskStatus="Current saved F08 AI risk category reused; explanatory prose is not treated as verified evidence.";
         }
@@ -221,8 +227,8 @@ public final class UsedCarAgent {
         }
         InspectionChecklist inspection;
         try{inspection=new ChecklistPlanner().build(vehicle,deterministic.knowledge(),missing);}
-        catch(RuntimeException e){inspection=new ChecklistPlanner().build(vehicle,null,missing);limits.add("Local inspection notes unavailable; general inspection priorities retained.");deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable());}
-        var evidence=new ReportEvidence(deterministic,assumptions,risk,riskStatus,inspection,history,conflicts,java.time.Year.now().getValue());
+        catch(RuntimeException e){inspection=new ChecklistPlanner().build(vehicle,null,missing);limits.add("Local inspection notes unavailable; general inspection priorities retained.");deterministic=new RiskEvidence(vehicle,original.preference(),missing,original.knowledge(),original.violations(),cost,original.priorityGuidance(),limits,original.constraintsAvailable(),original.referenceYear());}
+        var evidence=new ReportEvidence(deterministic,assumptions,risk,riskStatus,inspection,history,conflicts,deterministic.referenceYear());
         String id=java.util.UUID.randomUUID().toString();
         if(!evidence.sufficient())return new ReportEvaluation(id,"INSUFFICIENT_INFORMATION",evidence.insufficient(),evidence,"Java sufficiency gate; no AI recommendation request was made.");
         final String prompt, schema;

@@ -70,3 +70,10 @@ The existing GeminiAdapter now supplies typed, sanitized failure metadata to F12
 User-confirmed HTTP 400 narrows the failure to request rejection, not local report parsing. The exact historical server reason is unavailable. ReportSchema now uses a small, evidence-independent structural schema (nine required fields/four categories) rather than long evidence enums and dynamic maxItems; prompt duplication is removed. Exact evidence and category validation remains mandatory in Java. GeminiAdapter retains model, endpoint, structured MIME/schema configuration and limits, with bounded, allowlisted provider error classification for future manual diagnostics. See D17 and README for confirmed observations versus the complexity hypothesis.
 
 Java21 normal JAR build and all 274 JUnit tests pass (264 baseline plus ten), alongside all seven GUI verification entry points. Offline transport tests exercise actual F12 serialization and both accepted/rejected structured reports. No real Gemini request, live F12 AI_SUCCESS, Git mutation or Stage1 modification is claimed.
+
+
+## F08 model-year consistency correction — 2026-11-07
+
+Confirmed the observed six-year Risks statement passes the committed parser but fails the corrected Java validation. F08 now carries a Clock-derived reference-year snapshot, authoritative model-year difference and explicit unknown service age. Targeted checks cover strengths, risks, uncertainties and explanation, with safe unavailable fallback and explicit retry. Generic guidance/unrelated numbers remain usable. F11 invalidation and F12 reuse of valid matching-year risk pass regression tests; the F12 compact schema and GeminiAdapter are untouched.
+
+Java21 build/JAR succeeds; 294 JUnit tests pass, zero failures (274 baseline plus 20), with all seven GUI entry points including bad-age rejection/recovery and CLI fallback verification. No real API request was made. The rules do not verify arbitrary prose, all age paraphrases or non-English claims; live acceptance remains independent. Existing Simple Factory/final-deliverable limitations are unchanged.

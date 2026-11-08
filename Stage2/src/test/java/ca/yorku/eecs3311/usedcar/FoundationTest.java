@@ -277,4 +277,24 @@ public final class FoundationTest {
     @Test public void reportCompatibilityResponseConfigReason(){ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.responseConfigReason();}
     @Test public void reportCompatibilityGenericRejectionReason(){ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.genericRejectionReason();}
     @Test public void reportCompatibilityMalformedRejectionSafety(){ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.malformedRejectionSafety();}
+    @Test public void riskAgeArithmetic(){RiskAgeChecks.arithmetic();}
+    @Test public void riskAgePromptContext(){RiskAgeChecks.promptContext();}
+    @Test public void riskAgeRisks(){RiskAgeChecks.risks();}
+    @Test public void riskAgeExplanation(){RiskAgeChecks.explanation();}
+    @Test public void riskAgeStrengths(){RiskAgeChecks.strengths();}
+    @Test public void riskAgeUncertainties(){RiskAgeChecks.uncertainties();}
+    @Test public void riskAgeActualAge(){RiskAgeChecks.actualAge();}
+    @Test public void riskAgeSpelling(){RiskAgeChecks.spelling();}
+    @Test public void riskAgeWrongDifference(){RiskAgeChecks.wrongDifference();}
+    @Test public void riskAgeWrongContext(){RiskAgeChecks.wrongContext();}
+    @Test public void riskAgeValidGuidance(){RiskAgeChecks.validGuidance();}
+    @Test public void riskAgeInvalidContext(){RiskAgeChecks.invalidContext();}
+    @Test public void riskAgeNoRetry(){RiskAgeChecks.noRetry();}
+    @Test public void riskAgeReplacesPriorSuccess(){RiskAgeChecks.replacesPriorSuccess();}
+    @Test public void riskAgeClarification(){RiskAgeChecks.clarification();}
+    @Test public void riskAgeReportReuse(){RiskAgeChecks.reportReuse();}
+    @Test public void riskAgeReportRejects(){RiskAgeChecks.reportRejects();}
+    @Test public void riskAgeReferenceYearChange(){RiskAgeChecks.referenceYearChange();}
+    @Test public void riskAgeClockSnapshot(){RiskAgeChecks.clockSnapshot();}
+    @Test public void riskAgeCli(){RiskAgeChecks.cli();}
 }

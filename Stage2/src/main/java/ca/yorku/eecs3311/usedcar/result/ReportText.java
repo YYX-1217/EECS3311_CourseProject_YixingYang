@@ -15,7 +15,7 @@ public final class ReportText {
         text.append("Mileage (km): ").append(v.mileage()).append("; asking price (CAD): ").append(v.askingPrice().toPlainString()).append("\n");
         text.append("Transmission: ").append(v.transmission()).append("; fuel type: ").append(v.fuelType()).append("; fuel consumption (L/100 km): ").append(v.fuelConsumption()==null?"UNAVAILABLE":v.fuelConsumption()).append("\n");
         text.append("Accident-history claim: ").append(v.accidentHistory()).append("; maintenance-history claim: ").append(v.maintenanceHistory()).append("\n");
-        text.append("Model-year difference: ").append(e.referenceYear()-v.year()).append(" years (reference year ").append(e.referenceYear()).append(" minus model year ").append(v.year()).append("); not the exact in-service age.\n");
+        text.append(new ModelYearContext(v.year(),e.referenceYear()).description()).append("\n");
         var profile=d.preference();
         text.append("Buyer limits: budget CAD ").append(profile.maxBudget()==null?"unspecified":profile.maxBudget()).append("; mileage km ").append(profile.maxMileage()==null?"unspecified":profile.maxMileage()).append("; accepted transmissions ").append(profile.acceptedTransmissions()).append("\n");
         text.append("Buyer priorities: reliability ").append(profile.reliabilityPriority()).append("/5; fuel economy ").append(profile.fuelEconomyPriority()).append("/5; accident tolerance ").append(profile.accidentTolerance()).append("; preferred body type ").append(profile.preferredBodyType().isBlank()?"unspecified":profile.preferredBodyType()).append("\n");

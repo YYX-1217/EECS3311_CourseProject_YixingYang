@@ -95,6 +95,7 @@ public final class ResponseParser {
         return value.getAsString();
     }
     public RiskAssessment validateRiskAssessment(RiskAssessment assessment,RiskEvidence evidence){
+        RiskAgeValidator.validate(assessment,evidence.yearContext());
         if(!assessment.risks().containsAll(evidence.requiredRisks()))throw new IllegalArgumentException("Risk response omitted or altered deterministic conflicts.");
         if(!assessment.uncertainties().containsAll(evidence.requiredUncertainties()))throw new IllegalArgumentException("Risk response omitted or altered required uncertainties/source limitations.");
         if(assessment.riskLevel().equals("Low")&&!evidence.requiredRisks().isEmpty())throw new IllegalArgumentException("Low risk contradicts unresolved buyer constraints.");

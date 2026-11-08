@@ -76,6 +76,7 @@ public final class ResultFormatter {
         else out.append("No validated AI risk category is available.\n");
         var e=evaluation.evidence();
         out.append("\nDETERMINISTIC EVIDENCE SNAPSHOT (not overwritten by AI)\n")
+                .append(e.yearContext().description()).append("\n")
                 .append("Vehicle: ").append(e.vehicle()).append("\nSaved preferences: ").append(e.preference()).append("\n")
                 .append(format(e.missing())).append("\nConstraints: ").append(e.violations()).append("\nConstraint tool available: ").append(e.constraintsAvailable())
                 .append("\nLocal knowledge: ").append(e.knowledge()==null?"UNAVAILABLE":e.knowledge())
