@@ -6,3 +6,7 @@ target/
 out/
 build/
 *.class
+
+# Defense in depth: enrolled credentials belong outside the repository.
+*.dpapi
+*.dpapi.tmp

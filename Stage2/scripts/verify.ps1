@@ -48,3 +48,14 @@ try {
         Assert-Stage2Exit 'Report GUI smoke verification'
     }
 } finally { Pop-Location }
+
+# Isolate fictional credential tests from the caller's environment and real saved store.
+if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+    $launcherChecks = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+        (Join-Path $PSScriptRoot 'verify-launcher.ps1'), '-SkipBuild')
+    if ($Gui) { $launcherChecks += '-Gui' }
+    & powershell @launcherChecks
+    Assert-Stage2Exit 'Windows credential/launcher verification'
+} else {
+    Write-Host 'Windows DPAPI launcher checks skipped on this platform.'
+}

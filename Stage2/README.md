@@ -26,6 +26,8 @@ Stage2/
   src/main/resources/example.properties
   src/test/java/ca/yorku/eecs3311/usedcar/
   scripts/common.ps1, build.ps1, run.ps1, verify.ps1
+  scripts/setup-gemini.ps1, remove-gemini.ps1, gemini-credentials.ps1
+  scripts/verify-launcher.ps1            Offline Windows DPAPI/child-process checks
   docs/                                 Architecture, traceability, status, logs, and next steps
   build/                                Ignored build, verification, and inspection artifacts
 ```
@@ -158,6 +160,18 @@ The 294 tests cover negative and malformed inputs, required fields and year vali
 Ten F04 tests additionally cover missing versus unknown histories, complete and insufficient essential data, optional omissions, matching and conflicting sources, unknown values without false conflicts, session preservation, and the interactive conflict-check command.
 
 The GUI smoke check verifies window launch, calculation, error display, recalculation, and source conflict display without overwriting the saved vehicle. It saves an image of the application's panel to `build/verification/gui.png`. These checks do not constitute complete Stage 3 testing, and KUMA validation has not been performed.
+
+### Windows credential and launcher verification
+
+`verify.ps1` also runs `verify-launcher.ps1` in a separate Windows PowerShell process. It uses randomly generated fictional credentials and a unique temporary LocalAppData test directory; it never reads or changes the user's real credential store. The Java child probe compares hashes internally and prints fixed success markers only. These are PowerShell integration checks, not additional JUnit tests.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify.ps1 -Gui
+# Focused rerun after a successful build:
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\verify-launcher.ps1 -SkipBuild -Gui
+```
+
+The 17 checks cover encryption, storage location, ACLs, current-user decryption, environment precedence/model preservation, replacement, normal/abnormal child exits, startup failure, corrupted/unreadable storage, deletion, failed enrollment, CLI/demo compatibility, initial GUI configuration status, and actual Java/launcher termination with environment cleanup. Without `-Gui`, 15 checks run; the fixture child still verifies the process wait. No real Gemini call is made. Seven existing Swing smoke programs and 294 existing JUnit tests remain separate regression coverage. Non-Windows verification skips Windows DPAPI checks.
 
 ## Optional Maven workflow
 
@@ -548,7 +562,16 @@ Close any previously running instance before rebuilding; Windows can lock the ex
 6. Select **Show saved report** to reuse the snapshot. Select **Export UTF-8 text...**, choose a new `.txt` filename outside the repository if it contains private data, and save. Choosing an existing filename must fail without overwriting it.
 7. Change and save a preference; the report becomes unavailable until regenerated. Or use **Clarification → Revisit field → MILEAGE**, answer 130000, then **Accept new**; the old report is invalidated and a new report must show 130000.
 
-For an offline test, open a new PowerShell terminal, set `$env:GEMINI_API_KEY = ''`, then launch the GUI. Complete input gives **AI_UNAVAILABLE** with exact deterministic results. Change maintenance to UNKNOWN and save: report generation must give **INSUFFICIENT_INFORMATION**. Set budget to 10000: buyer-budget conflict must remain visible, even when Gemini is unavailable. No positive recommendation is invented.
+For an offline test, bypass automatic credential loading by launching Java directly in a new Stage2 PowerShell terminal:
+
+```powershell
+$env:GEMINI_API_KEY = ''
+. .\scripts\common.ps1
+$offlineJdk = Find-Stage2Jdk
+& (Join-Path $offlineJdk 'bin\java.exe') -jar .\build\used-car-assistant.jar --gui
+```
+
+An empty environment variable alone does not disable saved-credential loading in `run.ps1`. Complete input gives **AI_UNAVAILABLE** with exact deterministic results. Change maintenance to UNKNOWN and save: report generation must give **INSUFFICIENT_INFORMATION**. Set budget to 10000: buyer-budget conflict must remain visible, even when Gemini is unavailable. No positive recommendation is invented.
 
 For a live test, use the hidden-key setup under API key security, launch a fresh application, save the same fictional input, and explicitly run **Risk Assessment → Evaluate Vehicle**, followed by **Generate / Regenerate Report**. These are separate authorized requests. A valid current risk may be reused; if the F08 result is unavailable, the report labels that limitation. Verify F12's own **AI_SUCCESS**, preserved costs, source limitations and all sections. A previous `llm-test` or F11 AI_SUCCESS is not proof of F12 success. **No real Gemini request was made during this increment.**
 
@@ -615,7 +638,48 @@ The explicit CLI `llm-test` command follows facade -> agent -> LLMClient -> Gemi
 
 ## API key security and optional live test
 
-From the Stage2 directory, build first. Enter a key only into the local hidden PowerShell prompt, never into chat, code or a command-history literal:
+### Windows one-time enrollment and automatic launch
+
+In VS Code, open the existing repository, open **Terminal > New Terminal**, and change to `Stage2` if the terminal starts at the repository root (`Set-Location .\Stage2`). All commands below run from Stage2. Build normally, then enroll once:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-gemini.ps1
+```
+
+Paste the key only into the hidden prompt and press Enter. Enrollment never prints the key or tests Google authentication. Future launches require no credential prompt:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode gui
+# The same automatic configuration is available for interactive CLI:
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode cli
+```
+
+A nonempty process `GEMINI_API_KEY` takes precedence, including an invalid value that Java must diagnose. Otherwise the launcher loads the current user's encrypted credential. It never silently saves an existing environment variable. `GEMINI_MODEL` is left unchanged; Java retains its established default when no model override is present. Startup and `status` do not call Gemini. The GUI initially reports **CONFIGURED: not live-verified** when local configuration passes; an invalid or revoked Google key may still fail on an explicitly requested live operation.
+
+The encrypted file is `%LOCALAPPDATA%\EECS3311\UsedCarAssistant\gemini-api-key.dpapi`. Windows `ConvertFrom-SecureString` without `-Key` uses current-user DPAPI, as documented by [Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/convertfrom-securestring?view=powershell-5.1). No custom encryption password or machine-wide variable is used. The directory and file have protected ACLs granting access only to the current user and SYSTEM. The implementation rejects repository locations and redirected storage paths. It is Windows-only and does not make the credential portable to another Windows account or computer. DPAPI and ACLs do not protect against code already running as the same user or an administrator controlling the machine.
+
+To replace a key, close the application, rerun `setup-gemini.ps1`, type `YES` at the replacement prompt, then enter the new key in the hidden prompt. Replacement uses a protected temporary ciphertext file and atomic file replacement; failed enrollment preserves the old file unless replacement has completed. To remove the saved credential, run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\remove-gemini.ps1
+```
+
+Confirm the deletion when prompted. This removes only the local encrypted file, not the Google-issued key, existing process copies or any explicitly configured environment variable. Revocation/rotation remains an explicit Google account action. Normal GUI exit preserves the encrypted file for later launches.
+
+With no saved credential, startup explains **NOT CONFIGURED**, prints the setup command and retains deterministic functionality without prompting. Corrupted or unreadable storage produces a fixed sanitized warning and the same fallback; rerun setup to replace it. Local decryption failure is distinct from Java's configuration validation or a later Google authorization failure.
+
+### Process lifetime and security limits
+
+The launcher decrypts in its own process and supplies plaintext only through the Java child's existing environment interface, never through arguments. It frees the native BSTR with `ZeroFreeBSTR`, disposes the SecureString and releases its temporary managed-string reference before starting Java. It waits for the actual Java GUI process to exit. A `finally` block removes the environment value that the launcher loaded, including on launch failure or a nonzero child exit; the launcher then exits. The CLI keeps its existing synchronous behavior. Help mode does not load credentials.
+
+A separately supplied caller/parent environment value is preserved: a child PowerShell process cannot clear an unrelated parent session. Clear such a parent value explicitly (`Remove-Item Env:GEMINI_API_KEY -ErrorAction SilentlyContinue`) if it is no longer needed. Java and .NET necessarily hold managed plaintext while using environment-based authentication; assigning null does not guarantee physical erasure of managed memory. Abruptly terminating the launcher or losing power cannot guarantee execution of `finally`, and forcibly killing the launcher is not a substitute for closing its Java GUI. No claim is made that these scripts erase swap files, dumps, clipboard contents or unrelated processes.
+
+For deterministic offline GUI testing after enrollment, use the direct-Java command in the F12 offline procedure above. Direct Java never reads the DPAPI file. Clearing the environment and then running `run.ps1` would load the saved credential again.
+
+### Optional session-only key and explicit live test
+
+For users who deliberately do not want persistent enrollment, the existing hidden session-only procedure remains available. Enter a key only into the local hidden prompt, never into chat, code or a command-history literal:
 
 ```powershell
 & .\scripts\build.ps1
@@ -627,7 +691,7 @@ try {
     [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($geminiPointer)
     $geminiSecret.Dispose()
 }
-$env:GEMINI_MODEL = 'gemini-3.1-flash-lite'
+# Preserve any existing GEMINI_MODEL override.
 try {
     & .\scripts\run.ps1 -Mode cli
 } finally {
@@ -637,7 +701,7 @@ try {
 
 In the CLI, enter `status`, then `llm-test` only when ready to authorize one real request, then `status` and `quit`. A successful test prints genuine generated text and the configured model. A failure prints a safe diagnostic; check account permissions, quota/billing or model access as appropriate before retrying manually. This operation can consume quota and incur provider charges. Without a key, the test explains missing configuration while other operations remain available.
 
-The application reads process environment variables only; `.env` is not loaded. `.env.example` contains placeholders and variable names, not working credentials. `.gitignore` continues to exclude `.env`, `.env.*` and `config.local.json`, while retaining `.env.example`. Never include keys in source, logs, screenshots, reports or Git. Do not enable HTTP header debugging with real keys. Environment variables exist in process memory; close the terminal after use if appropriate.
+Java reads process environment variables only; the PowerShell launcher optionally supplies them from the Windows DPAPI file. `.env` is not loaded. `.env.example` contains placeholders and variable names, not working credentials. `.gitignore` continues to exclude `.env`, `.env.*` and `config.local.json`, while retaining `.env.example`; Stage2 also ignores `*.dpapi` and `*.dpapi.tmp` as defense in depth. Credential files still belong outside the repository. Never include keys in source, logs, screenshots, reports or Git. Do not enable HTTP header debugging with real keys. Environment variables exist in process memory; close the terminal after use if appropriate.
 
 Fourteen adapter test groups exercise loopback HTTP requests, JSON escaping, endpoint selection, actual parser behavior, configuration, HTTP failures, malformed/empty/blocked output, timeout/connection/interruption handling, secret redaction, state transitions and shared CLI integration. They require no real key and consume no Gemini quota. The existing verification command runs these alongside all prior regression tests.
 
