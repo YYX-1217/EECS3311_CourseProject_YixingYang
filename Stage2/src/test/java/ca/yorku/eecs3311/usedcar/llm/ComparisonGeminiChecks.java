@@ -37,7 +37,7 @@ public final class ComparisonGeminiChecks {
             check(!ResultFormatter.format(result).contains(KEY)&&!failed.status().contains(KEY),"Transport failures must not expose credentials");
         }
     }
-    private static String body(HttpRequest request) throws IOException,InterruptedException {
+    static String body(HttpRequest request) throws IOException,InterruptedException {
         var bytes=new ByteArrayOutputStream();var done=new CountDownLatch(1);
         request.bodyPublisher().orElseThrow().subscribe(new Flow.Subscriber<ByteBuffer>(){
             public void onSubscribe(Flow.Subscription subscription){subscription.request(Long.MAX_VALUE);}

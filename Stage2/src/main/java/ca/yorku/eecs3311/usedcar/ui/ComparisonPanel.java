@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 /** Two saved records; editable B form is separate from the current-vehicle form. */
 public final class ComparisonPanel extends JPanel {
     private final UsedCarApplicationFacade facade;
+    private SwingWorker<ComparisonEvaluation,Void> worker;
     private final Map<String,JTextField> fields=new LinkedHashMap<>();
     private final JTextArea summary=new JTextArea(3,65);
     private final JTextArea output=new JTextArea(15,70);
@@ -28,6 +29,8 @@ public final class ComparisonPanel extends JPanel {
         var save=new JButton("Save Vehicle B"); save.setName("comparisonSave");
         var cancel=new JButton("Cancel edits / reload saved B"); cancel.setName("comparisonCancel");
         var compare=new JButton("Compare saved vehicles"); compare.setName("comparisonRun");
+        var stop=new JButton("Cancel comparison"); stop.setName("comparisonStop"); stop.setEnabled(false);
+        stop.addActionListener(event->{if(worker!=null)worker.cancel(true);});
         var refresh=new JButton("Refresh saved summaries"); refresh.setName("comparisonRefresh");
         save.addActionListener(event->{
             var values=new LinkedHashMap<String,String>(); fields.forEach((key,input)->values.put(key,input.getText()));
@@ -47,23 +50,29 @@ public final class ComparisonPanel extends JPanel {
             if(facade.currentVehicle().isEmpty() || facade.comparisonVehicle().isEmpty()) {
                 output.setText("ERROR: Save Vehicle A and comparison Vehicle B before comparing."); return;
             }
-            compare.setEnabled(false); output.setText("Comparing saved records; collecting evidence and requesting AI only when sufficient...");
-            new SwingWorker<ComparisonEvaluation,Void>() {
+            compare.setEnabled(false); stop.setEnabled(true); output.setText("Comparing saved records; collecting evidence and requesting AI only when sufficient...");
+            worker=new SwingWorker<ComparisonEvaluation,Void>() {
                 protected ComparisonEvaluation doInBackground() { return new CompareVehiclesCommand(facade).execute(); }
                 protected void done() {
                     try { output.setText(ResultFormatter.format(get())); output.setCaretPosition(0); }
+                    catch(java.util.concurrent.CancellationException e) { output.setText("Comparison cancelled; saved records preserved. Compare again when ready."); }
                     catch(InterruptedException e) { Thread.currentThread().interrupt(); output.setText("Comparison interrupted; saved records preserved."); }
                     catch(ExecutionException e) { output.setText("Comparison failed. Review both saved records and retry. No AI narrative displayed; saved records preserved."); }
-                    finally { compare.setEnabled(true); refresh(); }
+                    finally { compare.setEnabled(true); stop.setEnabled(false); refresh(); }
                 }
-            }.execute();
+            };
+            worker.execute();
         });
-        var buttons=new JPanel(new FlowLayout(FlowLayout.LEFT)); buttons.add(save); buttons.add(cancel); buttons.add(compare); buttons.add(refresh);
+        var buttons=new JPanel(new FlowLayout(FlowLayout.LEFT)); buttons.add(save); buttons.add(cancel); buttons.add(compare); buttons.add(stop); buttons.add(refresh);
         var upper=new JPanel(new BorderLayout()); upper.add(new JScrollPane(summary),BorderLayout.NORTH);
         upper.add(new JScrollPane(form)); upper.add(buttons,BorderLayout.SOUTH);
         var split=new JSplitPane(JSplitPane.VERTICAL_SPLIT,upper,new JScrollPane(output)); split.setResizeWeight(0.55); add(split);
         addComponentListener(new java.awt.event.ComponentAdapter(){ public void componentShown(java.awt.event.ComponentEvent e){refresh();} });
-        output.setText("Save A in the existing Vehicle workflow, enter/save B here, then compare. CAD/km only; save common cost assumptions using Save and calculate. Comparison may send one Gemini request.");
+        output.setText("Save A in the existing Vehicle workflow, enter/save B here, then compare. CAD/km only; save common cost assumptions using Save and calculate. Comparison may send up to two Gemini requests (one retry for HTTP 502/503/504 only).");
+        addHierarchyListener(event->{
+            if((event.getChangeFlags() & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED)!=0 && !isDisplayable() && worker!=null)
+                worker.cancel(true);
+        });
         refresh();
     }
     private void refresh() {

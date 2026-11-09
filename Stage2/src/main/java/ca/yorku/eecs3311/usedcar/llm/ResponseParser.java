@@ -156,19 +156,9 @@ public final class ResponseParser {
         if(!result.metricSummary().equals(evidence.metrics())) throw comparisonError("metricSummary changed, omitted or added deterministic metrics.");
         if(!evidence.sufficient() && !result.preferredVehicleId().isEmpty())
             throw comparisonError("preferredVehicleId is unsupported by insufficient evidence.");
-        String narrative=result.explanation().toLowerCase(Locale.ROOT);
-        boolean conflicts=!evidence.first().requiredRisks().isEmpty() || !evidence.second().requiredRisks().isEmpty();
-        if(conflicts && (narrative.contains("both vehicles meet all constraints") || narrative.contains("no constraint conflicts")))
-            throw comparisonError("explanation contradicts known buyer constraints.");
-        if((reportedAccident(evidence.first()) || reportedAccident(evidence.second()))
-                && (narrative.contains("both vehicles are accident-free") || narrative.contains("neither vehicle has reported accidents")))
-            throw comparisonError("explanation contradicts reported accident history.");
-        if((missingRecords(evidence.first()) || missingRecords(evidence.second())) && narrative.contains("both vehicles have complete service history"))
-            throw comparisonError("explanation contradicts maintenance records.");
+        ComparisonNarrative.validate(result,evidence);
         return result;
     }
-    private static boolean reportedAccident(RiskEvidence e) { return Set.of("YES","ACCIDENT_REPORTED","HAS_ACCIDENTS").contains(e.vehicle().accidentHistory()); }
-    private static boolean missingRecords(RiskEvidence e) { return Set.of("NONE","PARTIAL").contains(e.vehicle().maintenanceHistory()); }
     private static String comparisonText(JsonElement value,String field,boolean emptyAllowed) {
         if(value==null || !value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString()
                 || (!emptyAllowed && value.getAsString().isBlank())) throw comparisonError(field+" must be "+(emptyAllowed?"a string.":"nonblank text."));

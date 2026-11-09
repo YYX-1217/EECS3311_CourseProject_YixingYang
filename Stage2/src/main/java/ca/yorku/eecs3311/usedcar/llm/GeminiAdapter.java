@@ -18,7 +18,9 @@ public final class GeminiAdapter implements LLMClient {
     @FunctionalInterface interface Transport {
         Reply send(HttpRequest request) throws IOException, InterruptedException;
     }
-    record Reply(int status, String body) { }
+    record Reply(int status, String body, boolean retryDeferred) {
+        Reply(int status, String body) { this(status,body,false); }
+    }
     public GeminiAdapter() { this(System.getenv("GEMINI_API_KEY"), System.getenv("GEMINI_MODEL")); }
     public GeminiAdapter(String key, String model) { this(key, model, realTransport()); }
     GeminiAdapter(String key, String model, Transport transport) {
@@ -32,7 +34,7 @@ public final class GeminiAdapter implements LLMClient {
                 .followRedirects(HttpClient.Redirect.NEVER).build();
         return request -> {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString(java.nio.charset.StandardCharsets.UTF_8));
-            return new Reply(response.statusCode(), response.body());
+            return new Reply(response.statusCode(), response.body(), response.headers().firstValue("Retry-After").isPresent());
         };
     }
     private String configurationError() {
@@ -93,7 +95,8 @@ public final class GeminiAdapter implements LLMClient {
             var rejection = response.status() == 400 ? classifyRejection(response.body()) : LLMFailure.Rejection.UNSPECIFIED;
             state = "REQUEST FAILED: HTTP " + response.status() + ": " + explanation
                     + (rejection == LLMFailure.Rejection.UNSPECIFIED ? "" : " [" + rejection + "]");
-            throw new LLMFailure(LLMFailure.Kind.HTTP_ERROR, response.status(), safe(state), rejection);
+            throw new LLMFailure(LLMFailure.Kind.HTTP_ERROR, response.status(), safe(state), rejection,
+                    response.retryDeferred() || hasRetryInfo(response.body()));
         }
         final String result;
         try {
@@ -124,6 +127,17 @@ public final class GeminiAdapter implements LLMClient {
         catch (RuntimeException e) { throw failure(LLMFailure.Kind.INVALID_RESPONSE, 0, "invalid, empty, blocked or incomplete generated response."); }
         state = "VERIFIED: last generation succeeded in this session";
         return safe(result);
+    }
+    // Conservatively defer to explicit user retry whenever the provider supplies retry guidance.
+    // No raw header/body is retained in the failure or shown to the user.
+    private static boolean hasRetryInfo(String body) {
+        if (body == null || body.length() > 65536) return false;
+        try {
+            var details = JSON.fromJson(body,JsonObject.class).getAsJsonObject("error").getAsJsonArray("details");
+            if (details != null) for (var detail : details)
+                if (detail.isJsonObject() && errorText(detail.getAsJsonObject(),"@type").equals("type.googleapis.com/google.rpc.RetryInfo")) return true;
+        } catch (RuntimeException ignored) { }
+        return false;
     }
     /** Read only bounded error metadata; emit fixed categories, never server text, keys or request fragments. */
     private static LLMFailure.Rejection classifyRejection(String body) {

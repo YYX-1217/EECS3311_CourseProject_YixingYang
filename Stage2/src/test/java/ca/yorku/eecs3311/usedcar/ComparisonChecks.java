@@ -31,7 +31,11 @@ public final class ComparisonChecks {
         String line=prompt.lines().filter(x->x.startsWith(prefix)).findFirst().orElseThrow();
         var json=JsonParser.parseString(line.substring(prefix.length())).getAsJsonObject();
         json.addProperty("preferredVehicleId","");
-        json.addProperty("explanation","A and B have different price, mileage and ownership-cost trade-offs. Review the displayed buyer constraints and history limitations. Instructional knowledge is not verified research; no defensible preference is established by this offline fixture.");
+        var statements=new ArrayList<>(RiskChecks.required(prompt,"Required explanation statements"));
+        String options=prompt.lines().filter(x->x.startsWith("Optional trade-off statements")).findFirst().orElseThrow();
+        statements.addAll(JsonParser.parseString(options.substring(options.indexOf(": ")+2)).getAsJsonObject().keySet());
+        statements.add(ComparisonNarrative.NO_PREFERENCE);
+        json.addProperty("explanation",String.join("\n",statements));
         return json.toString();
     }
     public static UsedCarApplicationFacade facade(LLMClient llm) { return RiskChecks.facade(llm); }
@@ -143,6 +147,7 @@ public final class ComparisonChecks {
         var llm=new Fake();var f=prepared(llm);var result=f.compareCurrentVehicles();var parsed=new ResponseParser().parseComparison(response(llm.prompt));
         check(result.status().equals("AI_SUCCESS")&&parsed.equals(result.comparison())&&parsed.preferredVehicleId().isEmpty(),"Valid five-field result and explicit no-preference must parse");
         var j=JsonParser.parseString(response(llm.prompt)).getAsJsonObject();j.addProperty("preferredVehicleId",f.comparisonVehicle().orElseThrow().id());
+        j.addProperty("explanation",j.get("explanation").getAsString().replace(ComparisonNarrative.NO_PREFERENCE,ComparisonNarrative.LIMITED_PREFERENCE));
         check(new ResponseParser().validateComparison(new ResponseParser().parseComparison(j.toString()),result.evidence()).preferredVehicleId().equals(f.comparisonVehicle().orElseThrow().id()),"Supported pair ID is accepted");
     }
     public static void malformed(){for(String s:List.of("","broken","null","[]","{} trailing","```json\n{}\n```"))rejects(()->new ResponseParser().parseComparison(s));}

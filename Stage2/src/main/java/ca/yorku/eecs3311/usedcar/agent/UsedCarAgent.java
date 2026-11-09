@@ -126,17 +126,40 @@ public final class UsedCarAgent {
         var evidence=new ComparisonEvidence(a,b,assumptions);
         if(!evidence.sufficient()) return new ComparisonEvaluation("INSUFFICIENT_INFORMATION",evidence.deterministic(),evidence,
                 "Essential data or mandatory checks are unavailable. No AI request was made; no preferred vehicle is identified.");
-        final String response;
-        try { response=llmClient.generateStructured(new PromptBuilder().buildComparisonPrompt(evidence),ComparisonSchema.json(evidence)); }
-        catch(RuntimeException e) { return new ComparisonEvaluation("AI_UNAVAILABLE",evidence.deterministic(),evidence,
-                "AI narrative unavailable: request failed or is not configured. Check status and retry explicitly; deterministic evidence is retained."); }
+        String response = null;
+        int attempts = 0;
+        String prompt = new PromptBuilder().buildComparisonPrompt(evidence);
+        String schema = ComparisonSchema.json(evidence);
+        while (attempts < 2) {
+            if (Thread.currentThread().isInterrupted()) return comparisonUnavailable(evidence,"[INTERRUPTED] Comparison cancelled.",attempts);
+            attempts++;
+            try { response = llmClient.generateStructured(prompt,schema); break; }
+            catch (LLMFailure e) {
+                boolean transientFailure = e.kind() == LLMFailure.Kind.HTTP_ERROR
+                        && java.util.Set.of(502,503,504).contains(e.httpStatus());
+                if (attempts == 1 && transientFailure && !e.retryDeferred()) {
+                    try { Thread.sleep(500); }
+                    catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                        return comparisonUnavailable(evidence,"[INTERRUPTED] Comparison retry cancelled.",attempts);
+                    }
+                } else return comparisonUnavailable(evidence,e.diagnostic()
+                        + (e.retryDeferred() ? " Provider retry guidance present; automatic retry deferred." : ""),attempts);
+            } catch (RuntimeException e) {
+                return comparisonUnavailable(evidence,"[REQUEST_FAILURE] Request failed or is not configured.",attempts);
+            }
+        }
         try {
             var parser=new ResponseParser();
             var result=parser.validateComparison(parser.parseComparison(response),evidence);
-            return new ComparisonEvaluation("AI_SUCCESS",result,evidence,"AI trade-off interpretation; advisory only, not a verified inspection or safety guarantee.");
+            return new ComparisonEvaluation("AI_SUCCESS",result,evidence,"AI-selected evidence-grounded trade-offs; advisory only, not a verified inspection or safety guarantee. Provider attempts: "+attempts+".");
         } catch(IllegalArgumentException e) {
             return new ComparisonEvaluation("AI_UNAVAILABLE",evidence.deterministic(),evidence,"AI narrative rejected: "+e.getMessage());
         }
+    }
+    private ComparisonEvaluation comparisonUnavailable(ComparisonEvidence evidence, String reason, int attempts) {
+        return new ComparisonEvaluation("AI_UNAVAILABLE",evidence.deterministic(),evidence,
+                reason+" Provider attempts: "+attempts+". Deterministic evidence retained; retry explicitly when appropriate.");
     }
     private RiskEvidence comparisonEvidence(Vehicle vehicle, UserPreference preference, CostAssumptions assumptions) {
         CostEstimate cost=null; boolean costFailed=false;

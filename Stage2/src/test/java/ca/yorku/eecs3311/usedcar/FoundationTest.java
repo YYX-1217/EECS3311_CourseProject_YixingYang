@@ -297,4 +297,32 @@ public final class FoundationTest {
     @Test public void riskAgeReferenceYearChange(){RiskAgeChecks.referenceYearChange();}
     @Test public void riskAgeClockSnapshot(){RiskAgeChecks.clockSnapshot();}
     @Test public void riskAgeCli(){RiskAgeChecks.cli();}
+    @Test public void f09EvidenceScenario(){ComparisonReliabilityChecks.scenario();}
+    @Test public void f09EvidenceReversedIds(){ComparisonReliabilityChecks.reversedIds();}
+    @Test public void f09EvidencePriceTampering(){ComparisonReliabilityChecks.priceTampering();}
+    @Test public void f09EvidenceMileageTampering(){ComparisonReliabilityChecks.mileageTampering();}
+    @Test public void f09EvidenceCostTampering(){ComparisonReliabilityChecks.costTampering();}
+    @Test public void f09EvidenceInventedNumericProse(){ComparisonReliabilityChecks.inventedNumericProse();}
+    @Test public void f09EvidenceReversedPriceProse(){ComparisonReliabilityChecks.reversedPriceProse();}
+    @Test public void f09EvidenceInventedKnowledge(){ComparisonReliabilityChecks.inventedKnowledge();}
+    @Test public void f09EvidenceInventedVerification(){ComparisonReliabilityChecks.inventedVerification();}
+    @Test public void f09EvidenceUnknownHistory(){ComparisonReliabilityChecks.unknownHistory();}
+    @Test public void f09EvidencePreferredConflict(){ComparisonReliabilityChecks.preferredConflict();}
+    @Test public void f09EvidenceUnsupportedPreference(){ComparisonReliabilityChecks.unsupportedPreference();}
+    @Test public void f09EvidenceSupportedPreference(){ComparisonReliabilityChecks.supportedPreference();}
+    @Test public void f09EvidenceReorderedStatements(){ComparisonReliabilityChecks.reorderedStatements();}
+    @Test public void f09EvidenceOmittedLimit(){ComparisonReliabilityChecks.omittedLimit();}
+    @Test public void f09EvidenceDuplicateStatement(){ComparisonReliabilityChecks.duplicateStatement();}
+    @Test public void f09EvidenceMissingCost(){ComparisonReliabilityChecks.missingCost();}
+    @Test public void f09EvidenceCli(){ComparisonReliabilityChecks.cli();}
+    @Test public void f09RetryRecovery() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.recovery();}
+    @Test public void f09RetryExhausted() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.exhausted();}
+    @Test public void f09RetryNoRetryPermanent() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.noRetryPermanent();}
+    @Test public void f09RetryDeferredHeader() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.deferredHeader();}
+    @Test public void f09RetryDeferredMetadata() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.deferredMetadata();}
+    @Test public void f09RetryNoRetryTimeout() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.noRetryTimeout();}
+    @Test public void f09RetryInterruptedDelay() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.interruptedDelay();}
+    @Test public void f09RetryPreInterrupted() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.preInterrupted();}
+    @Test public void f09RetryInvalidAfterRetry() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.invalidAfterRetry();}
+    @Test public void f09RetryOtherFeaturesNoRetry() throws Exception {ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.otherFeaturesNoRetry();}
 }

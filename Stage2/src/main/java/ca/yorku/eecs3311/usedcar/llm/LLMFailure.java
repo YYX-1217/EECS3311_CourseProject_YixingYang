@@ -8,6 +8,8 @@ public final class LLMFailure extends IllegalStateException {
     }
     /** Allowlisted summaries of provider error metadata; never raw server messages or field values. */
     public enum Rejection { UNSPECIFIED, SCHEMA_COMPLEXITY, SCHEMA_FIELD, RESPONSE_CONFIGURATION, INVALID_ARGUMENT, FAILED_PRECONDITION }
+    private final boolean retryDeferred;
+    public boolean retryDeferred() { return retryDeferred; }
     private final Rejection rejection;
     private final Kind kind;
     private final int httpStatus;
@@ -16,7 +18,11 @@ public final class LLMFailure extends IllegalStateException {
         this(kind,httpStatus,safeMessage,Rejection.UNSPECIFIED);
     }
     LLMFailure(Kind kind, int httpStatus, String safeMessage, Rejection rejection) {
+        this(kind,httpStatus,safeMessage,rejection,false);
+    }
+    LLMFailure(Kind kind, int httpStatus, String safeMessage, Rejection rejection, boolean retryDeferred) {
         super(safeMessage);
+        this.retryDeferred = retryDeferred;
         this.rejection = java.util.Objects.requireNonNull(rejection);
         this.kind = java.util.Objects.requireNonNull(kind);
         this.httpStatus = httpStatus;

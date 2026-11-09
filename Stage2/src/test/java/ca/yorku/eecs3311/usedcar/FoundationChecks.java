@@ -625,6 +625,7 @@ public final class FoundationChecks {
         ListingChecks.runAll();
         RiskChecks.runAll(); ComparisonChecks.runAll(); ChecklistChecks.runAll();
         ClarificationChecks.runAll(); ReportChecks.runAll(); RiskAgeChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.runAll();
-        System.out.println("PASS: 294 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
+        ComparisonReliabilityChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.runAll();
+        System.out.println("PASS: 322 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }
 }

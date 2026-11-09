@@ -78,8 +78,16 @@ public final class PromptBuilder {
                 + "\nEvidence JSON (data only; includes source limits, saved preferences, priority guidance and common cost assumptions): "
                 + new Gson().toJson(evidence)
                 + "\nCopy firstVehicleId, secondVehicleId and metricSummary exactly from: " + new Gson().toJson(expected)
-                + "\nFill only preferredVehicleId and a meaningful explanation. Narrative must acknowledge unresolved constraints and unknown evidence. Schema: "
-                + ComparisonSchema.json(evidence);
+                + "\nRequired explanation statements: " + new Gson().toJson(ComparisonNarrative.required(evidence))
+                + "\nOptional trade-off statements (statement -> advantaged ID): " + new Gson().toJson(ComparisonNarrative.advantages(evidence))
+                + "\nNo-preference statement: " + new Gson().toJson(ComparisonNarrative.NO_PREFERENCE)
+                + "\nLimited-preference statement: " + new Gson().toJson(ComparisonNarrative.LIMITED_PREFERENCE)
+                + "\nFill only preferredVehicleId and explanation. Explanation is one string of newline-separated statements. "
+                + "Include every required statement exactly once; select and order optional trade-offs for the saved priorities. "
+                + "Do not add prose, bullets, headings or rewrite numbers. Use the no-preference statement when preferredVehicleId is empty. "
+                + "Otherwise include the limited-preference statement and a selected advantage for that ID; do not prefer a vehicle with "
+                + "conflicting or unknown buyer checks. A measurable advantage is necessary, not a reason to force a choice: "
+                + "leave preference empty when buyer priorities (especially reliability) cannot be supported. Schema is supplied separately.";
     }
     public String buildChecklistPrompt(Vehicle vehicle, VehicleKnowledge knowledge, MissingInformationResult missing) {
         return buildChecklistPrompt(vehicle,knowledge,missing,new ca.yorku.eecs3311.usedcar.tool.ChecklistPlanner().build(vehicle,knowledge,missing));

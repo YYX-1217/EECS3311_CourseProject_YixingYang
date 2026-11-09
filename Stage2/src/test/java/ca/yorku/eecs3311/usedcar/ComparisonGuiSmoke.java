@@ -60,8 +60,36 @@ public final class ComparisonGuiSmoke {
                 String text=output(panel.get());check(text.contains("AI_UNAVAILABLE")&&text.contains("DETERMINISTIC SIDE-BY-SIDE")&&!text.contains("AI trade-off explanation (advisory):"),"Provider failure preserves metrics and removes prior narrative");
                 check(f.currentVehicle().equals(first)&&f.preferences().equals(prefs),"Failed GUI comparison preserves session");
             });
+            groundedAndCancellable();
             System.out.println("PASS: F09 GUI entry/edit/cancel, background comparison, responsive EDT, stale-result rejection and evidence-preserving failure.");
         }finally{release.countDown();if(frame.get()!=null)SwingUtilities.invokeAndWait(()->frame.get().dispose());}
+    }
+    private static void groundedAndCancellable() throws Exception {
+        var panel=new AtomicReference<JPanel>();var frame=new AtomicReference<JFrame>();
+        var calls=new AtomicInteger();var started=new CountDownLatch(1);var retryMode=new AtomicBoolean();
+        var retry=ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.guiClient(calls,started);
+        var fake=new ComparisonChecks.Fake(){public String generateStructured(String p,String schema){return retryMode.get()?retry.generateStructured(p,schema):super.generateStructured(p,schema);}};
+        var facade=ComparisonReliabilityChecks.facade(fake);
+        try {
+            SwingUtilities.invokeAndWait(()->{var gui=new UsedCarGUI(facade);panel.set(gui.panel());frame.set(gui.show());button(panel.get(),"comparisonRun").doClick();});
+            awaitReady(panel.get());
+            SwingUtilities.invokeAndWait(()->{
+                String text=output(panel.get());check(text.contains("AI_SUCCESS")&&text.contains("18707.00")&&text.contains("19911.25")&&text.contains("Vehicle B has lower mileage")&&text.contains("local knowledge unavailable"),"Actual GUI must display grounded Corolla/Mazda evidence");
+                // Replay the baseline defect through the real UI. Correct metrics must not conceal fabricated prose.
+                var j=com.google.gson.JsonParser.parseString(ComparisonChecks.response(fake.prompt)).getAsJsonObject();
+                j.addProperty("explanation",j.get("explanation").getAsString()+"\nVehicle A costs CAD 1.");fake.fixed=j.toString();
+                button(panel.get(),"comparisonRun").doClick();
+            });
+            awaitReady(panel.get());
+            SwingUtilities.invokeAndWait(()->{
+                String text=output(panel.get());check(text.contains("AI_UNAVAILABLE")&&text.contains("18707.00")&&!text.contains("Vehicle A costs CAD 1"),"GUI must withhold invalid prose and retain exact Java totals");
+                retryMode.set(true);button(panel.get(),"comparisonRun").doClick();
+            });
+            check(started.await(3,TimeUnit.SECONDS),"Transient request did not start");
+            SwingUtilities.invokeAndWait(()->{check(button(panel.get(),"comparisonStop").isEnabled(),"EDT must remain responsive during retry delay");button(panel.get(),"comparisonStop").doClick();});
+            awaitReady(panel.get());Thread.sleep(600);
+            SwingUtilities.invokeAndWait(()->check(calls.get()==1&&output(panel.get()).contains("cancelled"),"Cancel must prevent the automatic second request"));
+        } finally {if(frame.get()!=null)SwingUtilities.invokeAndWait(()->frame.get().dispose());}
     }
     private static void awaitReady(Container panel)throws Exception{
         long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);var ready=new AtomicBoolean();

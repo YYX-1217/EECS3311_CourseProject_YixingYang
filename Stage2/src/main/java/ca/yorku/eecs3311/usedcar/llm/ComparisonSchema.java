@@ -11,7 +11,9 @@ public final class ComparisonSchema {
         properties.add("firstVehicleId",text(evidence.first().vehicle().id()));
         properties.add("secondVehicleId",text(evidence.second().vehicle().id()));
         properties.add("preferredVehicleId",text("",evidence.first().vehicle().id(),evidence.second().vehicle().id()));
-        properties.add("explanation",text());
+        var explanation = text();
+        explanation.addProperty("description", "Newline-separated exact statements from the supplied evidence catalog; no additional prose.");
+        properties.add("explanation",explanation);
         var metrics = new JsonObject();
         evidence.metrics().forEach((key,value)->metrics.add(key,text(value)));
         properties.add("metricSummary",object(metrics));
