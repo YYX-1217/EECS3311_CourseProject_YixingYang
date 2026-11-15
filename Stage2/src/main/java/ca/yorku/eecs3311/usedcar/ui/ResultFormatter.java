@@ -35,7 +35,7 @@ public final class ResultFormatter {
                 + "Reliability priority: " + preference.reliabilityPriority() + "\n"
                 + "Fuel economy priority: " + preference.fuelEconomyPriority() + " (priorities: 0 = neutral; 1-5 increasing importance)\n"
                 + "Accident tolerance: " + preference.accidentTolerance() + " (UNKNOWN = neutral)\n"
-                + "Body type and priorities are stored; scoring and recommendation use remains planned.\n";
+                + "Body type is stored but is not checked as an F07 body-type constraint. Reliability and fuel-economy priorities inform Strategy guidance and supported evaluation/recommendation workflows.\n";
     }
 
     public static String format(PreparationResult result) {

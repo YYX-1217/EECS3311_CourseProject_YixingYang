@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /** F11 UI: local actions use the displayed cycle token; network work never runs on the EDT. */
-public final class ClarificationPanel extends JPanel {
+public final class ClarificationPanel extends WorkspaceUI.Feature {
     private final UsedCarApplicationFacade facade;
     private final Runnable changed;
     private final JTextArea status=new JTextArea(17,70);
     private final JComboBox<String> questions=new JComboBox<>();
     private final JComboBox<ClarificationField> revisit=new JComboBox<>(ClarificationField.values());
     private final JTextField answer=new JTextField(18);
+    private final JPanel questionCards=WorkspaceUI.column();
     private final java.util.List<JButton> buttons=new ArrayList<>();
     private String cycle;
     private boolean busy;
@@ -23,22 +24,22 @@ public final class ClarificationPanel extends JPanel {
         super(new BorderLayout(6,6));this.facade=facade;this.changed=changed;
         status.setName("clarificationStatus");status.setEditable(false);status.setLineWrap(true);status.setWrapStyleWord(true);
         questions.setName("clarificationField");answer.setName("clarificationAnswer");revisit.setName("clarificationRevisitField");
-        var controls=new JPanel(new GridLayout(0,1));var top=new JPanel(new FlowLayout(FlowLayout.LEFT));
+        var controls=WorkspaceUI.column();var top=new JPanel(new WorkspaceUI.WrapLayout());
         top.add(button("Start / Show","clarificationStart",()->background(()->facade.startClarification(false))));
         top.add(button("Next gaps","clarificationNext",()->background(()->facade.startClarification(true))));
-        top.add(button("Refresh status","clarificationShow",this::refresh));controls.add(top);
-        var row=new JPanel(new FlowLayout(FlowLayout.LEFT));row.add(new JLabel("Target:"));row.add(questions);row.add(answer);
+        top.add(button("Refresh status","clarificationShow",this::refresh));controls.add(top);controls.add(Box.createVerticalStrut(8));
+        var row=new JPanel(new WorkspaceUI.WrapLayout());row.add(new JLabel("Target:"));row.add(questions);row.add(answer);
         row.add(button("Answer","clarificationSubmit",()->local(()->facade.submitClarification(cycle,field(),answer.getText()))));
         row.add(button("Skip","clarificationSkip",()->local(()->facade.skipClarification(cycle,field(),false))));
-        row.add(button("Unknown","clarificationUnknown",()->local(()->facade.skipClarification(cycle,field(),true))));controls.add(row);
-        var conflict=new JPanel(new FlowLayout(FlowLayout.LEFT));
+        row.add(button("Unknown","clarificationUnknown",()->local(()->facade.skipClarification(cycle,field(),true))));controls.add(WorkspaceUI.card("Answer a question",row));controls.add(Box.createVerticalStrut(12));
+        var conflict=new JPanel(new WorkspaceUI.WrapLayout());
         conflict.add(button("Keep existing","clarificationKeep",()->local(()->facade.resolveClarification(cycle,field(),false))));
         conflict.add(button("Accept new","clarificationAccept",()->local(()->facade.resolveClarification(cycle,field(),true))));
-        conflict.add(revisit);conflict.add(button("Revisit field","clarificationRevisit",()->local(()->facade.revisitClarification((ClarificationField)revisit.getSelectedItem()))));controls.add(conflict);
-        var resume=new JPanel(new FlowLayout(FlowLayout.LEFT));
+        conflict.add(revisit);conflict.add(button("Revisit field","clarificationRevisit",()->local(()->facade.revisitClarification((ClarificationField)revisit.getSelectedItem()))));controls.add(WorkspaceUI.card("Resolve or revisit",conflict));controls.add(Box.createVerticalStrut(12));
+        var resume=new JPanel(new WorkspaceUI.WrapLayout());
         resume.add(button("Continue Risk Evaluation","clarificationRisk",()->{String token=cycle;background(()->facade.continueClarification(token,false));}));
-        resume.add(button("Continue Checklist","clarificationChecklist",()->{String token=cycle;background(()->facade.continueClarification(token,true));}));controls.add(resume);
-        add(controls,BorderLayout.NORTH);add(new JScrollPane(status));
+        resume.add(button("Continue Checklist","clarificationChecklist",()->{String token=cycle;background(()->facade.continueClarification(token,true));}));controls.add(WorkspaceUI.card("Continue with saved answers",resume));
+        workspace(controls,WorkspaceUI.split(JSplitPane.VERTICAL_SPLIT,WorkspaceUI.card("Current questions",WorkspaceUI.columnScroll(questionCards)),WorkspaceUI.resultCard("Clarification status & full history",status),0.38));
         addComponentListener(new java.awt.event.ComponentAdapter(){public void componentShown(java.awt.event.ComponentEvent e){if(!busy)refresh();}});
         refresh();
     }
@@ -48,8 +49,16 @@ public final class ClarificationPanel extends JPanel {
         cycle=state.cycleId();var selected=questions.getSelectedItem();questions.removeAllItems();state.batch().questions().forEach(q->questions.addItem(q.id()));
         if(selected!=null&&state.batch().questions().stream().anyMatch(q->q.id().equals(selected)))questions.setSelectedItem(selected);
         status.setText(ResultFormatter.format(state));status.setCaretPosition(0);
+        questionCards.removeAll();
+        for(var q:state.batch().questions()){
+            var response=state.responses().get(q.field());
+            var text=new WorkspaceUI.WrappingText(q.question()+"\n"+q.reason()+(response.answer().isBlank()?"":"\nAnswer: "+response.answer()));text.setFont(WorkspaceUI.FONT);
+            var card=WorkspaceUI.card(q.field().label()+" / "+q.priority()+" / "+state.responses().get(q.field()).status(),text);
+            questionCards.add(card);questionCards.add(Box.createVerticalStrut(12));WorkspaceUI.style(card);
+        }
+        questionCards.revalidate();questionCards.repaint();
     }
-    private void refresh(){facade.currentClarification().ifPresentOrElse(this::display,()->{cycle=null;questions.removeAllItems();status.setText("Save a vehicle, then Start clarification. Start/Next may send one AI request; answers and Refresh are local. Finish each cycle before Next, Revisit or Continue. Unknown and Skip preserve data.");});}
+    private void refresh(){facade.currentClarification().ifPresentOrElse(this::display,()->{cycle=null;questions.removeAllItems();questionCards.removeAll();questionCards.revalidate();questionCards.repaint();status.setText("Save a vehicle, then Start clarification. Start/Next may send one AI request; answers and Refresh are local. Finish each cycle before Next, Revisit or Continue. Unknown and Skip preserve data.");});}
     private void local(Supplier<ClarificationState> action){try{display(action.get());answer.setText("");changed.run();}catch(IllegalArgumentException|IllegalStateException e){status.setText("ERROR: "+e.getMessage()+"\nRefresh status to review the saved cycle.");}}
     private void background(Supplier<Object> action){
         var expected=facade.currentVehicle();

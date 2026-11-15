@@ -15,7 +15,7 @@ public final class ReportGuiSmoke {
     private static JButton button(Container p,String name){return (JButton)named(p,name);}
     private static String text(Container p){return ((JTextArea)named(p,"reportResults")).getText();}
     private static ReportPanel reportPanel(Container p){if(p instanceof ReportPanel report)return report;for(Component c:p.getComponents())if(c instanceof Container box){var found=reportPanel(box);if(found!=null)return found;}return null;}
-    private static void select(Container p){for(Component c:p.getComponents()){if(c instanceof JTabbedPane tabs){for(int i=0;i<tabs.getTabCount();i++)if(tabs.getTitleAt(i).equals("Recommendation / Report"))tabs.setSelectedIndex(i);}if(c instanceof Container box)select(box);}}
+    private static void select(Container p){WorkspaceGuiSmoke.select(p,"Recommendation / Report");}
     private static void ready(Container p)throws Exception{var ready=new AtomicBoolean();long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(8);while(System.nanoTime()<end){SwingUtilities.invokeAndWait(()->ready.set(button(p,"reportGenerate").isEnabled()));if(ready.get())return;Thread.sleep(30);}throw new AssertionError("F12 Swing worker timeout");}
     public static void main(String[] args)throws Exception{
         var started=new CountDownLatch(1);var release=new CountDownLatch(1);var count=new AtomicInteger();
@@ -42,5 +42,6 @@ public final class ReportGuiSmoke {
             check(Files.readString(export).contains("18707.00"),"Export retains exact report text");
             System.out.println("PASS: F12 actual Swing report tab, fictional Corolla, background generation, stale rejection, cached show, UTF-8/no-overwrite export, F11 update, AI unavailable and insufficient evidence.");
         }finally{release.countDown();if(frame.get()!=null)SwingUtilities.invokeAndWait(()->frame.get().dispose());}
+        ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.timeoutGui();
     }
 }

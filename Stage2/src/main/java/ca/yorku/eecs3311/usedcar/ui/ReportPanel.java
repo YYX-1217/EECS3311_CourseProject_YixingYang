@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.concurrent.*;
 
 /** F12 boundary: shared report formatting, asynchronous generation and explicit local export. */
-public final class ReportPanel extends JPanel {
+public final class ReportPanel extends WorkspaceUI.Feature {
     private final UsedCarApplicationFacade facade;
     private final JTextArea output=new JTextArea(20,75);
     private final JButton generate=new JButton("Generate / Regenerate Report");
@@ -18,7 +18,7 @@ public final class ReportPanel extends JPanel {
     public ReportPanel(UsedCarApplicationFacade facade){
         super(new BorderLayout(6,6));this.facade=facade;generate.setName("reportGenerate");show.setName("reportShow");save.setName("reportExport");
         output.setName("reportResults");output.setEditable(false);output.setLineWrap(true);output.setWrapStyleWord(true);
-        var controls=new JPanel(new FlowLayout(FlowLayout.LEFT));controls.add(generate);controls.add(show);controls.add(save);add(controls,BorderLayout.NORTH);add(new JScrollPane(output));
+        var controls=new JPanel(new WorkspaceUI.WrapLayout());controls.add(generate);controls.add(show);controls.add(save);WorkspaceUI.primary(generate);workspace(controls,WorkspaceUI.resultCard("Recommendation / Report",output));
         show.addActionListener(e->showSaved());generate.addActionListener(e->generate());save.addActionListener(e->chooseExport());
         addComponentListener(new java.awt.event.ComponentAdapter(){public void componentShown(java.awt.event.ComponentEvent e){if(generate.isEnabled())showSaved();}});
         // A visible report must not remain apparently current after another tab changes evidence.

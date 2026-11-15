@@ -96,6 +96,7 @@ public final class ResponseParser {
     }
     public RiskAssessment validateRiskAssessment(RiskAssessment assessment,RiskEvidence evidence){
         RiskAgeValidator.validate(assessment,evidence.yearContext());
+        RiskGroundingValidator.validate(assessment,evidence);
         if(!assessment.risks().containsAll(evidence.requiredRisks()))throw new IllegalArgumentException("Risk response omitted or altered deterministic conflicts.");
         if(!assessment.uncertainties().containsAll(evidence.requiredUncertainties()))throw new IllegalArgumentException("Risk response omitted or altered required uncertainties/source limitations.");
         if(assessment.riskLevel().equals("Low")&&!evidence.requiredRisks().isEmpty())throw new IllegalArgumentException("Low risk contradicts unresolved buyer constraints.");
@@ -218,6 +219,9 @@ public final class ResponseParser {
                         ||priorityRank(item.priority())<priorityRank(original.priority()))
                     throw new IllegalArgumentException("Checklist changed an evidence-grounded action, source, section or minimum priority.");
                 String text=item.reason().toLowerCase(Locale.ROOT);
+                // F10 consumes fixed metric/CAD evidence; reject the observed km-to-miles relabeling.
+                if(java.util.regex.Pattern.compile("\\b[0-9][0-9, .]*[ -]?(?:miles?|mi|mpg|usd)\\b|\\busd[ :$]*[0-9]").matcher(text).find())
+                    throw new IllegalArgumentException("Checklist reason changes the fixed km, L/100 km or CAD evidence units.");
                 for(String claim:List.of("accident-free","no accidents","complete service history","full maintenance records","mechanically sound","is reliable","is defective","guaranteed","confirmed defect"))
                     if(text.contains(claim))throw new IllegalArgumentException("Checklist reason contains an unsupported condition/history claim.");
             }
@@ -227,32 +231,65 @@ public final class ResponseParser {
     private static int priorityRank(String priority){return switch(priority){case "High"->3;case "Medium"->2;default->1;};}
 
     public java.util.List<ClarificationQuestion> parseClarificationQuestions(String response,
-            java.util.List<ca.yorku.eecs3311.usedcar.domain.ClarificationField> allowed){
-        try{
-            if(response==null||response.isBlank()||response.length()>8000)throw new IllegalArgumentException();
-            JsonObject root;
-            try(var reader=JSON.newJsonReader(new java.io.StringReader(response))){
-                root=readChecklistJson(reader,0).getAsJsonObject();
-                if(reader.peek()!=com.google.gson.stream.JsonToken.END_DOCUMENT)throw new IllegalArgumentException();
-            }
-            if(!root.keySet().equals(java.util.Set.of("questions")))throw new IllegalArgumentException();
-            var array=root.getAsJsonArray("questions");
-            if(array.isEmpty()||array.size()>3||array.size()!=allowed.size())throw new IllegalArgumentException();
-            var result=new java.util.ArrayList<ClarificationQuestion>();var seen=new java.util.HashSet<ca.yorku.eecs3311.usedcar.domain.ClarificationField>();
-            for(var value:array){
-                var item=value.getAsJsonObject();
-                if(!item.keySet().equals(java.util.Set.of("field","question","priority","reason")))throw new IllegalArgumentException();
-                for(var entry:item.entrySet())if(!entry.getValue().isJsonPrimitive()||!entry.getValue().getAsJsonPrimitive().isString())throw new IllegalArgumentException();
-                var field=ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(item.get("field").getAsString());
-                if(!allowed.contains(field)||!seen.add(field))throw new IllegalArgumentException();
-                var q=new ClarificationQuestion(field,item.get("question").getAsString(),item.get("priority").getAsString(),item.get("reason").getAsString());
-                if(!ClarificationQuestion.wordings(field).contains(q.question())||!q.reason().equals(ClarificationQuestion.REASON))throw new IllegalArgumentException();
-                if((field.key().equals("accident")||field.key().equals("maintenance"))&&!q.priority().equals("High"))throw new IllegalArgumentException();
-                result.add(q);
-            }
-            result.sort(java.util.Comparator.comparingInt(q->java.util.List.of("High","Medium","Low").indexOf(q.priority())));
-            return java.util.List.copyOf(result);
-        }catch(RuntimeException|java.io.IOException e){throw new IllegalArgumentException("Invalid clarification JSON: expected 1-3 distinct allowed fields, approved question/reason text and valid priorities.");}
+            java.util.List<ca.yorku.eecs3311.usedcar.domain.ClarificationField> allowed) {
+        if (response == null || response.isBlank())
+            throw new ClarificationFailure(ClarificationFailure.Kind.RESPONSE_PARSE_ERROR, "$", "Empty JSON response.");
+        if (response.length() > 8000)
+            throw clarificationSchema("$", "Response exceeds the 8000-character limit.");
+        final JsonElement parsed;
+        try (var reader = JSON.newJsonReader(new java.io.StringReader(response))) {
+            parsed = readChecklistJson(reader, 0);
+            if (reader.peek() != com.google.gson.stream.JsonToken.END_DOCUMENT)
+                throw new ClarificationFailure(ClarificationFailure.Kind.RESPONSE_PARSE_ERROR, "$", "Trailing JSON content.");
+        } catch (ClarificationFailure e) { throw e; }
+        catch (java.io.IOException | JsonParseException e) {
+            throw new ClarificationFailure(ClarificationFailure.Kind.RESPONSE_PARSE_ERROR, "$", "Malformed JSON; JSON only is required.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw clarificationSchema("$", "Expected bounded objects, arrays and strings without duplicate properties.");
+        }
+        if (!parsed.isJsonObject()) throw clarificationSchema("$", "Expected an object.");
+        var root = parsed.getAsJsonObject();
+        if (!root.keySet().equals(java.util.Set.of("questions")))
+            throw clarificationSchema("$", "Required property: questions; no extra properties.");
+        if (!root.get("questions").isJsonArray()) throw clarificationSchema("questions", "Expected an array.");
+        var array = root.getAsJsonArray("questions");
+        if (array.isEmpty() || array.size() > 3 || array.size() != allowed.size())
+            throw clarificationSchema("questions", "Expected exactly " + allowed.size() + " questions, one per requested target.");
+        var result = new java.util.ArrayList<ClarificationQuestion>();
+        var seen = new java.util.HashSet<ca.yorku.eecs3311.usedcar.domain.ClarificationField>();
+        for (int i = 0; i < array.size(); i++) {
+            String path = "questions[" + i + "]";
+            if (!array.get(i).isJsonObject()) throw clarificationSchema(path, "Expected an object.");
+            var item = array.get(i).getAsJsonObject();
+            if (!item.keySet().equals(java.util.Set.of("field", "question", "priority", "reason")))
+                throw clarificationSchema(path, "Required properties: field, question, priority, reason; no extra properties.");
+            for (var name : java.util.List.of("field", "question", "priority", "reason"))
+                if (!item.get(name).isJsonPrimitive() || !item.get(name).getAsJsonPrimitive().isString())
+                    throw clarificationSchema(path + "." + name, "Expected a string.");
+            final ca.yorku.eecs3311.usedcar.domain.ClarificationField field;
+            try { field = ca.yorku.eecs3311.usedcar.domain.ClarificationField.fromKey(item.get("field").getAsString()); }
+            catch (IllegalArgumentException e) { throw clarificationValidation(path + ".field", "Unsupported target."); }
+            if (!allowed.contains(field) || !seen.add(field))
+                throw clarificationValidation(path + ".field", "Target must be requested and distinct.");
+            String question = item.get("question").getAsString(), priority = item.get("priority").getAsString();
+            String reason = item.get("reason").getAsString();
+            if (!ClarificationQuestion.wordings(field).contains(question))
+                throw clarificationValidation(path + ".question", "Question must match an approved wording for its target.");
+            if (!reason.equals(ClarificationQuestion.REASON))
+                throw clarificationValidation(path + ".reason", "Expected the approved evidence-review reminder.");
+            if (!java.util.Set.of("High", "Medium", "Low").contains(priority)
+                    || ((field.key().equals("accident") || field.key().equals("maintenance")) && !priority.equals("High")))
+                throw clarificationValidation(path + ".priority", "Expected High/Medium/Low; history targets require High.");
+            result.add(new ClarificationQuestion(field, question, priority, reason));
+        }
+        result.sort(java.util.Comparator.comparingInt(q -> java.util.List.of("High", "Medium", "Low").indexOf(q.priority())));
+        return java.util.List.copyOf(result);
+    }
+    private static ClarificationFailure clarificationSchema(String path, String rule) {
+        return new ClarificationFailure(ClarificationFailure.Kind.RESPONSE_SCHEMA_ERROR, path, rule);
+    }
+    private static ClarificationFailure clarificationValidation(String path, String rule) {
+        return new ClarificationFailure(ClarificationFailure.Kind.CLARIFICATION_VALIDATION_ERROR, path, rule);
     }
 
     public EvaluationReport parseReport(String response){
@@ -273,8 +310,9 @@ public final class ResponseParser {
         if(!evidence.strengths().containsAll(report.strengths()))throw new IllegalArgumentException("Report field strengths introduced unsupported evidence.");
         reportSet("risks",report.risks(),evidence.risks());reportSet("constraintConflicts",report.constraintConflicts(),evidence.conflicts());reportSet("missingInformation",report.missingInformation(),evidence.uncertainties());
         reportSet("inspectionPriorities",report.inspectionPriorities(),evidence.priorities());reportSet("nextSteps",report.nextSteps(),evidence.nextSteps());
+        ReportNarrativeValidator.validate(report.explanation(),evidence.deterministic().vehicle());
         String prose=report.explanation().toLowerCase(Locale.ROOT);
-        if(prose.codePoints().anyMatch(Character::isDigit)||prose.matches("(?s).*\\b(age|aged|years?|engine|transmission|brakes?|tires?|battery|frame|rust|damage|defects?|faults?|certification|carfax|certified|guaranteed|guarantee|roadworthy|accident[- ]free|mechanically sound|no defects|complete service history|insurance quote|market value)\\b.*"))throw new IllegalArgumentException("Report explanation contains unsupported numeric, age, certification or condition claims.");
+        if(prose.codePoints().anyMatch(Character::isDigit)||prose.matches("(?s).*\\b(age|aged|years?|engine|transmission|brakes?|tires?|battery|frame|rust|damage|defects?|faults?|certification|carfax|certified|guaranteed|guarantee|roadworthy|accident[- ]free|mechanically sound|no defects|insurance quote|market value)\\b.*"))throw new IllegalArgumentException("Report explanation contains unsupported numeric, age, certification or condition claims.");
         if(!evidence.conflicts().isEmpty()&&prose.matches("(?s).*(no (buyer |budget |constraint )?conflicts|all (buyer )?constraints (are )?(met|satisfied)|within (your|the) budget).*"))throw new IllegalArgumentException("Report explanation contradicts buyer constraints.");
         return report;
     }

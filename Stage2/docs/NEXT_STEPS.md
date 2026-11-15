@@ -1,4 +1,16 @@
-# Ordered development plan
+# Next steps
+
+## Current priorities — 2026-11-15
+
+1. Review the corrected F10/F12 results and the [current verification record](IMPLEMENTATION_STATUS.md). Final real F10/F12/F11/F09 requests passed; no automatic additional calls are needed. Future 503/timeouts remain external availability risks and should retain safe fallback.
+2. For the final demonstration, launch the rebuilt GUI/CLI with the existing secure configuration, use clearly fictional data and demonstrate both valid AI output and safe unavailable/unknown behavior. Review narrative claims manually; targeted English validation is not universal fact checking.
+3. Confirm whether the pre-existing deletion of `../EECS3311_Stage1_YixingYang.pdf` was intentional. Its original tracked contents are recoverable exactly from HEAD; this task leaves the deletion unchanged pending that decision.
+4. Complete/review the final implementation report, updated submission UML, feature videos and timestamp index, AI tools/model/token/cost record and weekly GitHub evidence. The 398-test pass and live samples do not certify these deliverables. Durable sessions, curated real vehicle data and broader semantic verification remain limitations. Stage 3 KUMA remains separate.
+5. Any future stage/commit/push requires an explicit request. All existing local changes and this repair remain uncommitted; no history or remote state was changed.
+
+## Historical foundation development plan
+
+The original ordered plan below is retained as development history; its proposed implementation steps and checkout-location notes are not current setup instructions.
 
 This is a plan, not a record of completed work. Continue all twelve original features. Keep deterministic calculations independent of the LLM and use the same application services from both interfaces.
 

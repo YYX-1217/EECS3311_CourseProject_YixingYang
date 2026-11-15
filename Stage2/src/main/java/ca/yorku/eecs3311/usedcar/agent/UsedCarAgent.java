@@ -88,7 +88,7 @@ public final class UsedCarAgent {
             var parser=new ResponseParser();String prompt=new PromptBuilder().buildRiskPrompt(evidence);
             var assessment=parser.validateRiskAssessment(parser.parseRiskAssessment(llmClient.generateStructured(prompt,RiskAssessmentSchema.json())),evidence);
             return new RiskEvaluation("AI_SUCCESS",assessment,evidence,"AI interpretation of the displayed evidence; advisory only.");
-        }catch(RiskAgeValidator.Rejected e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,e.getMessage()+" Deterministic evidence remains available; retry explicitly. No automatic retry.");}
+        }catch(RiskAgeValidator.Rejected | RiskGroundingValidator.Rejected e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,e.getMessage()+" Deterministic evidence remains available; retry explicitly. No automatic retry.");}
         catch(IllegalArgumentException e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,"Risk response rejected by structural/evidence validation. Deterministic evidence remains available; retry explicitly.");}
         catch(RuntimeException e){return new RiskEvaluation("AI_UNAVAILABLE",null,evidence,"AI request failed or is not configured. Check status/configuration; deterministic evidence remains available. No automatic retry.");}
     }
@@ -199,6 +199,7 @@ public final class UsedCarAgent {
         String message="Deterministic checklist; AI unavailable or not configured. No automatic retry. This does not replace a professional pre-purchase inspection.";
         final String response;
         try{response=llmClient.generateStructured(new PromptBuilder().buildChecklistPrompt(vehicle,knowledge,missing,baseline),ChecklistSchema.json());}
+        catch(LLMFailure e){return new ChecklistEvaluation(java.util.UUID.randomUUID().toString(),vehicle,result,status,e.diagnostic()+" "+message,knowledgeStatus,missing,java.util.Set.of());}
         catch(RuntimeException e){return new ChecklistEvaluation(java.util.UUID.randomUUID().toString(),vehicle,result,status,message,knowledgeStatus,missing,java.util.Set.of());}
         try{
             var parser=new ResponseParser();result=parser.validateChecklist(parser.parseChecklist(response),baseline);status="AI_SUCCESS";
@@ -217,7 +218,15 @@ public final class UsedCarAgent {
             String prompt=new PromptBuilder().buildClarificationPrompt(missing,preference,targets,listingNeeds);
             var questions=new ResponseParser().parseClarificationQuestions(llmClient.generateStructured(prompt,ClarificationSchema.json(targets)),targets);
             return new ClarificationBatch("AI_SUCCESS","AI prioritized approved, grounded questions; answers require user input and deterministic validation.",questions);
-        }catch(RuntimeException e){return new ClarificationBatch("FALLBACK","Deterministic questions: AI unavailable or response rejected. No automatic retry; no vehicle values inferred.",targets.stream().map(ClarificationQuestion::fallback).toList());}
+        } catch (LLMFailure e) { return clarificationFallback(targets, e.diagnostic()); }
+        catch (ClarificationFailure e) { return clarificationFallback(targets, e.diagnostic()); }
+        catch (RuntimeException e) { return clarificationFallback(targets, "[UNKNOWN_FAILURE] Clarification generation failed without classified provider metadata."); }
+    }
+    private ClarificationBatch clarificationFallback(List<ClarificationField> targets, String diagnostic) {
+        return new ClarificationBatch("FALLBACK", diagnostic
+                + " Deterministic questions remain available. No automatic retry; no vehicle values inferred."
+                + " Start / Show reuses this cycle. To retry AI for the same gaps, start a new application session and save the vehicle again.",
+                targets.stream().map(ClarificationQuestion::fallback).toList());
     }
 
     private MissingInformationResult withListingNeeds(MissingInformationResult missing,java.util.Set<ClarificationField> listingNeeds){

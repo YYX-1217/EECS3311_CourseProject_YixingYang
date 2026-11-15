@@ -12,8 +12,10 @@ public final class ChecklistSchema {
             if(field.equals("priority")){var values=new JsonArray();for(String p:new String[]{"High","Medium","Low"})values.add(p);value.add("enum",values);}
             fields.add(field,value);
         }
+        // A finite maxItems expands the provider grammar for every item position.
+        // Keep the 40-item limit in ResponseParser; exact plan membership is validated in Java.
         var sections=new JsonObject();
-        for(String section:InspectionChecklist.SECTIONS){var array=new JsonObject();array.addProperty("type","array");array.add("items",object(fields));array.addProperty("minItems",1);array.addProperty("maxItems",40);sections.add(section,array);}
+        for(String section:InspectionChecklist.SECTIONS){var array=new JsonObject();array.addProperty("type","array");array.add("items",object(fields));array.addProperty("minItems",1);sections.add(section,array);}
         var root=new JsonObject();root.add("sections",object(sections));return object(root).toString();
     }
     private static JsonObject object(JsonObject fields){

@@ -1,41 +1,53 @@
 # Implementation status
 
-Updated: 2026-11-07 (America/New_York; same local date as Toronto). This remains a partial implementation, not a final Stage 2 submission.
+Updated: 2026-11-15. These statements describe the current local working tree, including uncommitted changes. Implemented workflows are not proof of exhaustive AI quality or completion of all submission materials. The GUI has twelve independent F01–F12 workspaces; the CLI uses distinct commands through the same facade/agent/services. Save and calculate combines deterministic preparation tasks. Each workspace shows its own results.
 
-**WORKING SUBSET** means the described operation runs end to end; it does not mark the entire original feature complete. **FOUNDATION ONLY** means a boundary exists without the final behavior. **PLANNED** means no implementation claim.
+| Feature | Implemented behavior | Evidence and remaining limits |
+|---|---|---|
+| F01 | Validated current-vehicle creation/editing; combined preparation save; F09 second vehicle slot | Offline verified; in-memory, no durable vehicle database |
+| F02 | Listing extraction, partial draft, source checks, correction and explicit confirmation | Offline verified; previous audit validated a real draft; user reports prior live success; seller claims unverified |
+| F03 | All seven preferences, independent save/load, Strategy use | Offline verified; session only; body-type matching is not implemented |
+| F04 | Missing/uncertain data, sufficiency, source conflicts, F02/F11 integration and dedicated workspace | Offline verified; broader free-text interpretation is limited |
+| F05 | CSV repository/tool, provenance, no-match/error handling, F08–F12 evidence use | Offline verified; instructional data, not reliability research |
+| F06 | Fuel, tax, complete-input first-year cost and missing components; dedicated workspace | Offline verified; calculation action still uses combined preparation; supplied assumptions, fixed units |
+| F07 | Budget, mileage, transmission and accident rules; UNKNOWN versus CONFLICT; dedicated workspace | Offline verified; no body-type rule or separate constraint editor |
+| F08 | Evidence/Strategy synthesis, year/grounding checks, safe rejection, cache-aware GUI | AUD-01/02/03 offline verified; prior audit live success predates these corrections; bounded English checks are not universal fact checking |
+| F09 | Symmetric A/B evidence, bounded grounded narrative/preference and transient retry | Offline verified; current live HTTP 200 / AI_SUCCESS in one attempt; previous 503/timeout not reproduced |
+| F10 | Six-section typed checklist, grounded actions, completion, safe classified fallback | Offline adapter/GUI/CLI verified; six provider maxItems bounds removed; metric-unit guard; final live HTTP 200 / AI_SUCCESS |
+| F11 | Bounded questions, answer/skip/unknown, keep/accept conflicts, history, F08/F10 continuation | Offline verified; current live HTTP 200 / AI_SUCCESS; prior timeout not reproduced; no cross-session restoration |
+| F12 | Four-category recommendation, authoritative evidence/F08 reuse, cache invalidation, UTF-8 export | FIN-01 history contradictions rejected; current live HTTP 200 / AI_SUCCESS and matching UTF-8 export; earlier timeout cause unverified |
 
-| Feature | Status | Actually working | Still required |
-|---|---|---|---|
-| F01 | WORKING SUBSET | Manual fields, validation/normalization, create/replace current vehicle through GUI/CLI, identity retained for edit | Independent vehicle-add/edit/save controls; explicit provenance; durable vehicle storage (F09 now provides two in-memory slots) |
-| F02 | IMPLEMENTED; LIVE EXTRACTION UNVERIFIED | Gemini-backed command/agent/prompt/parser/draft/F04 flow; CLI and background Swing review/edit/confirm/cancel; source retention and stale-baseline protection | Real Gemini F02 quality verification; no independent verification of seller claims |
-| F03 | WORKING SUBSET | All seven validated preferences, independent CLI/GUI save/load, neutral values and in-memory storage | Local persistence and full downstream AI use |
-| F04 | WORKING SUBSET | Missing/uncertain fields, conservative sufficiency and structured source conflicts through CLI/GUI | Prioritized gaps and broader uncertain-source interpretation; F02 now supports partial drafts and manual review of conflicts |
-| F05 | WORKING SUBSET | Local CSV repository, source labels, normalized lookup, no-match and malformed/I/O handling | Real curated data and integration into planned report features (F09 comparison is implemented) |
-| F06 | WORKING SUBSET | Fuel, optional tax and complete-input first-year estimate; exact decimal arithmetic; unknown components preserved | Independent estimate-cost command/panel; durable assumptions/results; wider formats/units (F08 now reuses matching in-memory results) |
-| F07 | WORKING SUBSET | Budget, mileage, transmission and accident rules; distinct UNKNOWN and CONFLICT findings | Dedicated controls and report integration (F08/F09 integration is implemented) |
-| F08 | IMPLEMENTED; LIVE UNVERIFIED | Multi-tool evidence collection, matching saved cost reuse, automatic/manual strategy, structured Gemini request, strict RiskAssessment/evidence validation, CLI and background GUI; insufficient/unavailable states preserve evidence | Live-model F08 verification; semantic claims remain advisory and require review |
-| F09 | IMPLEMENTED; LIVE UNVERIFIED | Separate validated A/B records, shared cost assumptions, symmetric tools, immutable side-by-side metrics, structured Gemini narrative/preference, strict parser, CLI and background GUI, deterministic failure output | Live F09 verification; arbitrary narrative truth needs review; fixed CAD/km units and in-memory storage only |
-| F10 | IMPLEMENTED; LIVE UNVERIFIED | Six grouped sections, stable typed items, priorities/reasons/source attribution, F04 + local tool orchestration, structured AI enhancement, usable deterministic fallback, GUI/CLI local completion and generation freshness | Live model verification and human acceptance; in-memory only; reasons require review; not a professional inspection |
-| F11 | IMPLEMENTED; LIVE UNVERIFIED | Up to three typed F04/F02-context questions, structured AI prioritization with useful fallback, validated answers/skip/unknown, explicit keep/accept, session history, stale-result guards and actual F08/F10 resume through GUI/CLI | Live provider acceptance; in-memory only; bounded wording; partial F02 drafts require prior correction/confirmation |
-| F12 | IMPLEMENTED; LIVE UNVERIFIED | Original four-category typed report, current tool evidence and validated risk reuse, Strategy/Simple Factory guidance, strict structured recommendation, session freshness, GUI/CLI and explicit create-new UTF-8 export | Live provider quality/schema acceptance; semantic prose review; final course deliverables remain separate |
-
-`PreparationResult` is not an `EvaluationReport` or `RiskAssessment`. GUI/CLI expose deterministic preparation, F02 analysis, F08 risk evaluation and F09 comparison and F10 checklists plus F11 clarification/resumption, not all final major features. Unknown transmission/history values remain explicitly UNKNOWN when the corresponding preference is set; strategy selection does not change F07 findings.
+`PreparationResult` remains distinct from `RiskAssessment` and `EvaluationReport`. Unknown values remain unknown; AI failure preserves deterministic evidence. F10 fallback and F12 unavailable output are not fabricated AI recommendations.
 
 ## Pattern status
 
-| Pattern | Status | Evidence |
-|---|---|---|
-| Facade | WORKING | UsedCarApplicationFacade hides tools/session and serves both boundaries |
-| Command | WORKING SUBSET | Preparation, listing analysis risk evaluation and comparison commands are invoked by both GUI and CLI |
-| Adapter | IMPLEMENTED; LIVE UNVERIFIED | GeminiAdapter performs real HTTP/JSON adaptation; explicit CLI connection test, safe status/errors and offline HTTP verification |
-| Strategy | WORKING SUBSET | Three real priority-guidance policies invoked through EvaluationStrategy by the agent |
-| Simple Factory | WORKING SUBSET | EvaluationStrategyFactory creates automatic/manual policies used by CLI and GUI; not formal GoF Factory Method |
+Strategy, Adapter, argument-based Simple Factory, Command and Facade have connected implementations. `EvaluationStrategyFactory` returns concrete policies through the `EvaluationStrategy` interface; formal GoF Factory Method inheritance is not claimed. UI code invokes shared services/commands rather than duplicating business logic. Acceptance of course submission materials remains a separate review.
 
-Facade, Command, Strategy and a Simple Factory now have working relationships. Formal GoF Factory Method is not implemented or claimed; the course minimum of five completed patterns has not been established. F08 implements coordinated tool use and structured LLM reasoning with offline verification. Live Gemini verification and completion of the remaining proposed features remain development targets. The transport is implemented, but a connection test alone does not satisfy the agent-behavior requirement.
+Automatic mode chooses Reliability Focused when specified reliability priority exceeds specified fuel priority; otherwise Balanced. Budget Focused is a manual choice. See [design decisions](DESIGN_DECISIONS.md) and the [README](../README.md) for the documented Stage 1 refinement.
 
-Automatic mode chooses Reliability Focused only for two specified priorities with reliability strictly higher; otherwise it chooses Balanced. Missing/zero priorities are neutral. Budget Focused remains an explicit manual choice because the profile has no budget-priority field. Each automatic preview reselects from the latest saved preferences; manual choices persist until explicitly changed. D02 in DESIGN_DECISIONS.md records the Stage 1 clarification and pattern classification.
+## Current targeted repair — 2026-11-15
 
-## Verification boundary
+**398 JUnit passed, 0 failed**, up from the 380-test baseline: 16 new narrative/profile groups and two checklist bounds/units groups. Java 21 build/JAR, seven Swing smoke entry points, twelve-workspace navigation, 17 launcher/credential checks, 36 actual CLI cases and 13 cross-feature assertions passed. Focused subsets passed: F10 33, F12/profile 89, F03 1, F08 age/grounding 38, F09 24, F11 60. Subset counts overlap and are not added to 398.
+
+Exactly six authorized serial real requests were used: original F10 HTTP 400; schema-only F10 HTTP 200 with a review-discovered unit error; final F10 HTTP 200 / validated AI_SUCCESS after the unit guard; F12, F11 and F09 HTTP 200 / validated AI_SUCCESS. F12 export matched. Model/endpoint/timeouts and F09/F11 production logic were unchanged. No further requests were made. F02/F08 have earlier full-audit live evidence, not a new request in this repair.
+
+F10's controlled schema-only change removed six `maxItems: 40` values while retaining all essential fields and Java's 40-item and exact-plan checks. Provider grammar complexity is supported by official documentation, but the server returned only generic INVALID_ARGUMENT, so its precise internal rule remains unknown. The actual wrong-unit reasons are covered by a narrow metric/CAD prompt and Java guard.
+
+FIN-01's exact contradictions and observed summary failed three pre-fix regression tests. The new targeted history validator checks the free explanation against saved claims; other report fields remain constrained to authoritative evidence. Unknown-history gates, legitimate verification/advice, category restrictions, numeric/age/cost/constraint checks, cache replacement and safe UTF-8 export are preserved. These checks are not a universal language fact checker. FIN-02 shared GUI/CLI text now accurately describes Strategy use and absent F07 body-type matching.
+
+The original root Stage 1 PDF was already deleted before this task. Its exact HEAD blob is recoverable, but deletion intent is uncertain; the working-tree deletion is left unchanged. Source DOCX/UML were not modified. Final report/UML/videos, AI usage records and submission evidence still require separate completion/review.
+
+## Historical AUD-04–06 follow-up
+
+At that checkpoint, baseline: 364 JUnit tests. Observed result: **380 passed, 0 failed** (13 new F10 adapter groups and 3 F12 timeout/payload/export groups), Java 21 compilation and JAR packaging passed. All existing Swing smoke entry points, the new HTTP 400/timeout GUI cases, twelve-workspace navigation and 17 Windows launcher/credential checks passed. Focused JUnit runs passed: F10 31, F12 73, F08/AUD-01/AUD-02 58, F11 60. These focused counts are subsets of the 380 total, not additional tests. AUD-03 GUI scenarios also passed. Tests use fictional credentials and injected transport; no real credentials were read and no live Gemini calls were made.
+
+- **AUD-04: improved, not live-verified.** Request serialization/schema tests pass. The actual F10 fixture is 10,105 UTF-8 bytes (prompt 6,744; schema 2,481). Keywords/types and exclusive schema/MIME configuration match the documented contract; model-specific complexity limits cannot be certified offline. The only production change preserves `LLMFailure.diagnostic()` in F10 fallback. The earlier HTTP 400 body/reason was not retained; schema complexity remains a hypothesis. ChecklistSchema, prompt, adapter, model and timeouts are unchanged.
+- **AUD-05: application defect not reproduced.** The real audit timeout had no response. Mocked timeout handling, export and explicit recovery pass. A fictional F11-update/F08/F12 replay uses a 6,219-byte prompt, 751-byte schema, 7,305-byte request and existing 30-second request timeout. No F12 production logic, schema, timeout or retry behavior changed. Network/provider latency remains unverified.
+- **AUD-06: current documentation synchronized.** Twelve-workspace navigation, shared operations, current verification counts and live-versus-offline evidence are distinguished. Historical milestone counts below are retained as history, not current totals.
+
+For official schema references and the exact one-request F10/F12 manual retest procedure, see the [README F10](../README.md#f10-vehicle-specific-inspection-checklist--uc10--sd05) and [README F12](../README.md#f12-personalized-purchase-recommendation-and-evaluation-report). These results do not certify the final report, updated submission UML, demonstration videos, weekly GitHub activity, Stage 3 KUMA validation or grading acceptance.
+
+## Historical verification milestones
 
 Java 21 compilation, executable JAR/demo, 168 JUnit tests (150 prior tests plus 18 F10 tests), interactive CLI automatic selection, 10 targeted factory checks and Swing smoke operations were run. Factory tests include the 36 valid priority combinations, neutral/null input, policy behavior, manual overrides and saved-profile changes; GUI checks cover automatic/manual transitions and saved versus unsaved edits. The GUI smoke uses real Swing components and button listeners on the EDT, opens and disposes an actual frame, and renders only its own panel. It is not a feature demonstration video or an exhaustive manual desktop acceptance test.
 

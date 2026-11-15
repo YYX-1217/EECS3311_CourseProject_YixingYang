@@ -12,7 +12,7 @@ public final class ChecklistGuiSmoke {
     private static Component named(Container p,String name){for(Component c:p.getComponents()){if(name.equals(c.getName()))return c;if(c instanceof Container box){var found=named(box,name);if(found!=null)return found;}}return null;}
     private static JButton button(Container p,String name){return (JButton)named(p,name);}
     private static String status(Container p){return ((JTextArea)named(p,"checklistStatus")).getText();}
-    private static void selectTab(Container p){for(Component c:p.getComponents()){if(c instanceof JTabbedPane tabs){for(int i=0;i<tabs.getTabCount();i++)if(tabs.getTitleAt(i).equals("Inspection Checklist"))tabs.setSelectedIndex(i);}if(c instanceof Container box)selectTab(box);}}
+    private static void selectTab(Container p){WorkspaceGuiSmoke.select(p,"Inspection Checklist");}
     public static void main(String[] args)throws Exception{
         var started=new CountDownLatch(1);var release=new CountDownLatch(1);var sequence=new AtomicInteger();
         var llm=new ChecklistChecks.Fake(){public String generateStructured(String p,String s){
@@ -61,6 +61,7 @@ public final class ChecklistGuiSmoke {
             });
             System.out.println("PASS: F10 actual GUI launch, grouped items, background generation, stale rejection, local check/uncheck/reload and usable fallback.");
         }finally{release.countDown();if(frame.get()!=null)SwingUtilities.invokeAndWait(()->frame.get().dispose());}
+        ca.yorku.eecs3311.usedcar.llm.ChecklistGeminiChecks.httpGui();
     }
     private static void ready(Container p)throws Exception{
         var ready=new AtomicBoolean();long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);

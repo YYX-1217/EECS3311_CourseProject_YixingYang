@@ -1,4 +1,6 @@
-# Authored file inventory
+# Historical foundation file inventory
+
+This list records the original foundation slice, not the current complete source tree or final submission manifest. Later F01–F12 implementations, workspace UI and audit regression files are described in [current traceability](STAGE1_TRACEABILITY.md). From Stage2, `Get-ChildItem .\src -File -Recurse` lists the current source files. Build/test artifacts and local credentials are not submission source files.
 
 Paths are relative to Stage2. The pre-existing instruction PDF is listed separately and unchanged. Build/inspection outputs are excluded.
 
@@ -51,3 +53,7 @@ Pre-existing protected file: `Project-Stage2-Instruction.pdf`.
 - `src/test/java/ca/yorku/eecs3311/usedcar/FoundationChecks.java`
 - `src/test/java/ca/yorku/eecs3311/usedcar/FoundationTest.java`
 - `src/test/java/ca/yorku/eecs3311/usedcar/GuiSmoke.java`
+
+## Targeted repair additions — 2026-11-15
+
+The current source tree additionally includes `src/main/java/ca/yorku/eecs3311/usedcar/llm/ReportNarrativeValidator.java` (F12 explicit history-claim consistency) and `src/test/java/ca/yorku/eecs3311/usedcar/ReportNarrativeChecks.java` (FIN-01 and shared F03 regressions). Existing ChecklistSchema, PromptBuilder, ResponseParser, ResultFormatter, ChecklistGeminiChecks, FoundationChecks/FoundationTest and GuiSmoke received focused corrections/checks. Historical inventory entries above are retained. Live/CLI audit artifacts are outside the repository and are not application dependencies.

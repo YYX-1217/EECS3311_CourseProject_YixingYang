@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /** Two saved records; editable B form is separate from the current-vehicle form. */
-public final class ComparisonPanel extends JPanel {
+public final class ComparisonPanel extends WorkspaceUI.Feature {
     private final UsedCarApplicationFacade facade;
     private SwingWorker<ComparisonEvaluation,Void> worker;
     private final Map<String,JTextField> fields=new LinkedHashMap<>();
@@ -19,12 +19,11 @@ public final class ComparisonPanel extends JPanel {
         super(new BorderLayout(6,6)); this.facade=facade;
         summary.setName("comparisonSummary"); summary.setEditable(false); summary.setLineWrap(true);
         output.setName("comparisonResults"); output.setEditable(false); output.setLineWrap(true); output.setWrapStyleWord(true);
-        var form=new JPanel(new GridLayout(0,2,6,4));
+        var form=new WorkspaceUI.FormGrid();
         for(var field:PreparationForm.FIELDS) {
             if(!field.section().equals("Vehicle")) continue;
             var input=new JTextField(20); input.setName("comparison_"+field.key());
-            fields.put(field.key(),input); var label=new JLabel("B: "+field.label()); label.setLabelFor(input);
-            form.add(label); form.add(input);
+            fields.put(field.key(),input);form.field("B: "+field.label(),input);
         }
         var save=new JButton("Save Vehicle B"); save.setName("comparisonSave");
         var cancel=new JButton("Cancel edits / reload saved B"); cancel.setName("comparisonCancel");
@@ -63,10 +62,11 @@ public final class ComparisonPanel extends JPanel {
             };
             worker.execute();
         });
-        var buttons=new JPanel(new FlowLayout(FlowLayout.LEFT)); buttons.add(save); buttons.add(cancel); buttons.add(compare); buttons.add(stop); buttons.add(refresh);
-        var upper=new JPanel(new BorderLayout()); upper.add(new JScrollPane(summary),BorderLayout.NORTH);
-        upper.add(new JScrollPane(form)); upper.add(buttons,BorderLayout.SOUTH);
-        var split=new JSplitPane(JSplitPane.VERTICAL_SPLIT,upper,new JScrollPane(output)); split.setResizeWeight(0.55); add(split);
+        var buttons=new JPanel(new WorkspaceUI.WrapLayout()); buttons.add(save); buttons.add(cancel); buttons.add(compare); buttons.add(stop); buttons.add(refresh);
+        WorkspaceUI.primary(compare);
+        var controls=WorkspaceUI.column(buttons,WorkspaceUI.card("Vehicle B",form));
+        var results=WorkspaceUI.split(JSplitPane.VERTICAL_SPLIT,WorkspaceUI.resultCard("Saved vehicles A / B",summary),WorkspaceUI.resultCard("Comparison & shared evidence",output),0.38);
+        workspace(controls,results);
         addComponentListener(new java.awt.event.ComponentAdapter(){ public void componentShown(java.awt.event.ComponentEvent e){refresh();} });
         output.setText("Save A in the existing Vehicle workflow, enter/save B here, then compare. CAD/km only; save common cost assumptions using Save and calculate. Comparison may send up to two Gemini requests (one retry for HTTP 502/503/504 only).");
         addHierarchyListener(event->{
@@ -79,5 +79,6 @@ public final class ComparisonPanel extends JPanel {
         summary.setText("A: "+facade.currentVehicle().map(v->v.year()+" "+v.make()+" "+v.model()+" ["+v.id()+"]").orElse("not saved")
                 +"\nB: "+facade.comparisonVehicle().map(v->v.year()+" "+v.make()+" "+v.model()+" ["+v.id()+"]").orElse("not saved")
                 +"\nCommon cost assumptions: "+facade.costAssumptions().map(Object::toString).orElse("UNAVAILABLE"));
+        summary.setCaretPosition(0);
     }
 }

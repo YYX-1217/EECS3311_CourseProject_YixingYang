@@ -8,12 +8,13 @@ import static ca.yorku.eecs3311.usedcar.FoundationChecks.check;
 public final class RiskGuiSmoke {
     private static Component named(Container root,String name){for(Component c:root.getComponents()){if(name.equals(c.getName()))return c;if(c instanceof Container box){var f=named(box,name);if(f!=null)return f;}}return null;}
     public static void main(String[] args)throws Exception{
-        var start=new CountDownLatch(1);var release=new CountDownLatch(1);var requestSequence=new AtomicInteger();var invalidAge=new AtomicBoolean();
+        var start=new CountDownLatch(1);var release=new CountDownLatch(1);var requestSequence=new AtomicInteger();var invalidAge=new AtomicBoolean();var invalidGrounding=new AtomicBoolean();
         var llm=new RiskChecks.Fake(){@Override public String generateStructured(String p,String schema){
             check(!SwingUtilities.isEventDispatchThread(),"F08 request must be off EDT");
             if(requestSequence.incrementAndGet()==1){start.countDown();try{if(!release.await(5,TimeUnit.SECONDS))throw new AssertionError("Worker release timeout");}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IllegalStateException();}}
             String result=super.generateStructured(p,schema);
             if(invalidAge.get()){var json=com.google.gson.JsonParser.parseString(result).getAsJsonObject();json.getAsJsonArray("risks").add(RiskAgeChecks.BAD);return json.toString();}
+            if(invalidGrounding.get()){var json=com.google.gson.JsonParser.parseString(result).getAsJsonObject();json.getAsJsonArray("risks").add("Mechanical wear is statistically more likely.");return json.toString();}
             return result;
         }};
         var facade=RiskChecks.facade(llm);RiskChecks.save(facade);var panel=new AtomicReference<RiskEvaluationPanel>();var window=new AtomicReference<JFrame>();
@@ -35,8 +36,13 @@ public final class RiskGuiSmoke {
                 invalidAge.set(false);((JButton)named(panel.get(),"riskEvaluate")).doClick();});
             awaitReady(panel.get());
             SwingUtilities.invokeAndWait(()->{check(((JTextArea)named(panel.get(),"riskResults")).getText().contains("AI_SUCCESS"),"Explicit retry can recover after a sound response");});
-            System.out.println("PASS: F08 GUI background evaluation, responsive EDT, stale-context rejection, structured result, safe provider failure, quantified-age rejection and explicit recovery.");
+            SwingUtilities.invokeAndWait(()->{invalidGrounding.set(true);((JButton)named(panel.get(),"riskEvaluate")).doClick();});
+            awaitReady(panel.get());
+            SwingUtilities.invokeAndWait(()->{String text=((JTextArea)named(panel.get(),"riskResults")).getText();
+                check(text.contains("AI_UNAVAILABLE")&&text.contains("[RISK_GROUNDING]")&&text.contains("risks[")&&text.contains("DETERMINISTIC EVIDENCE")&&!text.contains("Risk level: Moderate")&&!text.contains("Mechanical wear is statistically more likely."),"Grounding rejection must withhold category/prose and keep safe field diagnostic plus tools");});
+            System.out.println("PASS: F08 GUI background evaluation, responsive EDT, stale-context rejection, structured result, safe provider failure, quantified-age/unsupported-statistics rejection and explicit recovery.");
         }finally{release.countDown();SwingUtilities.invokeAndWait(()->window.get().dispose());}
+        RiskFreshnessGuiSmoke.main(args);
     }
     private static void awaitReady(RiskEvaluationPanel p)throws Exception{long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(5);var ready=new AtomicBoolean();while(System.nanoTime()<end){SwingUtilities.invokeAndWait(()->ready.set(((JButton)named(p,"riskEvaluate")).isEnabled()));if(ready.get())return;Thread.sleep(30);}throw new AssertionError("Risk GUI did not finish");}
 }

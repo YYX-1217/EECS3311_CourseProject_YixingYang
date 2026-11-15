@@ -1,14 +1,40 @@
 package ca.yorku.eecs3311.usedcar.llm;
+
 import ca.yorku.eecs3311.usedcar.domain.ClarificationField;
+import ca.yorku.eecs3311.usedcar.result.ClarificationQuestion;
 import com.google.gson.*;
 import java.util.*;
+
+/** Bounded Gemini JSON Schema; Java still verifies distinct targets and evidence. */
 public final class ClarificationSchema {
-    private ClarificationSchema(){}
-    public static String json(List<ClarificationField> allowed){
-        var fields=new JsonObject();fields.add("field",text(allowed.stream().map(ClarificationField::key).toList()));fields.add("question",text(allowed.stream().flatMap(f->ca.yorku.eecs3311.usedcar.result.ClarificationQuestion.wordings(f).stream()).toList()));fields.add("priority",text(List.of("High","Medium","Low")));fields.add("reason",text(List.of(ca.yorku.eecs3311.usedcar.result.ClarificationQuestion.REASON)));
-        var item=new JsonObject();item.addProperty("type","object");item.add("properties",fields);var required=new JsonArray();fields.keySet().forEach(required::add);item.add("required",required);item.addProperty("additionalProperties",false);
-        var array=new JsonObject();array.addProperty("type","array");array.add("items",item);array.addProperty("minItems",1);array.addProperty("maxItems",3);
-        var properties=new JsonObject();properties.add("questions",array);var root=new JsonObject();root.addProperty("type","object");root.add("properties",properties);var keys=new JsonArray();keys.add("questions");root.add("required",keys);root.addProperty("additionalProperties",false);return root.toString();
+    private ClarificationSchema() {}
+    public static String json(List<ClarificationField> allowed) {
+        if (allowed.isEmpty() || allowed.size() > 3 || new HashSet<>(allowed).size() != allowed.size())
+            throw new IllegalArgumentException("Clarification requires 1-3 distinct targets.");
+        var alternatives = new JsonArray();
+        for (var field : allowed) {
+            var fields = new JsonObject();
+            fields.add("field", text(List.of(field.key())));
+            fields.add("question", text(ClarificationQuestion.wordings(field)));
+            fields.add("priority", text(field == ClarificationField.ACCIDENT || field == ClarificationField.MAINTENANCE
+                    ? List.of("High") : List.of("High", "Medium", "Low")));
+            fields.add("reason", text(List.of(ClarificationQuestion.REASON)));
+            alternatives.add(object(fields));
+        }
+        // anyOf ties each question and priority to its field, rather than independent cross-product enums.
+        var item = new JsonObject(); item.add("anyOf", alternatives);
+        var array = new JsonObject(); array.addProperty("type", "array"); array.add("items", item);
+        array.addProperty("minItems", allowed.size()); array.addProperty("maxItems", allowed.size());
+        var properties = new JsonObject(); properties.add("questions", array);
+        return object(properties).toString();
     }
-    private static JsonObject text(List<String> allowed){var value=new JsonObject();value.addProperty("type","string");if(!allowed.isEmpty()){var values=new JsonArray();allowed.forEach(values::add);value.add("enum",values);}return value;}
+    private static JsonObject object(JsonObject properties) {
+        var value = new JsonObject(); value.addProperty("type", "object"); value.add("properties", properties);
+        var required = new JsonArray(); properties.keySet().forEach(required::add);
+        value.add("required", required); value.addProperty("additionalProperties", false); return value;
+    }
+    private static JsonObject text(List<String> allowed) {
+        var value = new JsonObject(); value.addProperty("type", "string");
+        var values = new JsonArray(); allowed.forEach(values::add); value.add("enum", values); return value;
+    }
 }

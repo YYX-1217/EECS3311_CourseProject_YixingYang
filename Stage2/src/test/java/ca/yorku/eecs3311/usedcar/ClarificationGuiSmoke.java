@@ -13,7 +13,7 @@ public final class ClarificationGuiSmoke {
     private static Component named(Container p,String n){for(Component c:p.getComponents()){if(n.equals(c.getName()))return c;if(c instanceof Container box){var found=named(box,n);if(found!=null)return found;}}return null;}
     private static JButton button(Container p,String n){return (JButton)named(p,n);}
     private static String text(Container p){return ((JTextArea)named(p,"clarificationStatus")).getText();}
-    private static void select(Container p){for(Component c:p.getComponents()){if(c instanceof JTabbedPane tabs){for(int i=0;i<tabs.getTabCount();i++)if(tabs.getTitleAt(i).equals("Clarification"))tabs.setSelectedIndex(i);}if(c instanceof Container box)select(box);}}
+    private static void select(Container p){WorkspaceGuiSmoke.select(p,"Clarification");}
     private static void target(Container p,String field){((JComboBox<?>)named(p,"clarificationField")).setSelectedItem(field);}
     private static void answer(Container p,String value){((JTextField)named(p,"clarificationAnswer")).setText(value);button(p,"clarificationSubmit").doClick();}
     private static void ready(Container p)throws Exception{var done=new AtomicBoolean();long end=System.nanoTime()+TimeUnit.SECONDS.toNanos(6);while(System.nanoTime()<end){SwingUtilities.invokeAndWait(()->done.set(button(p,"clarificationStart").isEnabled()));if(done.get())return;Thread.sleep(25);}throw new AssertionError("F11 worker timeout");}
@@ -26,7 +26,7 @@ public final class ClarificationGuiSmoke {
             SwingUtilities.invokeAndWait(()->{check(text(root.get()).contains("Save a vehicle"),"No-vehicle error must be helpful");ClarificationChecks.corolla().forEach((key,value)->((JTextField)named(root.get(),key)).setText(value));button(root.get(),"calculate").doClick();check(f.currentVehicle().orElseThrow().make().equals("Toyota"),"Save fictional Corolla through existing GUI");button(root.get(),"clarificationStart").doClick();});
             check(started.await(5,TimeUnit.SECONDS),"Worker did not start");SwingUtilities.invokeAndWait(()->check(!button(root.get(),"clarificationStart").isEnabled(),"GUI stays responsive and disables repeated requests"));release.countDown();ready(root.get());
             SwingUtilities.invokeAndWait(()->{
-                check(text(root.get()).contains("FALLBACK")&&text(root.get()).contains("accident"),"Useful fallback questions must appear");
+                check(text(root.get()).contains("FALLBACK")&&text(root.get()).contains("accident")&&text(root.get()).contains("[UNKNOWN_FAILURE]"),"Useful fallback questions must appear");
                 target(root.get(),"accident");answer(root.get(),"probably");check(text(root.get()).contains("ERROR:"),"Invalid enum shown without saving");button(root.get(),"clarificationShow").doClick();target(root.get(),"accident");answer(root.get(),"NO");
                 target(root.get(),"maintenance");button(root.get(),"clarificationUnknown").doClick();target(root.get(),"consumption");button(root.get(),"clarificationSkip").doClick();
                 check(f.currentVehicle().orElseThrow().accidentHistory().equals("NO")&&f.currentVehicle().orElseThrow().maintenanceHistory().equals("UNKNOWN"),"Answer changes only target and unknown remains unknown");
@@ -47,6 +47,9 @@ public final class ClarificationGuiSmoke {
                 try{var path=java.nio.file.Path.of("build","verification","f11-clarification.png");java.nio.file.Files.createDirectories(path.getParent());var image=new java.awt.image.BufferedImage(root.get().getWidth(),root.get().getHeight(),java.awt.image.BufferedImage.TYPE_INT_RGB);var g=image.createGraphics();root.get().paintAll(g);g.dispose();javax.imageio.ImageIO.write(image,"png",path.toFile());}catch(java.io.IOException e){throw new IllegalStateException(e);}
                 var before=f.currentClarification().orElseThrow();var v=ClarificationChecks.corolla();v.put("mileage","140000");f.saveVehicle(PreparationForm.vehicle(f,v));button(root.get(),"clarificationAccept").doClick();check(text(root.get()).contains("ERROR:")&&f.currentVehicle().orElseThrow().mileage()==140000,"Old UI token cannot alter changed vehicle");
             });
+            llm.fail=false;
+            SwingUtilities.invokeAndWait(()->button(root.get(),"clarificationStart").doClick());ready(root.get());
+            SwingUtilities.invokeAndWait(()->check(text(root.get()).contains("AI_SUCCESS")&&f.currentClarification().orElseThrow().batch().questions().size()==3,"Actual Swing displays validated offline AI questions after a new saved context"));
             System.out.println("PASS: F11 actual Swing launch, fictional Corolla entry, background fallback, answer/skip/unknown/history, cached reopen, keep/accept, real F08/F10 continuation and stale-response rejection.");
         }finally{release.countDown();if(frame.get()!=null)SwingUtilities.invokeAndWait(()->frame.get().dispose());}
     }

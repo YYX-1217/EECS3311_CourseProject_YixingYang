@@ -74,5 +74,89 @@ public final class RiskAgeChecks {
         check(r.evidence().risk()==null&&r.evidence().referenceYear()==2027,"F12 cannot reuse risk computed against an older reference year");}
     public static void clockSnapshot(){var llm=new Fake();var r=saved(llm).evaluateCurrentVehicle();check(new PromptBuilder().buildRiskPrompt(r.evidence()).contains("modelYearDifference=8")&&ResultFormatter.format(r).contains("reference year 2026"),"Prompt, validation and display reuse one year snapshot");}
     public static void cli(){var llm=new Fake();llm.claim=BAD;var out=new ByteArrayOutputStream();new UsedCarCLI(saved(llm),new Scanner("evaluate\nevaluate\nquit\n"),new PrintStream(out)).run();String text=out.toString();check(text.contains("[RISK_AGE_EVIDENCE]")&&text.contains("Model-year difference: 8")&&text.contains("18707")&&!text.contains(BAD)&&!text.contains("AI_SUCCESS")&&llm.riskCalls==2,"Actual CLI retains deterministic evidence and safe manual retry");}
-    public static void runAll(){arithmetic();promptContext();risks();explanation();strengths();uncertainties();actualAge();spelling();wrongDifference();wrongContext();validGuidance();invalidContext();noRetry();replacesPriorSuccess();clarification();reportReuse();reportRejects();referenceYearChange();clockSnapshot();cli();}
+
+    /** AUD-01: same accepted response, with only one contradictory risk statement added. */
+    public static void aud01PrefixRejected(){
+        var llm=new Fake();var f=saved(llm);
+        check(f.evaluateCurrentVehicle().status().equals("AI_SUCCESS"),"Unmodified fixed-2026/2018 fixture must be valid");
+        llm.claim="The vehicle has a 6-year model-year difference.";
+        var r=f.evaluateCurrentVehicle();
+        check(r.evidence().yearContext().equals(new ModelYearContext(2018,2026)),"Reproduction must use exactly 2026 minus 2018");
+        check(r.status().equals("AI_UNAVAILABLE")&&r.assessment()==null
+                &&r.message().contains("[RISK_AGE_EVIDENCE]")&&llm.riskCalls==2,
+                "AUD-01: contradictory 6-year prefix must be rejected without an extra request");
+        for(String claim:List.of("6-year model-year difference","a 6-year model-year difference",
+                "six-year model-year difference","A six–year model–year difference.",
+                "A 6.5-year model-year difference."))bad("risks",claim);
+    }
+    public static void aud01PrefixAccepted(){
+        for(String claim:List.of("The vehicle has an 8-year model-year difference.",
+                "An eight-year model-year difference.","8 year model year gap","An 8–year model–year difference.")){
+            var llm=new Fake();llm.claim=claim;
+            for(String field:List.of("strengths","risks","uncertainties","explanation")){
+                llm.field=field;var r=saved(llm).evaluateCurrentVehicle();
+                check(r.status().equals("AI_SUCCESS")&&ResultFormatter.format(r).contains(claim),
+                        "Correct explicit model-year difference must remain unchanged in "+field);
+            }
+        }
+    }
+    public static void aud01SuffixForms(){
+        for(String claim:List.of("model-year difference of 6 years","model year difference is 6 years",
+                "model-year difference of six years"))bad("risks",claim);
+        for(String claim:List.of("model-year difference of 8 years","model year difference is 8 years",
+                "model-year difference of eight years")){
+            var llm=new Fake();llm.claim=claim;check(saved(llm).evaluateCurrentVehicle().status().equals("AI_SUCCESS"),"Existing correct suffix form preserved");
+        }
+    }
+    public static void aud01UnrelatedNumbers(){
+        for(String claim:List.of("Mileage 125000 km; price CAD 12500; annual distance 15000 km.",
+                "For a hypothetical 6-year ownership period, review future costs separately.",
+                "A maintenance record dated 2020 does not establish the vehicle's first registration date.",
+                "For comparison, another vehicle has a 6-year model-year difference; this vehicle has an 8-year model-year difference.",
+                "The other vehicle has a six-year model-year difference. This vehicle has an eight-year model-year difference.",
+                "Vehicle B has a 6-year model-year difference; the evaluated vehicle has an 8-year model-year difference.")){
+            var llm=new Fake();llm.claim=claim;
+            check(saved(llm).evaluateCurrentVehicle().status().equals("AI_SUCCESS"),"Unrelated numbers or clearly identified other-vehicle comparison must not be rejected");
+        }
+        bad("risks","Another vehicle has a 6-year model-year difference; this vehicle has a 7-year model-year difference.");
+        bad("risks","Another vehicle has a 6-year model-year difference, but this vehicle has a 7-year model-year difference.");
+    }
+    public static void aud01ExactAgeRejected(){
+        bad("risks","This vehicle is 8 years old.");
+        bad("explanation","The vehicle has been in service for eight years.");
+    }
+    public static void aud01SuppliedContext(){
+        for(var context:List.of(new ModelYearContext(2020,2029),new ModelYearContext(2010,2031),
+                new ModelYearContext(2027,2026))){
+            String valid="The vehicle has a "+context.difference()+"-year model-year difference.";
+            var assessment=new RiskAssessment("Moderate",List.of(),List.of(valid),List.of(),"Review the supplied evidence.");
+            RiskAgeValidator.validate(assessment,context);
+            try{
+                RiskAgeValidator.validate(new RiskAssessment("Moderate",List.of(),List.of("The vehicle has an 8-year model-year difference."),List.of(),"Review evidence."),context);
+                throw new AssertionError("Difference must come from supplied Java context");
+            }catch(RiskAgeValidator.Rejected expected){}
+        }
+        RiskAgeValidator.validate(new RiskAssessment("Moderate",List.of(),List.of("A twenty-one-year model-year difference."),List.of(),"Review evidence."),new ModelYearContext(2010,2031));
+        try{
+            RiskAgeValidator.validate(new RiskAssessment("Moderate",List.of(),List.of("An 8-year model-year difference."),List.of(),"Review evidence."),new ModelYearContext(null,2026));
+            throw new AssertionError("Missing context cannot validate a numerical difference");
+        }catch(RiskAgeValidator.Rejected expected){}
+    }
+    public static void aud01EveryNarrativeField(){
+        for(String field:List.of("strengths","risks","uncertainties","explanation"))
+            bad(field,"The vehicle has a 6-year model-year difference.");
+    }
+    public static void aud01RejectedRiskNotReused(){
+        var llm=new Fake();var f=saved(llm);
+        check(f.evaluateCurrentVehicle().status().equals("AI_SUCCESS"),"Initial valid assessment");
+        llm.claim="The vehicle has a 6-year model-year difference.";
+        var r=f.evaluateCurrentVehicle();var report=f.generateCurrentReport();
+        check(r.assessment()==null&&f.lastRiskEvaluation().orElseThrow().assessment()==null
+                &&report.evidence().risk()==null&&llm.riskCalls==2,"Rejected response supplies no validated risk to cache/F12 and triggers no retry");
+        check(r.evidence().cost().firstYearEstimate().intValue()==18707
+                &&!ResultFormatter.format(r).contains(llm.claim)&&!ReportText.format(report).contains(llm.claim),
+                "Preserve deterministic costs and withhold rejected text without rewriting it");
+    }
+
+    public static void runAll(){aud01PrefixRejected();aud01PrefixAccepted();aud01SuffixForms();aud01UnrelatedNumbers();aud01ExactAgeRejected();aud01SuppliedContext();aud01EveryNarrativeField();aud01RejectedRiskNotReused();arithmetic();promptContext();risks();explanation();strengths();uncertainties();actualAge();spelling();wrongDifference();wrongContext();validGuidance();invalidContext();noRetry();replacesPriorSuccess();clarification();reportReuse();reportRejects();referenceYearChange();clockSnapshot();cli();}
 }

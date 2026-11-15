@@ -28,8 +28,8 @@ public final class ClarificationChecks {
     }
     public static String response(String schema){
         var targets=JsonParser.parseString(schema).getAsJsonObject().getAsJsonObject("properties").getAsJsonObject("questions")
-            .getAsJsonObject("items").getAsJsonObject("properties").getAsJsonObject("field").getAsJsonArray("enum");
-        var array=new JsonArray();for(var key:targets){var f=ClarificationField.fromKey(key.getAsString());var q=ClarificationQuestion.fallback(f);
+            .getAsJsonObject("items").getAsJsonArray("anyOf");
+        var array=new JsonArray();for(var branch:targets){var key=branch.getAsJsonObject().getAsJsonObject("properties").getAsJsonObject("field").getAsJsonArray("enum").get(0);var f=ClarificationField.fromKey(key.getAsString());var q=ClarificationQuestion.fallback(f);
             var item=new JsonObject();item.addProperty("field",f.key());item.addProperty("question",q.question());item.addProperty("priority",q.priority());item.addProperty("reason",q.reason());array.add(item);}
         var root=new JsonObject();root.add("questions",array);return root.toString();
     }

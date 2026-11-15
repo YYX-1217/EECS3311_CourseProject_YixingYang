@@ -33,6 +33,8 @@ public final class GuiSmoke {
                 ((JButton) named(gui.panel(), "profileSave")).doClick();
                 FoundationChecks.check(facade.currentVehicle().isEmpty() && facade.preferences().reliabilityPriority() == 5
                         && facade.preferences().preferredBodyType().equals("SUV"), "GUI must save preferences without vehicle entry.");
+                String profileText=((JTextArea)named(gui.panel(),"results")).getText();
+                FoundationChecks.check(profileText.contains("not checked as an F07 body-type constraint")&&profileText.contains("Strategy guidance")&&!profileText.contains("remains planned"),"F03 GUI uses accurate shared profile text");
                 ((JTextField) named(gui.panel(), "reliabilityPriority")).setText("6");
                 ((JButton) named(gui.panel(), "profileSave")).doClick();
                 FoundationChecks.check(((JTextArea) named(gui.panel(), "results")).getText().startsWith("ERROR:")
@@ -127,5 +129,6 @@ public final class GuiSmoke {
             } catch (Exception e) { throw new RuntimeException(e); }
             finally { window.dispose(); }
         });
+        WorkspaceGuiSmoke.main(args);
     }
 }

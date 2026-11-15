@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 import java.util.function.Predicate;
 
 /** F02 boundary: background analysis, local draft editing and explicit confirmation. */
-public final class ListingAnalyzerPanel extends JPanel {
+public final class ListingAnalyzerPanel extends WorkspaceUI.Feature {
     private final JTextArea source = new JTextArea(5,60), result = new JTextArea(9,60);
     private final JButton analyze = new JButton("Analyze Listing"), save = new JButton("Confirm and Save"), cancel = new JButton("Cancel");
     private final Map<String,JTextField> fields = new LinkedHashMap<>();
@@ -28,15 +28,15 @@ public final class ListingAnalyzerPanel extends JPanel {
         source.setName("listingText"); result.setName("listingResult"); result.setEditable(false);
         result.setLineWrap(true); result.setWrapStyleWord(true);
         analyze.setName("listingAnalyze"); save.setName("listingSave"); cancel.setName("listingCancel"); save.setEnabled(false);
-        var top = new JPanel(new BorderLayout()); top.add(new JLabel("Untrusted seller listing (max 16000 characters); sends one explicit Gemini request"),BorderLayout.NORTH);
-        top.add(new JScrollPane(source)); add(top,BorderLayout.NORTH);
-        var form = new JPanel(new GridLayout(0,2,4,4));
+        source.setLineWrap(true);source.setWrapStyleWord(true);
+        var top=WorkspaceUI.card("Seller listing",WorkspaceUI.column(new WorkspaceUI.WrappingText("Untrusted seller listing (max 16000 characters); sends one explicit Gemini request"),WorkspaceUI.scroll(source)));
+        var form = new WorkspaceUI.FormGrid();
         for (var field : PreparationForm.FIELDS) if (field.section().equals("Vehicle")) {
             var value = new JTextField(24); value.setName("listing-"+field.key()); fields.put(field.key(),value);
-            form.add(new JLabel(field.label())); form.add(value);
+            form.field(field.label(),value);
         }
-        var middle = new JPanel(new BorderLayout()); middle.add(form,BorderLayout.NORTH); middle.add(new JScrollPane(result)); add(middle);
-        var buttons = new JPanel(); buttons.add(analyze);buttons.add(save);buttons.add(cancel);add(buttons,BorderLayout.SOUTH);
+        var buttons=WorkspaceUI.actions(analyze,save,cancel);WorkspaceUI.primary(analyze);
+        workspace(WorkspaceUI.column(buttons,top,WorkspaceUI.card("Review extracted fields",form)),WorkspaceUI.resultCard("Extraction, evidence & confirmation",result));
         analyze.addActionListener(e -> start()); cancel.addActionListener(e -> cancelDraft()); save.addActionListener(e -> save());
     }
     private void start() {

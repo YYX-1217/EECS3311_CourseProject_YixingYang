@@ -1,4 +1,12 @@
-# Stage 2 foundation architecture
+# Stage 2 architecture
+
+## Current architecture — 2026-11-15
+
+F01–F12 have independent Swing workspaces connected to the existing CLI-shared commands, facade, agent, deterministic tools, in-memory session and GeminiAdapter through LLMClient. Gson supplies runtime JSON handling. Network work uses SwingWorker; result/cache revisions prevent stale delivery. F08 additionally checks displayed cache validity on workspace return. F10 retains typed provider diagnostics with deterministic fallback. F12 keeps its compact structured report contract, cached evidence, explicit regeneration and create-new UTF-8 export; the observed timeout remains unassigned to a proven application defect. No model, timeout, endpoint or pattern redesign was made during AUD-04–06. The 2026-11-15 targeted repair removes provider-facing F10 array upper bounds while retaining Java bounds/exact-plan validation, adds a fixed-unit reason guard, and validates explicit F12 history assertions through ReportNarrativeValidator. Existing authoritative evidence checks still govern all other report sections. F03 shared output now accurately describes Strategy use. No model, endpoint, timeout, public interface or pattern changed. See [current implementation status](IMPLEMENTATION_STATUS.md).
+
+## Historical initial foundation snapshot
+
+The following initial diagram and package/pattern descriptions document the earlier foundation only. Statements such as planned, no network client and no cache do not describe the current application. Later dated F11/F12 notes below record subsequent increments.
 
 This foundation implements the deterministic preparation part of Stage 1 SD02, with manual record creation from UC01. It is a single Java 21 desktop/CLI application, with no runtime dependencies beyond the JDK. It does not yet implement an autonomous reasoning agent.
 

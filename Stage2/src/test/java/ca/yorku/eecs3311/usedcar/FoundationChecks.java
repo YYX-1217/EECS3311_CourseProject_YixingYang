@@ -607,6 +607,7 @@ public final class FoundationChecks {
     }
 
     public static void main(String[] args) {
+        ReportNarrativeChecks.runAll();
         numericValidation(); requiredFieldsAndYear(); exactCostCalculation(); omittedAssumptions(); unknownConsumption();
         constraintBoundaries(); zeroAndRounding(); sessionAndInvalidUpdate(); toolContractsAndLlmBoundary(); cliFlow();
         transmissionConflict(); transmissionMatch(); multipleTransmissions(); neutralTransmission(); unknownTransmission();
@@ -623,8 +624,8 @@ public final class FoundationChecks {
         FactoryChecks.runAll();
         ca.yorku.eecs3311.usedcar.llm.GeminiChecks.runAll();
         ListingChecks.runAll();
-        RiskChecks.runAll(); ComparisonChecks.runAll(); ChecklistChecks.runAll();
-        ClarificationChecks.runAll(); ReportChecks.runAll(); RiskAgeChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.runAll();
+        RiskChecks.runAll(); ComparisonChecks.runAll(); ChecklistChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ChecklistGeminiChecks.runAll();
+        ClarificationChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ClarificationGeminiChecks.runAll(); ReportChecks.runAll(); RiskAgeChecks.runAll(); RiskGroundingChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ReportGeminiChecks.runAll();
         ComparisonReliabilityChecks.runAll(); ca.yorku.eecs3311.usedcar.llm.ComparisonRetryChecks.runAll();
         System.out.println("PASS: 322 deterministic verification groups (dependency-free runner; not JUnit/Stage 3 completion).");
     }

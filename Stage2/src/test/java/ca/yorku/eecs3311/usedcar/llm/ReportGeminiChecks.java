@@ -201,7 +201,65 @@ public final class ReportGeminiChecks {
         var malformed=fail(r->new GeminiAdapter.Reply(400,"{\"error\":{\"status\":\"INVALID_ARGUMENT\",\"message\":[],\"details\":[null]}}"),"[INVALID_ARGUMENT]");
         check(!malformed.message().contains("[SCHEMA_FIELD]"),"Ignore wrong-type optional error metadata safely");
     }
-    public static void runAll(){workflow();badRequest();authorization();quota();model();server();timeout();transport();interrupted();configuration();blocked();outputLimit();incomplete();invalidEnvelope();structure();evidence();unknownClient();cliDiagnostics();localSchema();compactSchema();schemaIndependent();wireContract();strictCategories();strictBounds();schemaComplexityReason();schemaFieldReason();responseConfigReason();genericRejectionReason();malformedRejectionSafety();}
+    /** AUD-05: a timeout is a cached unavailable result, not a fabricated report or hidden retry. */
+    public static void timeoutExportRecovery(){
+        var calls=new AtomicInteger();var adapter=new GeminiAdapter(KEY,null,request->{
+            if(calls.incrementAndGet()==1)throw new HttpTimeoutException(PRIVATE+KEY);
+            return new GeminiAdapter.Reply(200,envelope(ReportChecks.response(prompt(request)),"STOP"));
+        });
+        var f=ReportChecks.saved(adapter);var form=ReportChecks.corolla();form.put("trim","LE — 测试");ca.yorku.eecs3311.usedcar.ui.PreparationForm.command(f,form).execute();
+        var result=f.generateCurrentReport();String display=ReportText.format(result);
+        check(result.status().equals("AI_UNAVAILABLE")&&result.report()==null&&result.message().contains("[TIMEOUT]")&&!result.message().contains("HTTP_400"),"Timeout has no HTTP response or validated category");
+        check(display.contains("18707.00")&&display.contains("LE — 测试")&&!display.contains(PRIVATE)&&!display.contains(KEY),"Unavailable report retains deterministic evidence without provider data");
+        var out=new ByteArrayOutputStream();new UsedCarCLI(f,new Scanner("report-show\nreport-show\nquit\n"),new PrintStream(out)).run();
+        check(out.toString().contains("[TIMEOUT]")&&f.currentReport().orElseThrow()==result&&calls.get()==1,"Repeated CLI/cache viewing does not retry");
+        try{
+            var root=java.nio.file.Path.of("build","verification");java.nio.file.Files.createDirectories(root);var dir=java.nio.file.Files.createTempDirectory(root,"aud05-");var path=dir.resolve("timeout.txt");
+            f.exportReport(result.generationId(),path);
+            check(java.nio.file.Files.readString(path,StandardCharsets.UTF_8).equals(display),"Timeout UTF-8 export equals displayed ReportText");
+            try{f.exportReport(result.generationId(),path);throw new AssertionError("Existing export overwritten");}catch(IllegalStateException expected){}
+            check(java.nio.file.Files.readString(path,StandardCharsets.UTF_8).equals(display)&&calls.get()==1,"Refused overwrite preserves file and never generates AI");
+        }catch(IOException e){throw new AssertionError(e);}
+        var recovered=f.generateCurrentReport();check(recovered.status().equals("AI_SUCCESS")&&calls.get()==2&&!recovered.generationId().equals(result.generationId()),"Only explicit regeneration can recover with one new mocked request");
+    }
+    public static void timeoutStale(){
+        var ref=new java.util.concurrent.atomic.AtomicReference<ca.yorku.eecs3311.usedcar.app.UsedCarApplicationFacade>();
+        var adapter=new GeminiAdapter(KEY,null,request->{var form=ReportChecks.corolla();form.put("price","14000");ref.get().saveVehicle(PreparationForm.vehicle(ref.get(),form));throw new HttpTimeoutException(PRIVATE+KEY);});
+        var f=ReportChecks.saved(adapter);ref.set(f);
+        try{f.generateCurrentReport();throw new AssertionError("Old timeout snapshot stored for new vehicle");}catch(IllegalStateException expected){}
+        check(f.currentReport().isEmpty()&&f.currentVehicle().orElseThrow().askingPrice().intValue()==14000,"Late timeout cannot overwrite changed saved context");
+    }
+    public static void payloadProfile(){
+        var calls=new AtomicInteger();var adapter=new GeminiAdapter(KEY,null,request->{
+            calls.incrementAndGet();String p=prompt(request);var json=JsonParser.parseString(body(request)).getAsJsonObject();
+            if(p.startsWith("Assess advisory"))return new GeminiAdapter.Reply(200,envelope(ca.yorku.eecs3311.usedcar.RiskChecks.response(p),"STOP"));
+            check(p.indexOf("Approved report sections: ")==p.lastIndexOf("Approved report sections: ")&&!p.contains("\nSchema: "),"F12 sections supplied once and no duplicate schema in prompt");
+            compactContract(json.getAsJsonObject("generationConfig").getAsJsonObject("responseJsonSchema"));
+            System.out.println("AUD-05 fictional F12 payload: prompt_utf8_bytes="+p.getBytes(StandardCharsets.UTF_8).length+", schema_utf8_bytes="+json.getAsJsonObject("generationConfig").get("responseJsonSchema").toString().getBytes(StandardCharsets.UTF_8).length+", request_utf8_bytes="+body(request).getBytes(StandardCharsets.UTF_8).length+", timeout_seconds="+request.timeout().orElseThrow().getSeconds());
+            return new GeminiAdapter.Reply(200,envelope(ReportChecks.response(p),"STOP"));
+        });
+        var f=ca.yorku.eecs3311.usedcar.RiskAgeChecks.saved(adapter);var form=ReportChecks.corolla();form.put("consumption","8");PreparationForm.command(f,form).execute();
+        var cycle=f.revisitClarification(ca.yorku.eecs3311.usedcar.domain.ClarificationField.CONSUMPTION);f.submitClarification(cycle.cycleId(),ca.yorku.eecs3311.usedcar.domain.ClarificationField.CONSUMPTION,"7.2");f.resolveClarification(cycle.cycleId(),ca.yorku.eecs3311.usedcar.domain.ClarificationField.CONSUMPTION,true);
+        f.estimateCost(f.currentVehicle().orElseThrow(),f.costAssumptions().orElseThrow());var risk=f.evaluateCurrentVehicle();var result=f.generateCurrentReport();
+        check(result.status().equals("AI_SUCCESS")&&result.evidence().risk()==risk.assessment()&&result.evidence().costSummary().contains("18707.00")&&calls.get()==2,"F11 accepted update plus F08 reuse reaches valid F12 without extra requests");
+    }
+    /** Included in the existing GUI smoke entry point; no network or wall-clock timeout delay. */
+    public static void timeoutGui()throws Exception{
+        var entered=new CountDownLatch(1);var release=new CountDownLatch(1);var calls=new AtomicInteger();
+        var adapter=new GeminiAdapter(KEY,null,request->{check(!javax.swing.SwingUtilities.isEventDispatchThread(),"HTTP must stay off EDT");calls.incrementAndGet();entered.countDown();check(release.await(8,TimeUnit.SECONDS),"GUI timeout barrier released");throw new HttpTimeoutException(PRIVATE+KEY);});
+        var f=ReportChecks.saved(adapter);var panel=new java.util.concurrent.atomic.AtomicReference<ReportPanel>();var frame=new java.util.concurrent.atomic.AtomicReference<javax.swing.JFrame>();
+        javax.swing.SwingUtilities.invokeAndWait(()->{var p=new ReportPanel(f);panel.set(p);var w=new javax.swing.JFrame();frame.set(w);w.setContentPane(p);w.pack();w.setVisible(true);((javax.swing.JButton)ca.yorku.eecs3311.usedcar.WorkspaceGuiSmoke.named(p,"reportGenerate")).doClick();});
+        try{
+            check(entered.await(8,TimeUnit.SECONDS),"Provider fixture entered");
+            javax.swing.SwingUtilities.invokeAndWait(()->check(!((javax.swing.JButton)ca.yorku.eecs3311.usedcar.WorkspaceGuiSmoke.named(panel.get(),"reportGenerate")).isEnabled(),"EDT remains responsive during request"));release.countDown();
+            var ready=new java.util.concurrent.atomic.AtomicBoolean();long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(8);
+            while(!ready.get()&&System.nanoTime()<deadline){javax.swing.SwingUtilities.invokeAndWait(()->ready.set(((javax.swing.JButton)ca.yorku.eecs3311.usedcar.WorkspaceGuiSmoke.named(panel.get(),"reportGenerate")).isEnabled()));Thread.sleep(20);}
+            check(ready.get(),"Timeout restores GUI controls");
+            javax.swing.SwingUtilities.invokeAndWait(()->{String text=((javax.swing.JTextArea)ca.yorku.eecs3311.usedcar.WorkspaceGuiSmoke.named(panel.get(),"reportResults")).getText();check(text.contains("AI_UNAVAILABLE")&&text.contains("[TIMEOUT]")&&text.contains("18707.00")&&!text.contains(KEY)&&!text.contains(PRIVATE),"GUI shows safe timeout with deterministic evidence");((javax.swing.JButton)ca.yorku.eecs3311.usedcar.WorkspaceGuiSmoke.named(panel.get(),"reportShow")).doClick();check(calls.get()==1,"Show cannot retry");});
+            System.out.println("PASS: AUD-05 injected HTTP timeout preserves responsive Swing, evidence, cached viewing and safe diagnostics.");
+        }finally{release.countDown();javax.swing.SwingUtilities.invokeAndWait(()->frame.get().dispose());}
+    }
+    public static void runAll(){timeoutExportRecovery();timeoutStale();payloadProfile();workflow();badRequest();authorization();quota();model();server();timeout();transport();interrupted();configuration();blocked();outputLimit();incomplete();invalidEnvelope();structure();evidence();unknownClient();cliDiagnostics();localSchema();compactSchema();schemaIndependent();wireContract();strictCategories();strictBounds();schemaComplexityReason();schemaFieldReason();responseConfigReason();genericRejectionReason();malformedRejectionSafety();}
     private static String body(HttpRequest request) throws IOException,InterruptedException {
         var bytes=new ByteArrayOutputStream();var done=new CountDownLatch(1);
         request.bodyPublisher().orElseThrow().subscribe(new Flow.Subscriber<ByteBuffer>(){

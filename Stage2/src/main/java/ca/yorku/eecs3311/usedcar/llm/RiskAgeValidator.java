@@ -16,6 +16,10 @@ public final class RiskAgeValidator {
     private static final Pattern AGE=Pattern.compile("\\b(?:age|aged)"+LINK+NUMBER+"[-\\s]+years?\\b");
     private static final Pattern SERVICE=Pattern.compile("\\b(?:in service|on the road|in use)\\s+(?:for\\s+)?"+NUMBER+"\\s+years?\\b|\\b"+NUMBER+"\\s+years?\\s+(?:in service|on the road|of service|of use)\\b");
     private static final Pattern DIFFERENCE=Pattern.compile("\\bmodel[- ]year (?:difference|gap)"+LINK+"("+NUMBER+")\\s+years?\\b");
+    private static final Pattern PREFIXED_DIFFERENCE=Pattern.compile("(?<![\\w.\\-])("+NUMBER+")[-\\s]+years?\\s+model[- ]year (?:difference|gap)\\b");
+    // Only an immediately identified other subject exempts the new comparison form.
+    // An earlier mention of another vehicle must not exempt a later claim about this vehicle.
+    private static final Pattern OTHER_VEHICLE_SUBJECT=Pattern.compile("\\b(?:(?:another|the other|a different|the comparison) (?:vehicle|car)|vehicle b)(?:'s| (?:has|shows|with))?(?: an?)?\\s*$");
     private static final Pattern MODEL=Pattern.compile("\\bmodel[- ]year"+LINK+"(\\d{4})\\b");
     private static final Pattern REFERENCE=Pattern.compile("\\breference[- ]year"+LINK+"(\\d{4})\\b");
     private static final Map<String,Integer> WORDS;
@@ -44,12 +48,15 @@ public final class RiskAgeValidator {
             throw new Rejected(field,"Numerical vehicle age/time in service is unsupported; model-year difference is not exact age.");
         Integer difference=context==null?null:context.difference();
         verify(DIFFERENCE,normalized,difference,field);
+        verify(PREFIXED_DIFFERENCE,normalized,difference,field);
         verify(MODEL,normalized,difference==null?null:context.modelYear(),field);
         verify(REFERENCE,normalized,difference==null?null:context.referenceYear(),field);
     }
     private static void verify(Pattern pattern,String text,Integer expected,String field){
         var matcher=pattern.matcher(text);
         while(matcher.find()){
+            if(pattern==PREFIXED_DIFFERENCE
+                    &&OTHER_VEHICLE_SUBJECT.matcher(text.substring(0,matcher.start())).find())continue;
             if(expected==null||number(matcher.group(1)).compareTo(BigDecimal.valueOf(expected))!=0)
                 throw new Rejected(field,"Model/reference-year statement is inconsistent with or unsupported by the Java year context.");
         }
