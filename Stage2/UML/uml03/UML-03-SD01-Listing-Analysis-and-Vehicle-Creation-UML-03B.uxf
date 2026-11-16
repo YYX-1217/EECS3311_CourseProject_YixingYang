@@ -1,0 +1,2425 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>25</x>
+      <y>15</y>
+      <w>2660</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>Figure 3.3 — SD01: Listing Analysis and Vehicle Record Creation
+fontsize=32
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>25</x>
+      <y>62</y>
+      <w>2660</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>UML-03B  |  F01 / UC01 manual entry + SD01 review and exception details  |  Companion to UML-03A  |  Source 48fe916
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>20</x>
+      <y>110</y>
+      <w>1550</w>
+      <h>1030</h>
+    </coordinates>
+    <panel_attributes>sd B1 — F01 Save and calculate (shared F01/F03/F06 preparation)
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>55</x>
+      <y>155</y>
+      <w>90</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>User
+fontsize=23</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>255</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>gui
+«EDT»
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>485</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>form
+«static»
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>725</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>prepareCmd
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>975</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>facade
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1195</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1415</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>session
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>314</x>
+      <y>275</y>
+      <w>12</w>
+      <h>815</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>544</x>
+      <y>330</y>
+      <w>12</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>784</x>
+      <y>510</y>
+      <w>12</w>
+      <h>580</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1034</x>
+      <y>560</y>
+      <w>12</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1034</x>
+      <y>745</y>
+      <w>12</w>
+      <h>295</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1254</x>
+      <y>610</y>
+      <w>12</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1254</x>
+      <y>745</y>
+      <w>12</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>90</x>
+      <y>265</y>
+      <w>245</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;230;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>112</x>
+      <y>245</y>
+      <w>432</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>Enter / edit fields; click Save and calculate
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>320</y>
+      <w>255</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;240;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>332</x>
+      <y>300</y>
+      <w>455</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>command(facade, values) [inside calculate()]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>690</x>
+      <y>345</y>
+      <w>830</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>Parse and validate Vehicle, UserPreference, CostAssumptions;
+vehicle(facade, values) reuses current ID or creates one.
+No mutable Vehicle.updateField operation exists.
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>450</y>
+      <w>255</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>240;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>332</x>
+      <y>430</y>
+      <w>304</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>PrepareEvaluationCommand
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>500</y>
+      <w>495</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;480;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>332</x>
+      <y>480</y>
+      <w>340</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>execute() [via submit(command)]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>550</y>
+      <w>275</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;260;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>802</x>
+      <y>530</y>
+      <w>474</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>prepareEvaluation(v, preference, assumptions)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>600</y>
+      <w>245</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;230;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1052</x>
+      <y>580</y>
+      <w>474</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>prepareEvaluation(v, preference, assumptions)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>870</x>
+      <y>630</y>
+      <w>650</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>ref deterministic computation (details belong to SD02)
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>885</x>
+      <y>668</y>
+      <w>625</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>checkMissingInformation → estimateCost → checkConstraints
+llmStatus() is local; no generateStructured / network call.
+fontsize=21
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>760</y>
+      <w>245</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>230;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1043</x>
+      <y>740</y>
+      <w>515</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>result: PreparationResult (computed before saving)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>950</x>
+      <y>780</y>
+      <w>590</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>critical — synchronized(session)
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>840</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1052</x>
+      <y>820</y>
+      <w>392</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>setCurrentVehicle(v) [via saveVehicle]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>885</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1052</x>
+      <y>865</y>
+      <w>492</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>setPreference(preference) [via savePreferences]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>930</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1052</x>
+      <y>910</y>
+      <w>226</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>setCost(result.cost())
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>975</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1052</x>
+      <y>955</y>
+      <w>360</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>setCostAssumptions(assumptions)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>1030</y>
+      <w>275</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>260;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>802</x>
+      <y>1010</y>
+      <w>264</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>result: PreparationResult
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>1080</y>
+      <w>495</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>480;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>332</x>
+      <y>1060</y>
+      <w>436</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>result [GUI then calls displayResult(result)]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>1105</y>
+      <w>1470</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Any field / calculation rejection before commitment preserves the previous session. No Gemini request.
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1600</x>
+      <y>110</y>
+      <w>1080</w>
+      <h>1010</h>
+    </coordinates>
+    <panel_attributes>sd B2 — reviewListing(r, v), called twice in A3
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1635</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>facade
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1875</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>session
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2125</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2465</x>
+      <y>175</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>checker
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1694</x>
+      <y>280</y>
+      <w>12</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>270</y>
+      <w>265</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;250;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1712</x>
+      <y>250</y>
+      <w>417</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>getCurrentVehicle() [via currentVehicle()]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>315</y>
+      <w>265</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>250;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1712</x>
+      <y>295</y>
+      <w>304</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>Optional&lt;Vehicle&gt; → current
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1640</x>
+      <y>355</y>
+      <w>1000</w>
+      <h>710</h>
+    </coordinates>
+    <panel_attributes>alt
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1660</x>
+      <y>405</y>
+      <w>960</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[r.baseline() differs from current]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1690</x>
+      <y>450</y>
+      <w>900</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>throw IllegalStateException: saved vehicle changed; cancel and analyze again.
+Return to A3 error handler; preserve the newer record.
+No save and no automatic re-analysis.
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1630</x>
+      <y>555</y>
+      <w>1025</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1010;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1660</x>
+      <y>580</y>
+      <w>960</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[baseline matches current, including both null]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1680</x>
+      <y>625</y>
+      <w>920</w>
+      <h>350</h>
+    </coordinates>
+    <panel_attributes>alt
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1700</x>
+      <y>670</y>
+      <w>880</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[r.baseline() == null]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>725</y>
+      <w>515</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;500;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1712</x>
+      <y>705</y>
+      <w>289</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>checkMissingInformation(v)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>770</y>
+      <w>365</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;350;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>2202</x>
+      <y>750</y>
+      <w>107</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>check(v)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1670</x>
+      <y>795</y>
+      <w>945</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;930;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1700</x>
+      <y>815</y>
+      <w>880</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[r.baseline() != null]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>875</y>
+      <w>515</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;500;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1712</x>
+      <y>855</y>
+      <w>299</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>checkConflict(r.baseline(), v)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>920</y>
+      <w>365</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;350;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>2202</x>
+      <y>900</y>
+      <w>299</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>checkConflict(r.baseline(), v)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>995</y>
+      <w>365</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>350;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>2202</x>
+      <y>975</y>
+      <w>269</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>MissingInformationResult
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>1040</y>
+      <w>515</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>500;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1712</x>
+      <y>1020</y>
+      <w>410</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>MissingInformationResult → caller in A3
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1630</x>
+      <y>1080</y>
+      <w>1020</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Known-value disagreements are presented for explicit user choice, not silently merged.
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>20</x>
+      <y>1150</y>
+      <w>2660</w>
+      <h>710</h>
+    </coordinates>
+    <panel_attributes>sd B3 — alternatives at A1/A2/A3 call sites; no automatic retry
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>45</x>
+      <y>1205</y>
+      <w>1270</w>
+      <h>605</h>
+    </coordinates>
+    <panel_attributes>sd provider / parser rejection (unwind A1)
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>155</x>
+      <y>1260</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>535</x>
+      <y>1260</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>llm
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1015</x>
+      <y>1260</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>parser
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>90</x>
+      <y>1350</y>
+      <w>1180</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>alt
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>110</x>
+      <y>1395</y>
+      <w>1120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[GeminiAdapter rejects configuration / transport / HTTP / envelope]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1450</y>
+      <w>405</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>390;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>232</x>
+      <y>1430</y>
+      <w>370</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>throw LLMFailure (sanitized reason)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>80</x>
+      <y>1470</y>
+      <w>1205</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1190;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>110</x>
+      <y>1495</y>
+      <w>1120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[ResponseParser rejects structure / types / source evidence]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1560</y>
+      <w>885</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>870;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>232</x>
+      <y>1540</y>
+      <w>575</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>throw IllegalArgumentException (field-specific diagnostic)
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>90</x>
+      <y>1640</y>
+      <w>1180</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>ref A1: exception through facade / command / worker
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>90</x>
+      <y>1720</y>
+      <w>1180</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>done(): get() throws ExecutionException; show cause message + no-save / explicit-retry advice.
+Blank or &gt;16000-character listings fail in PromptBuilder before the provider is called.
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1340</x>
+      <y>1205</y>
+      <w>1310</w>
+      <h>605</h>
+    </coordinates>
+    <panel_attributes>sd cancellation / withheld approval
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>1425</x>
+      <y>1240</y>
+      <w>90</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>User
+fontsize=23</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1845</x>
+      <y>1260</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>panel
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2395</x>
+      <y>1260</y>
+      <w>130</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>worker
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1380</x>
+      <y>1370</y>
+      <w>1230</w>
+      <h>325</h>
+    </coordinates>
+    <panel_attributes>alt
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1400</x>
+      <y>1410</y>
+      <w>1160</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[User clicks Cancel during analysis or draft review]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1465</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1482</x>
+      <y>1445</y>
+      <w>251</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>Cancel → cancelDraft()
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1900</x>
+      <y>1525</y>
+      <w>575</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;560;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1922</x>
+      <y>1505</y>
+      <w>316</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>cancel(true) [if pending != null]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1370</x>
+      <y>1545</y>
+      <w>1255</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1240;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1400</x>
+      <y>1570</y>
+      <w>1160</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>[User answers NO to the A3 confirmation dialog]
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1635</y>
+      <w>465</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;450;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1482</x>
+      <y>1615</y>
+      <w>500</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>NO → confirm.test(review) is false; save() returns
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1380</x>
+      <y>1720</y>
+      <w>1230</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Cancel detaches worker and clears the local draft; done() ignores detached results.
+NO never calls confirmListing. Saved Vehicle/preferences stay unchanged in both branches.
+fontsize=22
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>30</x>
+      <y>1880</y>
+      <w>2640</w>
+      <h>150</h>
+    </coordinates>
+    <panel_attributes>Participant key: gui = UsedCarGUI; form = PreparationForm; prepareCmd = PrepareEvaluationCommand; facade = UsedCarApplicationFacade; agent = UsedCarAgent.
+session = EvaluationSession; checker = DataQualityChecker; panel = ListingAnalyzerPanel; llm = GeminiAdapter : LLMClient; parser = ResponseParser; worker = SwingWorker.
+A2 partial drafts/conflicts are valid outputs; A3 invalid corrections or B2 stale baselines stop saving. confirmListing(..., false) also rejects approval at the API boundary.
+Cancellation does not roll back prior/in-flight listingNeeds registration. Already sent requests may consume quota. Interrupted get() restores the interrupt flag.
+Notation: filled arrow = synchronous call; open arrow = scheduling / user event; dashed = return / exception propagation. UI actions and framework callbacks are labelled explicitly.
+Insert both landscape panels as Figure 3.3. Existing 4-inch placeholder is insufficient; insertion and scope verification are documented in UML-03-verification.md.
+fontsize=22
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>90</x>
+      <y>235</y>
+      <w>25</w>
+      <h>880</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;865</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>225</y>
+      <w>25</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;17</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>310</x>
+      <y>264</y>
+      <w>25</w>
+      <h>851</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;836</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>225</y>
+      <w>25</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;72</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>319</y>
+      <w>25</w>
+      <h>123</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;108</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>449</y>
+      <w>25</w>
+      <h>43</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;28</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>499</y>
+      <w>25</w>
+      <h>573</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;558</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>1079</y>
+      <w>25</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;21</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>225</y>
+      <w>25</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;72</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>319</y>
+      <w>25</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;23</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>423</y>
+      <w>25</w>
+      <h>692</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;677</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>225</y>
+      <w>25</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;117</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>423</y>
+      <w>25</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;104</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>549</y>
+      <w>25</w>
+      <h>93</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;78</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>759</y>
+      <w>25</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;18</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>809</y>
+      <w>25</w>
+      <h>213</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;198</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>1029</y>
+      <w>25</w>
+      <h>86</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;71</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>225</y>
+      <w>25</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;117</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>423</y>
+      <w>25</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;104</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>549</y>
+      <w>25</w>
+      <h>43</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;28</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>599</y>
+      <w>25</w>
+      <h>43</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;28</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>759</y>
+      <w>25</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;18</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>839</y>
+      <w>25</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;23</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>884</y>
+      <w>25</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;23</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>929</y>
+      <w>25</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;23</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>974</y>
+      <w>25</w>
+      <h>141</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;126</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>225</y>
+      <w>25</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;117</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>423</y>
+      <w>25</w>
+      <h>169</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;154</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>599</y>
+      <w>25</w>
+      <h>43</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;28</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>759</y>
+      <w>25</w>
+      <h>118</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;103</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>884</y>
+      <w>25</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;216</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>225</y>
+      <w>25</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;177</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>428</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>538</y>
+      <w>25</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;39</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>603</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>654</y>
+      <w>25</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;13</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>693</y>
+      <w>25</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;119</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1690</x>
+      <y>838</y>
+      <w>25</w>
+      <h>257</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;242</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>225</y>
+      <w>25</w>
+      <h>37</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;22</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>269</y>
+      <w>25</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;23</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>314</y>
+      <w>25</w>
+      <h>103</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;88</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>428</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>538</y>
+      <w>25</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;39</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>603</y>
+      <w>25</w>
+      <h>79</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;64</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>724</y>
+      <w>25</w>
+      <h>103</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;88</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>838</y>
+      <w>25</w>
+      <h>29</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;14</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>874</y>
+      <w>25</w>
+      <h>158</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;143</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1930</x>
+      <y>1039</y>
+      <w>25</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;41</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>225</y>
+      <w>25</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;177</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>428</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>538</y>
+      <w>25</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;39</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>603</y>
+      <w>25</w>
+      <h>79</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;64</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>693</y>
+      <w>25</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;119</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2180</x>
+      <y>838</y>
+      <w>25</w>
+      <h>257</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;242</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>225</y>
+      <w>25</w>
+      <h>192</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;177</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>428</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>538</y>
+      <w>25</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;39</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>603</y>
+      <w>25</w>
+      <h>79</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;64</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>693</y>
+      <w>25</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;119</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2520</x>
+      <y>838</y>
+      <w>25</w>
+      <h>257</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;242</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1310</y>
+      <w>25</w>
+      <h>97</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;82</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1418</y>
+      <w>25</w>
+      <h>89</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;74</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1518</y>
+      <w>25</w>
+      <h>134</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;119</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>1669</y>
+      <w>25</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;41</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1310</y>
+      <w>25</w>
+      <h>97</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;82</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1449</y>
+      <w>25</w>
+      <h>58</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;43</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1518</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1559</y>
+      <w>25</w>
+      <h>93</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;78</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>590</x>
+      <y>1669</y>
+      <w>25</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;41</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1070</x>
+      <y>1310</y>
+      <w>25</w>
+      <h>97</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;82</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1070</x>
+      <y>1418</y>
+      <w>25</w>
+      <h>89</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;74</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1070</x>
+      <y>1518</y>
+      <w>25</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;192</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1320</y>
+      <w>25</w>
+      <h>102</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;87</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1433</y>
+      <w>25</w>
+      <h>149</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;134</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1593</y>
+      <w>25</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;117</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1900</x>
+      <y>1310</y>
+      <w>25</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;97</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1900</x>
+      <y>1433</y>
+      <w>25</w>
+      <h>149</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;134</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1900</x>
+      <y>1593</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1900</x>
+      <y>1634</y>
+      <w>25</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;76</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2450</x>
+      <y>1310</y>
+      <w>25</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;97</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2450</x>
+      <y>1433</y>
+      <w>25</w>
+      <h>149</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;134</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2450</x>
+      <y>1593</y>
+      <w>25</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;117</additional_attributes>
+  </element>
+</diagram>

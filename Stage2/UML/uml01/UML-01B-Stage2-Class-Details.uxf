@@ -1,0 +1,600 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>5</y>
+      <w>1680</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Figure 3.1 — Updated UML Class Diagram of the Implemented AI Used-Car Evaluation Assistant
+halign=left
+fontsize=20</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>37</y>
+      <w>1680</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>UML-01B  |  Immutable contracts and validation detail  |  Companion to UML-01A; no repeated class boxes
+halign=left
+fontsize=18</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>30</x>
+      <y>75</y>
+      <w>350</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>DOMAIN RECORDS
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>460</x>
+      <y>75</y>
+      <w>350</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>JAVA EVIDENCE
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>890</x>
+      <y>75</y>
+      <w>320</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>RESULT ENVELOPES
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1300</x>
+      <y>75</y>
+      <w>370</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>VALIDATED INTERPRETATION
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>115</y>
+      <w>350</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / immutable&gt;&gt;
+Vehicle
+--
+- id: String
+- year: int
+- mileage: int
+- askingPrice: BigDecimal
+- accidentHistory: String
+- maintenanceHistory: String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>345</y>
+      <w>350</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / immutable&gt;&gt;
+UserPreference
+--
+- maxBudget: BigDecimal [0..1]
+- maxMileage: Integer [0..1]
+- reliabilityPriority: int
+- fuelEconomyPriority: int
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>555</y>
+      <w>350</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / immutable&gt;&gt;
+CostAssumptions
+--
+- annualKm: BigDecimal
+- fuelPrice: BigDecimal
+- taxRate: BigDecimal [0..1]
+- annualMaintenance: BigDecimal [0..1]
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>115</y>
+      <w>350</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / authoritative evidence&gt;&gt;
+RiskEvidence
+--
+- vehicle: Vehicle
+- preference: UserPreference
+- cost: CostEstimate [0..1]
+- referenceYear: int
+--
++ yearContext(): ModelYearContext
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>490</y>
+      <w>350</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / authoritative evidence&gt;&gt;
+ReportEvidence
+--
+- deterministic: RiskEvidence
+- riskStatus: String
+- clarificationHistory: List&lt;String&gt;
+--
++ sufficient(): boolean
++ strongAllowed(): boolean
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>890</x>
+      <y>115</y>
+      <w>320</w>
+      <h>155</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / status envelope&gt;&gt;
+RiskEvaluation
+--
+- status: String
+- message: String
+--
++ requireAssessment():
+    RiskAssessment
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>890</x>
+      <y>490</y>
+      <w>320</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / status envelope&gt;&gt;
+ReportEvaluation
+--
+- generationId: String
+- status: String
+- message: String
+--
++ requireReport(): EvaluationReport
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1300</x>
+      <y>115</y>
+      <w>370</w>
+      <h>165</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / AI interpretation&gt;&gt;
+RiskAssessment
+--
+- riskLevel: String
+- strengths: List&lt;String&gt;
+- risks: List&lt;String&gt;
+- uncertainties: List&lt;String&gt;
+- explanation: String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1300</x>
+      <y>490</y>
+      <w>370</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / advisory interpretation&gt;&gt;
+EvaluationReport
+--
+- category: String
+- strengths: List&lt;String&gt;
+- risks: List&lt;String&gt;
+- missingInformation: List&lt;String&gt;
+- costSummary: String
+- explanation: String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>160</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>210</y>
+      <w>110</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;200;50;200;50;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>800</x>
+      <y>175</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>175</y>
+      <w>120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=0..1</panel_attributes>
+    <additional_attributes>100;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>800</x>
+      <y>550</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>550</y>
+      <w>120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=0..1</panel_attributes>
+    <additional_attributes>100;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>625</x>
+      <y>290</y>
+      <w>30</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;10;200</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>370</x>
+      <y>600</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>800</x>
+      <y>270</y>
+      <w>710</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=0..1</panel_attributes>
+    <additional_attributes>690;10;690;110;50;110;50;340;10;340</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>30</x>
+      <y>755</y>
+      <w>350</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>PROMPTS / SCHEMA
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>460</x>
+      <y>755</y>
+      <w>450</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>PARSING / EVIDENCE VALIDATION
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1010</x>
+      <y>755</y>
+      <w>340</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>SEMANTIC VALIDATORS
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1400</x>
+      <y>755</y>
+      <w>300</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>ADDITIONAL CONTEXT
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>810</y>
+      <w>350</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>PromptBuilder
+--
++ buildRiskPrompt(
+    evidence: RiskEvidence): String
++ buildRecommendationPrompt(
+    evidence: ReportEvidence): String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>995</y>
+      <w>350</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>ReportSchema
+--
+_+ json(evidence: ReportEvidence): String_
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>460</x>
+      <y>810</y>
+      <w>450</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>ResponseParser
+--
++ parseReport(response: String): EvaluationReport
++ validateReport(report: EvaluationReport,
+    evidence: ReportEvidence): EvaluationReport
++ validateRiskAssessment(
+    assessment: RiskAssessment,
+    evidence: RiskEvidence): RiskAssessment
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1010</x>
+      <y>810</y>
+      <w>340</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>RiskGroundingValidator
+--
+_+ validate(assessment: RiskAssessment,_
+_    evidence: RiskEvidence): void_
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1010</x>
+      <y>995</y>
+      <w>340</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>ReportNarrativeValidator
+--
+_+ validate(explanation: String,_
+_    vehicle: Vehicle): void_
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1400</x>
+      <y>805</y>
+      <w>300</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>UsedCarAgent (panel A) creates
+PromptBuilder and ResponseParser;
+uses ReportSchema.json(...).
+It holds DataQualityChecker;
+creates ChecklistPlanner locally.
+Neither checker/planner is a Tool.
+
+ResponseParser also calls:
+RiskAgeValidator.validate(...)
+ComparisonNarrative.validate(...).
+
+Other schemas cover listing,
+risk, comparison, checklist
+and clarification responses.
+fontsize=16
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>420</x>
+      <y>645</y>
+      <w>400</w>
+      <h>235</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>380;10;380;75;10;75;10;215;40;215</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>665</y>
+      <w>605</w>
+      <h>200</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>585;10;585;60;55;60;55;180;10;180</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>890</y>
+      <w>130</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>110;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>900</x>
+      <y>950</y>
+      <w>130</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>110;95;70;95;70;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>1130</y>
+      <w>1680</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>Records expose generated accessors; selected private final components are shown, not setters. Static methods are underlined.
+Failure keeps evidence but may leave interpretation null. Report categories: Strong Candidate / Consider with Caution / High Risk / Insufficient Information.
+halign=left
+fontsize=16</panel_attributes>
+    <additional_attributes />
+  </element>
+</diagram>

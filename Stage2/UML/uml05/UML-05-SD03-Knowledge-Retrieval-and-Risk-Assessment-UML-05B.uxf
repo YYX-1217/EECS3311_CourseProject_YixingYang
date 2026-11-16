@@ -1,0 +1,1717 @@
+<?xml version='1.0' encoding='utf-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>25</x>
+      <y>15</y>
+      <w>2660</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>Figure 3.5 — SD03: Knowledge Retrieval and AI-Assisted Risk Assessment
+fontsize=30
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>25</x>
+      <y>62</y>
+      <w>2660</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>UML-05B — Structured synthesis, guarded acceptance and display  |  Continuation of A2/A3; same SD03  |  48fe916
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>20</x>
+      <y>105</y>
+      <w>2660</w>
+      <h>810</h>
+    </coordinates>
+    <panel_attributes>sd B1 — after A3: sufficiency gate before any Gemini request
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>35</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>335</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>promptBuilder
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>635</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>schema
+«static»
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>945</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>llmClient
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1245</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>«external»
+Gemini API
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2415</x>
+      <y>155</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>parser
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>45</x>
+      <y>235</y>
+      <w>2610</w>
+      <h>660</h>
+    </coordinates>
+    <panel_attributes>alt [!evidence.missing().sufficient() || !evidence.constraintsAvailable()]
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>65</x>
+      <y>280</y>
+      <w>2560</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent constructs RiskAssessment("Insufficient Information", [], requiredRisks, requiredUncertainties, explanation) without AI.
+Return RiskEvaluation("INSUFFICIENT_INFORMATION", result, evidence, "Deterministic sufficiency gate; not an AI-generated assessment.") → B2.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>35</x>
+      <y>340</y>
+      <w>2635</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;2620;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>65</x>
+      <y>365</y>
+      <w>2550</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>[else: sufficient data AND mandatory constraint checks available] — exceptions use B1 outcomes below
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1760</x>
+      <y>415</y>
+      <w>850</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>Prompt context: evidence.yearContext() → ModelYearContext.
+Reference year is Year.now(agent clock), not a fixed year.
+2018 model / 2026 reference → difference 8 (example).
+This is not a verified age or registration/service date.
+
+Schema: exactly riskLevel, strengths, risks, uncertainties,
+explanation. Categories: Low / Moderate / High /
+Insufficient Information. Strict Java parser rejects
+wrong fields/types, blank text and Markdown wrappers.
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>430</y>
+      <w>325</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;310;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>408</y>
+      <w>307</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>buildRiskPrompt(evidence)
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>470</y>
+      <w>325</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>310;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>448</y>
+      <w>736</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>prompt: String [includes schema.json() and evidence.yearContext()]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>510</y>
+      <w>625</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;610;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>488</y>
+      <w>84</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>json()
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>545</y>
+      <w>625</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>610;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>523</y>
+      <w>231</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>jsonSchema: String
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>590</y>
+      <w>935</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;920;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>568</y>
+      <w>462</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>generateStructured(prompt, jsonSchema)
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1020</x>
+      <y>630</y>
+      <w>325</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;310;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1042</x>
+      <y>608</y>
+      <w>529</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>POST /v1beta/models/{model}:generateContent
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1020</x>
+      <y>670</y>
+      <w>325</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>310;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1042</x>
+      <y>648</y>
+      <w>424</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>HTTP response + candidate envelope
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>710</y>
+      <w>935</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>920;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>688</y>
+      <w>532</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>response: String [transport / envelope accepted]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>750</y>
+      <w>2405</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;2390;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>728</y>
+      <w>373</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>parseRiskAssessment(response)
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>790</y>
+      <w>2405</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>2390;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>768</y>
+      <w>650</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>candidate: RiskAssessment [strict JSON / types / category]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>835</y>
+      <w>2405</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;2390;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>813</y>
+      <w>508</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>validateRiskAssessment(candidate, evidence)
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1024</x>
+      <y>600</y>
+      <w>12</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2494</x>
+      <y>845</y>
+      <w>12</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>20</x>
+      <y>940</y>
+      <w>2660</w>
+      <h>220</h>
+    </coordinates>
+    <panel_attributes>ref B1 validation continuation — exact order inside ResponseParser.validateRiskAssessment
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>35</x>
+      <y>990</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>parser
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>685</x>
+      <y>990</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>ageValidator
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1347</x>
+      <y>990</y>
+      <w>185</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>groundValidator
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>1080</y>
+      <w>675</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;660;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>1058</y>
+      <w>483</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>validate(candidate, evidence.yearContext())
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>1130</y>
+      <w>1345</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1330;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>132</x>
+      <y>1108</y>
+      <w>647</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>validate(candidate, evidence) [after age check returns void]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1700</x>
+      <y>990</y>
+      <w>940</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>Then parser checks exact required risks / uncertainties;
+rejects Low with constraint conflict and covered history denials.
+Return candidate only after all checks → agent creates
+RiskEvaluation("AI_SUCCESS", candidate, evidence, advisoryMessage).
+Age / grounding failures throw Rejected; see alternatives below.
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>20</x>
+      <y>1180</y>
+      <w>1070</w>
+      <h>560</h>
+    </coordinates>
+    <panel_attributes>alt B1 outcomes — return envelope r to B2; no automatic retry
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>1225</y>
+      <w>1030</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>[Other RuntimeException: provider / timeout / HTTP / envelope failure]
+r = RiskEvaluation("AI_UNAVAILABLE", null, evidence, message).
+"AI request failed or is not configured." + explicit retry guidance.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>10</x>
+      <y>1310</y>
+      <w>1095</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1080;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>1335</y>
+      <w>1030</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>[Other IllegalArgumentException: structure / evidence rejection]
+r = RiskEvaluation("AI_UNAVAILABLE", null, evidence, message).
+"Risk response rejected by structural/evidence validation."
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>10</x>
+      <y>1420</y>
+      <w>1095</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1080;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>1445</y>
+      <w>1030</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>[RiskAgeValidator.Rejected / RiskGroundingValidator.Rejected]
+r = RiskEvaluation("AI_UNAVAILABLE", null, evidence, safeReason).
+[RISK_AGE_EVIDENCE] / [RISK_GROUNDING] + field and reason.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>10</x>
+      <y>1530</y>
+      <w>1095</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1080;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>40</x>
+      <y>1555</y>
+      <w>1030</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>[else: synthesis accepted or stopped at sufficiency gate]
+r.status="AI_SUCCESS"; validated assessment.
+[Gate at B1] r.status="INSUFFICIENT_INFORMATION"; non-AI result.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>40</x>
+      <y>1655</y>
+      <w>1010</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>All outcomes preserve RiskEvidence. Model interpretation
+is advisory; no validator proves every natural-language claim.
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1120</x>
+      <y>1180</y>
+      <w>1560</w>
+      <h>560</h>
+    </coordinates>
+    <panel_attributes>sd B2 — backend freshness, then independent GUI identity check
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1130</x>
+      <y>1230</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>agent
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1385</x>
+      <y>1230</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>facade
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1665</x>
+      <y>1230</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>session
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1955</x>
+      <y>1230</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>worker
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>2355</x>
+      <y>1230</y>
+      <w>170</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>riskPanel
+fontsize=24
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1205</x>
+      <y>1320</y>
+      <w>280</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;265;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1227</x>
+      <y>1298</y>
+      <w>203</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>r: RiskEvaluation
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1420</x>
+      <y>1345</y>
+      <w>1220</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>alt synchronized(session) [same version, vehicle.equals(v), preferences.equals(p)]
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1410</y>
+      <w>305</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;&gt;&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;290;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1482</x>
+      <y>1388</y>
+      <w>558</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>setRisk(r) [any current status; invalidate old report]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1410</x>
+      <y>1430</y>
+      <w>1245</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;1230;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1440</x>
+      <y>1455</y>
+      <w>1180</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>[else] return RiskEvaluation("STALE", null, r.evidence(), message).
+Do not call setRisk; rejected result cannot become the current risk.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1550</y>
+      <w>595</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>lt=.&gt;
+lw=1</panel_attributes>
+    <additional_attributes>10;10;580;10</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1482</x>
+      <y>1528</y>
+      <w>654</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>RiskEvaluation [via command return; GUI done() calls get()]
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates>
+      <x>1950</x>
+      <y>1580</y>
+      <w>690</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>ref GUI gate
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1970</x>
+      <y>1620</y>
+      <w>650</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>current(r): facade.lastRiskEvaluation()
+contains the identical object (saved == r).
+True → format/display; false → OUTDATED.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>1150</x>
+      <y>1595</y>
+      <w>775</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>Later: refreshValidity() runs on panel show and
+every 250 ms while visible. If identity is lost,
+clear displayed result and show OUTDATED.
+CLI evaluate formats the returned envelope directly.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>30</x>
+      <y>1760</y>
+      <w>2630</w>
+      <h>145</h>
+    </coordinates>
+    <panel_attributes>llmClient is the existing GeminiAdapter through LLMClient, not a second client. It builds responseMimeType=application/json + responseJsonSchema; 30-second request timeout.
+promptBuilder = PromptBuilder; schema = RiskAssessmentSchema; parser = ResponseParser; ageValidator = RiskAgeValidator; groundValidator = RiskGroundingValidator.
+RiskEvidence = Java facts and limitations. RiskAssessment = riskLevel / strengths / risks / uncertainties / explanation. RiskEvaluation = status / assessment / evidence / message.
+Reference year comes from the agent Clock. ModelYearContext: 2026 − 2018 = 8 model years (example), not exact in-service age. Covered age / grounding claims are rejected.
+Saved vehicle/profile, strategy, cost/preparation and applicable clarification changes invalidate risk or advance contextVersion. Unsaved form edits do neither.
+fontsize=24
+halign=left
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>205</y>
+      <w>25</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;27</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>264</y>
+      <w>25</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;13</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>393</y>
+      <w>25</w>
+      <h>517</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;502</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>205</y>
+      <w>25</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;27</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>264</y>
+      <w>25</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;13</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>393</y>
+      <w>25</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>429</y>
+      <w>25</w>
+      <h>31</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;16</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>469</y>
+      <w>25</w>
+      <h>111</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;96</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>589</y>
+      <w>25</w>
+      <h>111</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;96</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>709</y>
+      <w>25</w>
+      <h>31</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;16</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>749</y>
+      <w>25</w>
+      <h>31</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;16</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>789</y>
+      <w>25</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;21</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>834</y>
+      <w>25</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;61</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>205</y>
+      <w>25</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;27</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>264</y>
+      <w>25</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;13</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>393</y>
+      <w>25</w>
+      <h>67</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;52</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>469</y>
+      <w>25</w>
+      <h>311</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;296</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>789</y>
+      <w>25</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;106</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1020</x>
+      <y>205</y>
+      <w>25</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;72</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1020</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1020</x>
+      <y>393</y>
+      <w>25</w>
+      <h>517</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;502</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1320</x>
+      <y>205</y>
+      <w>25</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;72</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1320</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1320</x>
+      <y>393</y>
+      <w>25</w>
+      <h>227</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;212</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1320</x>
+      <y>629</y>
+      <w>25</w>
+      <h>31</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;16</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1320</x>
+      <y>669</y>
+      <w>25</w>
+      <h>241</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;226</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2490</x>
+      <y>205</y>
+      <w>25</w>
+      <h>87</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;72</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2490</x>
+      <y>333</y>
+      <w>25</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;29</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2490</x>
+      <y>393</y>
+      <w>25</w>
+      <h>34</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;19</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2490</x>
+      <y>698</y>
+      <w>25</w>
+      <h>212</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;197</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>110</x>
+      <y>1040</y>
+      <w>25</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>760</x>
+      <y>1040</y>
+      <w>25</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;65</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>760</x>
+      <y>1129</y>
+      <w>25</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;11</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1430</x>
+      <y>1040</y>
+      <w>25</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1205</x>
+      <y>1280</y>
+      <w>25</w>
+      <h>327</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;312</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1205</x>
+      <y>1703</y>
+      <w>25</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;17</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1280</y>
+      <w>25</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;62</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1374</y>
+      <w>25</w>
+      <h>93</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;78</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1503</y>
+      <w>25</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;89</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1460</x>
+      <y>1703</y>
+      <w>25</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;17</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1280</y>
+      <w>25</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;62</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1374</y>
+      <w>25</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;11</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1409</y>
+      <w>25</w>
+      <h>58</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;43</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1503</y>
+      <w>25</w>
+      <h>37</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;22</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1549</y>
+      <w>25</w>
+      <h>58</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;43</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1740</x>
+      <y>1703</y>
+      <w>25</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;17</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1280</y>
+      <w>25</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;62</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1374</y>
+      <w>25</w>
+      <h>26</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;11</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1409</y>
+      <w>25</w>
+      <h>58</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;43</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1503</y>
+      <w>25</w>
+      <h>37</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;22</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1549</y>
+      <w>25</w>
+      <h>43</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;28</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2030</x>
+      <y>1708</y>
+      <w>25</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;12</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2430</x>
+      <y>1280</y>
+      <w>25</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;62</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2430</x>
+      <y>1374</y>
+      <w>25</w>
+      <h>93</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;78</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2430</x>
+      <y>1503</y>
+      <w>25</w>
+      <h>129</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;114</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>2430</x>
+      <y>1708</y>
+      <w>25</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=.
+lw=1</panel_attributes>
+    <additional_attributes>10;10;10;12</additional_attributes>
+  </element>
+</diagram>

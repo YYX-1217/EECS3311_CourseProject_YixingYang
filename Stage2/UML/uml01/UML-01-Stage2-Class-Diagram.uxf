@@ -1,0 +1,818 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>5</y>
+      <w>1660</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Figure 3.1 — Updated UML Class Diagram of the Implemented AI Used-Car Evaluation Assistant
+halign=left
+fontsize=20</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>37</y>
+      <w>1660</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>UML-01A  |  Java 21 / 48fe916  |  Boot: Main.main(...) uses ApplicationFactory.create() as the composition root
+halign=left
+fontsize=18</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>30</x>
+      <y>70</y>
+      <w>320</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>PRESENTATION / COMMANDS
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>430</x>
+      <y>70</y>
+      <w>360</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>APPLICATION / AGENT / ADAPTER
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>880</x>
+      <y>70</y>
+      <w>320</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>TOOLS / REPOSITORY
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1310</x>
+      <y>70</y>
+      <w>340</w>
+      <h>25</h>
+    </coordinates>
+    <panel_attributes>STRATEGY / SIMPLE FACTORY
+halign=left
+fontsize=17</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>110</y>
+      <w>320</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary / invoker&gt;&gt;
+UsedCarGUI
+--
++ submit&lt;R&gt;(
+    command: Command&lt;R&gt;): R
++ show(): JFrame
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>250</y>
+      <w>320</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;boundary / invoker&gt;&gt;
+UsedCarCLI
+--
++ submit&lt;R&gt;(
+    command: Command&lt;R&gt;): R
++ run(): void
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>420</y>
+      <w>320</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Command&lt;R&gt;
+--
++ execute(): R
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>570</y>
+      <w>320</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / concrete command&gt;&gt;
+PrepareEvaluationCommand
+--
+- facade: UsedCarApplicationFacade
++ execute(): PreparationResult
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>30</x>
+      <y>750</y>
+      <w>320</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;record / concrete command&gt;&gt;
+GenerateReportCommand
+--
+- facade: UsedCarApplicationFacade
++ execute(): ReportEvaluation
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>30</x>
+      <y>930</y>
+      <w>320</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>Presentation detail
+WorkspaceUI supplies F01–F12 layout.
+Feature panels also invoke commands.
+Profile/clarification actions call
+the facade directly.
+Other concrete commands:
+AnalyzeListing, EvaluateVehicle,
+CompareVehicles, GenerateChecklist
+(all names end in Command).
+fontsize=16
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>110</y>
+      <w>360</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;facade / command receiver&gt;&gt;
+UsedCarApplicationFacade
+--
++ saveVehicle(vehicle: Vehicle): Vehicle
++ generateCurrentReport():
+    ReportEvaluation
++ currentVehicle(): Optional&lt;Vehicle&gt;
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>350</y>
+      <w>360</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>EvaluationSession
+--
+- currentVehicle: Vehicle [0..1]
+- comparisonVehicle: Vehicle [0..1]
+- preference: UserPreference [1]
+- report: ReportEvaluation [0..1]
+--
++ getReport(): Optional&lt;ReportEvaluation&gt;
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>590</y>
+      <w>360</w>
+      <h>170</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;strategy context / adapter client&gt;&gt;
+UsedCarAgent
+--
+- automaticStrategy: boolean
+- dataQualityChecker: DataQualityChecker
+--
++ buildPriorityGuidance(
+    preference: UserPreference): String
++ llmStatus(): String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>820</y>
+      <w>360</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface / adapter target&gt;&gt;
+LLMClient
+--
++ generate(prompt: String): String
++ generateStructured(prompt: String,
+    jsonSchema: String): String
++ status(): String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>1010</y>
+      <w>360</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;adapter&gt;&gt;
+GeminiAdapter
+--
+- model: String
++ status(): String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>110</y>
+      <w>320</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>ToolManager
+--
+- tools: Map&lt;String, Tool&gt;
+--
++ registerTool(name: String,
+    tool: Tool): void
++ execute(name: String,
+    input: Object): Object
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>320</y>
+      <w>320</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Tool
+--
++ execute(input: Object): Object
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>470</y>
+      <w>320</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>CostCalculatorTool
+--
++ execute(input: Object): CostEstimate
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>620</y>
+      <w>320</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>ConstraintCheckerTool
+--
++ execute(input: Object):
+    List&lt;ConstraintViolation&gt;
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>780</y>
+      <w>320</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>VehicleKnowledgeTool
+--
++ execute(input: Object):
+    VehicleKnowledge
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>940</y>
+      <w>320</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>VehicleKnowledgeRepository
+--
++ load(): void
++ findByVehicle(make: String,
+    model: String, year: int):
+    VehicleKnowledge
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1310</x>
+      <y>110</y>
+      <w>340</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;argument-based Simple Factory&gt;&gt;
+EvaluationStrategyFactory
+--
++ createStrategy(
+    preference: UserPreference):
+    EvaluationStrategy
++ createManualStrategy(mode: String):
+    EvaluationStrategy
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1310</x>
+      <y>340</y>
+      <w>340</w>
+      <h>115</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface / strategy product&gt;&gt;
+EvaluationStrategy
+--
++ buildPriorityGuidance(
+    preference: UserPreference): String
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1310</x>
+      <y>530</y>
+      <w>340</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;concrete strategy / product&gt;&gt;
+BalancedStrategy
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1310</x>
+      <y>610</y>
+      <w>340</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>Factory constructs all three products.
+fontsize=16
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1310</x>
+      <y>670</y>
+      <w>340</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;concrete strategy / product&gt;&gt;
+BudgetFocusedStrategy
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1310</x>
+      <y>810</y>
+      <w>340</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;concrete strategy / product&gt;&gt;
+ReliabilityFocusedStrategy
+fontsize=18
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1310</x>
+      <y>970</y>
+      <w>340</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;external HTTP service&gt;&gt;
+Google Gemini generateContent
+External protocol, not a Java class.
+GeminiAdapter translates requests
+and validates transport/envelopes.
+fontsize=17
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>0</x>
+      <y>150</y>
+      <w>50</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>30;300;10;300;10;10;30;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>180</x>
+      <y>355</y>
+      <w>30</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;65;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>140</y>
+      <w>110</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>90;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>195</y>
+      <w>110</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>90;10;40;10;40;100;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>180</x>
+      <y>490</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;10;80</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>455</y>
+      <w>50</w>
+      <h>360</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;30;10;30;340;10;340</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>225</y>
+      <w>110</w>
+      <h>420</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>90;10;60;10;60;400;10;400</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>340</x>
+      <y>250</y>
+      <w>110</w>
+      <h>605</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15</panel_attributes>
+    <additional_attributes>90;10;75;10;75;585;10;585</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>270</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>10;80;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>190</y>
+      <w>50</w>
+      <h>460</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>10;440;30;440;30;10;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>170</y>
+      <w>120</w>
+      <h>510</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>100;10;70;10;70;490;10;490</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>160</y>
+      <w>550</w>
+      <h>470</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>530;10;470;10;470;125;50;125;50;450;10;450</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>290</y>
+      <w>550</w>
+      <h>425</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=0..1</panel_attributes>
+    <additional_attributes>530;85;490;85;490;10;60;10;60;405;10;405</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>750</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>10;70;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>945</y>
+      <w>30</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;10;65</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>780</x>
+      <y>1025</y>
+      <w>550</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>530;10;510;10;510;85;40;85;40;25;10;25</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>240</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=0..*</panel_attributes>
+    <additional_attributes>10;80;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>390</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;10;80</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1190</x>
+      <y>345</y>
+      <w>50</w>
+      <h>340</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;30;10;30;320;10;320</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1190</x>
+      <y>370</y>
+      <w>70</w>
+      <h>475</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;50;10;50;455;10;455</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1030</x>
+      <y>860</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+fontsize=15
+m1=1</panel_attributes>
+    <additional_attributes>10;80;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>260</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+fontsize=15
+returns</panel_attributes>
+    <additional_attributes>10;80;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1470</x>
+      <y>445</y>
+      <w>30</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;10;85</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1640</x>
+      <y>395</y>
+      <w>50</w>
+      <h>325</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;30;10;30;305;10;305</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1640</x>
+      <y>420</y>
+      <w>70</w>
+      <h>440</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.
+fontsize=15</panel_attributes>
+    <additional_attributes>10;10;50;10;50;420;10;420</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>1130</y>
+      <w>1680</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Selected members only. Solid arrow: navigable association. Dashed open arrow: dependency. Dashed hollow triangle: realization.
+No lifecycle composition is asserted. Immutable domain/evidence contracts and validation dependencies are expanded in UML-01B.
+halign=left
+fontsize=16</panel_attributes>
+    <additional_attributes />
+  </element>
+</diagram>

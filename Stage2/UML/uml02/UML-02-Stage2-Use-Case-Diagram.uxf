@@ -1,0 +1,530 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>10</y>
+      <w>1800</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>Figure 3.2 — Updated Stage 2 Use-Case Diagram
+fontsize=26
+halign=left</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>20</x>
+      <y>52</y>
+      <w>1800</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>UML-02  |  Source: 48fe916  |  Solid lines denote participation, not control flow or mandatory model calls.
+fontsize=20
+halign=left</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>250</x>
+      <y>95</y>
+      <w>1280</w>
+      <h>1020</h>
+    </coordinates>
+    <panel_attributes>AI Used-Car Evaluation Assistant — Stage 2
+fontsize=25
+halign=center
+valign=top</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>360</x>
+      <y>135</y>
+      <w>440</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>Structured / deterministic features
+fontsize=21
+halign=left</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1010</x>
+      <y>135</y>
+      <w>440</w>
+      <h>28</h>
+    </coordinates>
+    <panel_attributes>AI-assisted / hybrid features
+fontsize=21
+halign=left</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>30</x>
+      <y>485</y>
+      <w>150</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>User
+fontsize=24</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>1570</x>
+      <y>485</y>
+      <w>260</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>External LLM Service
+(Google Gemini)
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>190</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC01 / F01
+Enter or Edit
+Vehicle Information
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>235</y>
+      <w>264</w>
+      <h>335</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;271;64;315;244;10</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>340</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC03 / F03
+Manage Buyer
+Preference Profile
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>385</y>
+      <w>264</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;121;64;165;244;10</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>490</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC04 / F04
+Check Missing Information
+and Data Quality
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>264</w>
+      <h>74</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;244;49</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>640</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC05 / F05
+Retrieve Local
+Vehicle Knowledge
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>264</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;244;199</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>790</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC06 / F06
+Estimate Ownership Cost
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>264</w>
+      <h>369</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;244;349</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>360</x>
+      <y>940</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC07 / F07
+Check Buyer
+Constraint Conflicts
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>264</w>
+      <h>519</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;244;499</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>190</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC02 / F02
+Analyze Used-Car
+Listing Text
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>160</y>
+      <w>914</w>
+      <h>410</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;346;64;390;204;10;784;10;784;85;894;85</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>235</y>
+      <w>259</w>
+      <h>335</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;271;130;315;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>340</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC08 / F08
+Evaluate Vehicle Risk
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>310</y>
+      <w>914</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;196;64;240;204;10;784;10;784;85;894;85</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>385</y>
+      <w>259</w>
+      <h>185</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;121;130;165;10;10</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>490</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC09 / F09
+Compare Two Vehicles
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>460</y>
+      <w>914</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;46;64;90;204;10;784;10;784;85;894;85</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>496</y>
+      <w>259</w>
+      <h>74</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;10;130;54;10;49</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>640</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC10 / F10
+Generate Vehicle-Specific
+Inspection Checklist
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>914</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;204;124;784;124;784;199;894;199</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>496</y>
+      <w>259</w>
+      <h>219</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;10;130;54;10;199</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>790</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC11 / F11
+Provide Clarification
+and Resume Evaluation
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>914</w>
+      <h>369</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;204;274;784;274;784;349;894;349</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>496</y>
+      <w>259</w>
+      <h>369</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;10;130;54;10;349</additional_attributes>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates>
+      <x>1010</x>
+      <y>940</y>
+      <w>440</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>UC12 / F12
+Generate Personalized
+Recommendation Report
+fontsize=22</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>116</x>
+      <y>496</y>
+      <w>914</w>
+      <h>519</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>10;10;64;54;204;424;784;424;784;499;894;499</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1440</x>
+      <y>496</y>
+      <w>259</w>
+      <h>519</h>
+    </coordinates>
+    <panel_attributes>lt=-
+lw=1</panel_attributes>
+    <additional_attributes>239;10;130;54;10;499</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>40</x>
+      <y>1140</y>
+      <w>560</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>One user, two access mechanisms
+Swing GUI and CLI use the same system.
+Local CSV, tools and validation are internal.
+F04 checks are deterministic; listing
+interpretation and clarification are separate.
+F07 does not match vehicle body type.
+fontsize=20
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>640</x>
+      <y>1140</y>
+      <w>560</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Explicit user control
+F02: review/correct, then confirm saving.
+F11: answer/resolve/skip/unknown;
+continue risk or checklist only on request.
+F09: saved A and independent saved B.
+No automatic use-case chaining is implied.
+fontsize=20
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>1240</x>
+      <y>1140</y>
+      <w>560</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Evidence and fallback
+Model participation is conditional.
+F10 can return a deterministic fallback.
+F12 reuses only current risk when available;
+it does not automatically request F08.
+Buyer TXT export is part of F12.
+fontsize=20
+bg=white</panel_attributes>
+    <additional_attributes />
+  </element>
+</diagram>
