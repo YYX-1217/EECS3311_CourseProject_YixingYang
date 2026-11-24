@@ -1,12 +1,14 @@
 # AI Used-Car Evaluation Assistant — EECS3311 Stage 2
 
+**Documentation updated: 2026-11-24.** Application source baseline: [`48fe916`](https://github.com/YYX-1217/EECS3311_CourseProject_YixingYang/commit/48fe916742d72acd531abc42f26cdc793652327e). This update changes documentation only.
+
 ## Project overview
 
 This EECS3311 Fall 2026 Stage 2 application implements workflows corresponding to all twelve original Stage 1 features, **F01–F12**, using Java 21, a Java Swing GUI with twelve independently accessible functional workspaces, an interactive CLI and Google Gemini integration. It combines deterministic validation and ownership-cost calculations, buyer preferences and Strategy selection, local CSV knowledge retrieval, evidence-grounded risk analysis, two-vehicle comparison, vehicle-specific inspection checklists, clarification questions with session memory, and personalized recommendations with UTF-8 text export. Both interfaces share the application facade, agent, tools and validation. Feature coverage does not imply exhaustive testing, verified vehicle facts or completion of every course submission deliverable.
 
-The `Stage2` directory belongs to the existing course-project repository; no personal Windows directory or particular checkout location is required. The original Stage 1 report and UML remain the design references. The root Stage 1 PDF is currently absent because of a pre-existing tracked deletion; the corresponding DOCX and original UML are present. This README update does not restore or modify those artifacts. The local course-instruction PDF is an optional reference, not a build/runtime dependency.
+The `Stage2` directory belongs to the existing course-project repository; no personal Windows directory or particular checkout location is required. The original Stage 1 report and UML remain the design references. The original Stage 1 PDF is tracked in the published repository; a deletion in a particular local working copy does not describe the public checkout. The local course-instruction PDF is an optional reference, not a build/runtime dependency.
 
-**Latest recorded automated verification, 2026-11-15:** **398 JUnit tests passed, 0 failed** (380 before the preceding targeted code repair), with Java 21 compilation/JAR packaging, seven existing Swing smoke entry points, twelve-workspace navigation, 17 Windows credential/launcher checks, 36 actual CLI scenarios and 13 cross-feature assertions passing. CLI scenarios comprise 28 unconfigured production-JAR cases and eight actual CLI cases with an injected provider fixture. These results describe the local uncommitted working tree. Earlier feature-level counts are historical milestones. This documentation-only review inspected those local logs and the current 398 annotated JUnit methods; it did not rerun the suite or issue new API requests.
+**Latest recorded automated verification, 2026-11-15:** **398 JUnit tests passed, 0 failed** (380 before the preceding targeted code repair), with Java 21 compilation/JAR packaging, seven existing Swing smoke entry points, twelve-workspace navigation, 17 Windows credential/launcher checks, 36 actual CLI scenarios and 13 cross-feature assertions passing. CLI scenarios comprise 28 unconfigured production-JAR cases and eight actual CLI cases with an injected provider fixture. These historical results describe the implementation subsequently committed in `48fe916`; they are not a new test run on the documentation revision date. Earlier feature-level counts are historical milestones. No new Gemini requests were made for this README update.
 
 **Real GUI use reported by the project author:** the current Swing application has been manually exercised successfully for F02 listing extraction and explicit confirmation, F08 risk assessment, F09 comparison, F10 checklist generation, F11 clarification and F12 recommendation with readable UTF-8 export. These are **user-provided manual observations**, not fresh GUI tests independently executed during this README review.
 
@@ -14,7 +16,28 @@ The `Stage2` directory belongs to the existing course-project repository; no per
 
 Start with [Windows Quick Start](#windows-quick-start), [current feature coverage and limitations](#implementation-status-and-known-limitations), [verification](#junit-and-local-verification) or [Gemini security/configuration](#api-key-security-and-optional-live-test). Detailed feature workflows and reproducible examples follow.
 
+## Published report, diagrams and demonstrations
+
+| Material | Repository location |
+|---|---|
+| Published implementation report (PDF) | [Stage2_Implementation_Report_FINAL.pdf.pdf](Stage2_Implementation_Report_FINAL.pdf.pdf) |
+| Published editable report (Word) | [Stage2_Implementation_Report_FINAL.docx](Stage2_Implementation_Report_FINAL.docx) |
+| Final implementation UML (UMLet sources and SVG exports) | [UML-01 class diagrams](UML/uml01/), [UML-02 use cases](UML/uml02/), [SD01](UML/uml03/), [SD02](UML/uml04/), [SD03](UML/uml05/), [SD04](UML/uml06/), [SD05](UML/uml07/), [SD06](UML/uml08/) |
+| F01–F12 demonstration video links | [Video_link.txt](Video_link.txt), numbered 1–12 to match the features |
+| Application source and tests | [Production Java](src/main/java/ca/yorku/eecs3311/usedcar/), [Java tests](src/test/java/ca/yorku/eecs3311/usedcar/) |
+
+These links identify files actually tracked in the published repository. The report files were added in `962128a`; the video index was updated in `d15528e`, including the replacement F11 video link. A later local report revision does not become the published report until separately uploaded. This README-only update does not upload or replace reports. External video playback and sharing permissions were not reverified during this update.
+
 ## Windows Quick Start
+
+For a new checkout, Git can retrieve the public repository from any parent directory:
+
+```powershell
+git clone https://github.com/YYX-1217/EECS3311_CourseProject_YixingYang.git
+Set-Location .\EECS3311_CourseProject_YixingYang\Stage2
+```
+
+If you used these commands, continue at step 2. Otherwise:
 
 1. Open the existing repository in VS Code or a Windows PowerShell terminal. If the terminal is at the repository root, enter Stage2 once:
 
@@ -87,10 +110,13 @@ The scripts check the current process's `STAGE2_JAVA_HOME`, then `JAVA_HOME`, `j
 ```text
 Stage2/
   pom.xml, README.md, .gitignore, .env.example
-  Project-Stage2-Instruction.pdf          Optional local course reference; not needed to run
+  Stage2_Implementation_Report_FINAL.docx
+  Stage2_Implementation_Report_FINAL.pdf.pdf
+  Video_link.txt                        F01–F12 demonstration links
+  UML/uml01/ ... UML/uml08/              UMLet sources and SVG diagrams
   src/main/java/ca/yorku/eecs3311/usedcar/
     app/ agent/ command/ domain/ llm/ result/ strategy/ tool/ ui/
-  src/main/resources/example.properties
+  src/main/resources/                   example.properties, fictional vehicle-knowledge.csv, Gson license
   src/test/java/ca/yorku/eecs3311/usedcar/
   scripts/common.ps1, build.ps1, run.ps1, verify.ps1
   scripts/setup-gemini.ps1, remove-gemini.ps1, gemini-credentials.ps1
@@ -181,6 +207,33 @@ java -jar .\build\used-car-assistant.jar --demo
 
 This direct command uses the `java` executable on `PATH`. Use the launch script if `PATH` selects an older Java version.
 
+### Standalone CLI: standard input and file redirection
+
+After building, the CLI runs without the Swing GUI or an IDE. From Stage2, start it with `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 -Mode cli`, then type `demo`, `show`, and `quit` on separate lines. `demo` performs a deterministic evaluation with fictional vehicle data; `show` displays its saved vehicle and preferences.
+
+For repeatable standard-input execution in PowerShell, use the existing Java 21 discovery helper:
+
+```powershell
+. .\scripts\common.ps1
+$stage2Java = Join-Path (Find-Stage2Jdk) 'bin\java.exe'
+@('demo', 'show', 'quit') | & $stage2Java -jar .\build\used-car-assistant.jar --cli
+```
+
+To run the same task from a file, create a small ASCII command file in the ignored build directory and feed it into the same CLI:
+
+```powershell
+@('demo', 'show', 'quit') | Set-Content -LiteralPath .\build\cli-input.txt -Encoding ascii
+Get-Content -LiteralPath .\build\cli-input.txt | & $stage2Java -jar .\build\used-car-assistant.jar --cli
+```
+
+For literal `<` file redirection, invoke `cmd.exe` from PowerShell; PowerShell itself does not implement that input-redirection operator:
+
+```powershell
+cmd.exe /d /s /c "`"$stage2Java`" -jar .\build\used-car-assistant.jar --cli < .\build\cli-input.txt"
+```
+
+Run the helper/`$stage2Java` initialization in the same terminal before the file examples. The input file contains the same commands and prompt answers a person would type, one per line; there is no `--input` file option. For `analyze-listing`, seller text must still end with `:end` and saving still requires explicit confirmation. These direct Java examples do not load a DPAPI credential. The deterministic `demo`/`show`/`quit` examples make no Gemini request, even if a process key is already configured. Use the supported PowerShell launcher for interactive AI workflows with saved credentials.
+
 ## GUI launch and use
 
 ```powershell
@@ -258,7 +311,7 @@ The GUI smoke check verifies window launch, calculation, error display, recalcul
 
 ### Verification evidence and provenance
 
-The following is the latest available local evidence inspected for this README; it describes the working tree, including uncommitted changes. Test logs and temporary audit helpers are local evidence, not promised files in a fresh checkout.
+The following records the 2026-11-15 verification evidence for the source baseline subsequently committed in `48fe916`. It is historical evidence, not a new execution of the entire suite on 2026-11-24. Test logs and temporary audit helpers are local evidence, not promised files in a fresh checkout.
 
 | Evidence type | Observed result | Meaning and reproduction scope |
 |---|---|---|
@@ -274,6 +327,8 @@ The following is the latest available local evidence inspected for this README; 
 The preceding repair used six serial real requests in total: original F10 HTTP 400; schema-only F10 HTTP 200 whose reasons still contained a km/miles error; final corrected F10 HTTP 200 with validated output; and F12, F11 and F09 HTTP 200 with validated output. Only the final F10 sample is used as completed repair evidence. F12's local exported text matched its formatter output. The user separately reports completing F11 accident, maintenance and consumption answers in the current GUI; the independent live log establishes question generation, while automated checks establish answer updates/history.
 
 AUD-01 model-year consistency, AUD-02 statistical/evidence grounding and AUD-03 stale-GUI checks remain passing. Remaining unverified scope includes arbitrary seller prose/model paraphrases, continuous API availability, Maven execution in this environment, a fresh-machine installation, non-Windows launch support, full Stage 3/KUMA validation and final submission acceptance. One live success is not a reliability guarantee.
+
+**Documentation smoke verification, 2026-11-24:** an isolated export of the published source built and packaged successfully with Java 21. The three standalone CLI examples above (standard-input pipeline, file pipeline and literal file redirection) each exited successfully, saved the fictional example vehicle and produced the expected CAD 24,922.00 first-year estimate. This focused check did not rerun the 398-test JUnit suite or make a Gemini request.
 
 ### Windows credential and launcher verification
 
@@ -973,14 +1028,12 @@ The application provides advisory F12 recommendations and explicit text export, 
 | Old or unavailable cached results | Save intended changes, then explicitly check/evaluate/generate in the relevant workspace. Navigation and cached viewing do not make a fresh request. |
 | Report export is refused | Use a current report and a new `.txt` filename in an existing writable directory. Existing files are deliberately not overwritten. |
 
-## Submission readiness and design traceability
+## Submission materials and design traceability
 
-This README describes the current local implementation; it does not certify that the same files have been pushed or that all course deliverables are complete. The local Stage 2 instructions require source/build/sample configuration, a README, a separate **`stage2-report` implementation report** (PDF/Word; the checklist specifies PDF), implemented-pattern UML, and feature demonstration videos or accessible timestamped links in the report. F12's buyer-facing UTF-8 `.txt` export is **not** the professor's `stage2-report.pdf`.
+The published repository includes application source, tests, build scripts, fictional CSV sample knowledge, safe example configuration, this README, the linked implementation report, final UML and the F01–F12 video index. See [Published report, diagrams and demonstrations](#published-report-diagrams-and-demonstrations). F12's buyer-facing UTF-8 `.txt` export is separate from the course implementation report.
 
-The report must account for every original F01–F12 feature, explain class/method collaboration and the five implemented patterns, and document design refinements: the argument-based Simple Factory, immutable record replacement, combined preparation commands, pasted listing input, A/B comparison slots, explicit user-driven continuation, session-only memory and limited body-type handling. Include updated class UML and affected use-case/sequence diagrams when needed; original Stage 1 diagrams alone do not establish that they match the current code.
+The feature sections above identify implemented behavior, relevant UC/SD references, commands and limitations. The course report should trace original requirements to classes/methods, the Strategy, Adapter, Simple Factory, Command and Facade implementations, and demonstrations. Relevant design refinements include the argument-based Simple Factory, immutable record replacement, combined preparation commands, pasted listing input, A/B comparison slots, explicit user-driven continuation, session-only memory and limited body-type handling. Original Stage 1 references remain historical design evidence; the Stage 2 UML and report explain the implementation.
 
-At this review, no final `stage2-report` or feature video files were located in the inspected repository. External video availability, final submission diagrams and a complete submission index have not been verified. Complete/review the implementation report, demonstration of all twelve features across GUI and CLI, AI collaboration/model/token/cost records and weekly commit links. Passing automated checks and user-reported GUI success do not replace those deliverables or Stage 3/KUMA validation.
+Repository presence alone does not certify report completeness, external video access, screenshot coverage, AI usage/token/cost accounting, weekly commit compliance or grading acceptance. This documentation update does not replace the published report with later local revisions. Historical test results do not establish continuous Gemini availability, and this update performs no live AI verification.
 
-The course document specifies at least five meaningful implementation/test commits in each Toronto-local period: October 20–26, October 27–November 2 and November 3–9, 2026, with pushes during those periods. This documentation review does not audit GitHub upload timing or certify compliance; report-only changes do not count as meaningful code commits. The document lists November 10, 2026 as the submission deadline; confirm the actual submission arrangement separately. No staging, commit, push or remote verification is performed by this README update.
-
-The pre-existing deletion of the original root Stage 1 PDF remains unresolved; confirm whether it was intentional before restoring the exact tracked original. Do not alter Stage 1 content to make it appear consistent with later implementation. Preserve its design references alongside the available DOCX/UML and explain actual changes in the Stage 2 report.
+The course requires at least five meaningful implementation/test commits in each period: October 20–26, October 27–November 2 and November 3–9, 2026, with pushes during those periods. Documentation/report-only changes do not qualify. Git commit dates alone do not establish historical push timing. The original handout's November 10 deadline was later revised in course communications; consult the latest instructor/eClass instructions for the applicable submission and supplementary-material deadlines. This README does not certify timely submission.
